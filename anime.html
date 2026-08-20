@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night" data-dark="false">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动漫 | LengMeng</title>
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/animate.css">
+    <link rel="stylesheet" href="./css/theme.css">
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <div class="loading-box" id="loadingBox">
+        <div class="loading-core">
+            <div class="loading-ring"></div>
+            <div class="loading-ring ring2"></div>
+            <div class="loading-text">LOADING</div>
+            <div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div>
+        </div>
+    </div>
+
+    <div class="bg-layer" id="bgLayer">
+        <div class="bg-wallpaper"></div>
+        <canvas id="particleCanvas"></canvas>
+        <div class="grid-overlay" id="gridOverlay"></div>
+        <div class="glow-orb orb1"></div>
+        <div class="glow-orb orb2"></div>
+    </div>
+
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="sidebar-mask" id="sidebarMask"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">◆</span>
+            <span class="logo-text">LengMeng</span>
+            <button class="icon-btn dark-btn logo-dark-btn" id="darkBtn" title="切换暗黑模式">
+                <span class="icon-sun">☀</span>
+                <span class="icon-moon">☾</span>
+            </button>
+        </div>
+        <div class="sidebar-tool">
+            <span class="weather-info" id="weatherInfo">
+                <span class="weather-icon">◌</span>
+                <span class="weather-text">加载中...</span>
+            </span>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="index.html"><span class="nav-icon">⌂</span>首页</a></li>
+                <li><a href="about.html"><span class="nav-icon">◉</span>关于我</a></li>
+                <li><a href="works.html"><span class="nav-icon">◆</span>项目作品</a></li>
+                <li><a href="blog.html"><span class="nav-icon">▤</span>博客</a></li>
+                <li><a href="album.html"><span class="nav-icon">▣</span>相册</a></li>
+                <li class="has-submenu open">
+                    <a href="javascript:void(0)" class="submenu-toggle">
+                        <span class="nav-icon">◈</span>生活
+                        <span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="cook.html">菜谱</a></li>
+                        <li><a href="stock.html">股票走势</a></li>
+                        <li class="active"><a href="anime.html">动漫</a></li>
+                    </ul>
+                </li>
+                <li><a href="contact.html"><span class="nav-icon">✉</span>联系我</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-container page-container">
+        <div class="page-header animate-fade-up">
+            <h1 class="page-title">动漫追番</h1>
+            <p class="page-subtitle">Anime · 热门新番与经典佳作</p>
+        </div>
+
+        <!-- 跳转卡片 -->
+        <a href="https://www.dmghg.app" target="_blank" class="anime-jump-card animate-on-scroll">
+            <div class="jump-icon">📺</div>
+            <div class="jump-info">
+                <h3>免费看动漫</h3>
+                <p>www.dmghg.app · 海量番剧 在线观看</p>
+            </div>
+            <div class="jump-arrow">前往 →</div>
+        </a>
+
+        <!-- 筛选标签 -->
+        <div class="anime-filter animate-on-scroll">
+            <button class="anime-filter-btn active" data-filter="all">全部</button>
+            <button class="anime-filter-btn" data-filter="trending">热门趋势</button>
+            <button class="anime-filter-btn" data-filter="top">高分经典</button>
+            <button class="anime-filter-btn" data-filter="season">本季新番</button>
+            <button class="anime-filter-btn" data-filter="upcoming">即将上线</button>
+            <button class="anime-filter-btn" data-filter="guochuang">国产动漫</button>
+        </div>
+
+        <!-- 动漫网格 -->
+        <div class="anime-grid" id="animeGrid">
+            <div class="anime-loading">正在加载热门动漫...</div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2026 LengMeng · All Rights Reserved</p>
+            <p class="footer-link">
+                <a href="https://lengmeng.online" target="_blank">lengmeng.online</a>
+                <span>·</span>
+                <span>点击卡片跳转 AniList 详情</span>
+            </p>
+        </div>
+    </footer>
+
+    <audio id="bgMusic" loop muted preload="auto">
+        <source src="./music/bgm.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="./js/theme.js"></script>
+    <script src="./js/animate.js"></script>
+    <script src="./js/weather.js"></script>
+    <script src="./js/music.js"></script>
+    <script src="./js/sentence.js"></script>
+    <script src="./js/visitor.js"></script>
+    <script src="./js/darkmode.js"></script>
+    <script src="./js/anime.js?v=3"></script>
+    <script src="./js/main.js"></script>
+</body>
+</html>

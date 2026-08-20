@@ -1,0 +1,299 @@
+/* ===== 加载动画 ===== */
+.loading-box {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #050510;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+.loading-box.hide {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.loading-core {
+    text-align: center;
+    position: relative;
+}
+
+.loading-ring {
+    width: 80px;
+    height: 80px;
+    border: 2px solid rgba(0, 212, 255, 0.15);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    animation: spin 1s linear infinite;
+    position: relative;
+}
+
+.loading-ring.ring2 {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 60px;
+    margin-top: 10px;
+    border-color: rgba(123, 44, 191, 0.15);
+    border-bottom-color: var(--accent-secondary);
+    animation: spin 1.5s linear infinite reverse;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-ring.ring2 {
+    animation: spin-reverse 1.5s linear infinite;
+}
+
+@keyframes spin-reverse {
+    to { transform: translateX(-50%) rotate(-360deg); }
+}
+
+.loading-text {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+    margin-bottom: 1rem;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.loading-bar {
+    width: 160px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.loading-bar-inner {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+    border-radius: 2px;
+    animation: loadingProgress 1.5s ease forwards;
+}
+
+@keyframes loadingProgress {
+    to { width: 100%; }
+}
+
+/* ===== 入场动画 ===== */
+.animate-fade-up {
+    opacity: 0;
+    transform: translateY(40px);
+    animation: fadeUp 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes fadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1),
+                transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.animate-on-scroll.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ===== 背景层 ===== */
+.bg-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* 壁纸层 - page7 半透明 */
+.bg-wallpaper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../images/背景.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.85;
+    z-index: 0;
+}
+
+/* 壁纸遮罩 - 保证文字可读性 */
+.bg-wallpaper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0,0,0,0.05), rgba(0,0,0,0.1));
+}
+
+#particleCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        linear-gradient(var(--grid-color, rgba(0, 212, 255, 0.03)) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color, rgba(0, 212, 255, 0.03)) 1px, transparent 1px);
+    background-size: 50px 50px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+    z-index: 2;
+}
+
+.glow-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.4;
+    animation: orbFloat 20s ease-in-out infinite;
+    z-index: 1;
+}
+
+.orb1 {
+    width: 400px;
+    height: 400px;
+    background: var(--accent);
+    top: -100px;
+    left: -100px;
+}
+
+.orb2 {
+    width: 350px;
+    height: 350px;
+    background: var(--accent-secondary);
+    bottom: -80px;
+    right: -80px;
+    animation-delay: -10s;
+}
+
+@keyframes orbFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(50px, -30px) scale(1.1); }
+    66% { transform: translate(-30px, 40px) scale(0.95); }
+}
+
+/* ===== 主题切换过渡 ===== */
+.theme-transition {
+    animation: themeFade 0.8s ease;
+}
+
+@keyframes themeFade {
+    0% { opacity: 0.6; filter: brightness(1.2); }
+    100% { opacity: 1; filter: brightness(1); }
+}
+
+/* ===== 光标闪烁 ===== */
+.name-cursor {
+    display: inline-block;
+    animation: blink 1s step-end infinite;
+    color: var(--accent);
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* ===== 音乐波形 ===== */
+.music-wave {
+    display: none;
+    align-items: flex-end;
+    gap: 2px;
+    height: 14px;
+}
+
+.music-wave i {
+    width: 2px;
+    background: var(--accent);
+    border-radius: 1px;
+    animation: wave 0.8s ease-in-out infinite;
+}
+
+.music-wave i:nth-child(2) { animation-delay: 0.2s; }
+.music-wave i:nth-child(3) { animation-delay: 0.4s; }
+
+.music-btn.playing .music-icon { display: none; }
+.music-btn.playing .music-wave { display: flex; }
+
+@keyframes wave {
+    0%, 100% { height: 4px; }
+    50% { height: 14px; }
+}
+
+/* ===== 暗黑模式按钮图标切换 ===== */
+.dark-btn .icon-sun { display: none; }
+.dark-btn .icon-moon { display: inline; }
+[data-dark="true"] .dark-btn .icon-sun { display: inline; }
+[data-dark="true"] .dark-btn .icon-moon { display: none; }
+
+/* ===== 滚动提示 ===== */
+.scroll-arrow {
+    animation: scrollBounce 2s ease-in-out infinite;
+}
+
+@keyframes scrollBounce {
+    0%, 100% { transform: translateY(0); opacity: 0.5; }
+    50% { transform: translateY(8px); opacity: 1; }
+}
+
+/* ===== 数字计数动画 ===== */
+.stat-num {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* ===== 减少动画偏好 ===== */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

@@ -1,0 +1,286 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night" data-dark="false">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>相册 | LengMeng</title>
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/animate.css">
+    <link rel="stylesheet" href="./css/theme.css">
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <div class="loading-box" id="loadingBox">
+        <div class="loading-core">
+            <div class="loading-ring"></div>
+            <div class="loading-ring ring2"></div>
+            <div class="loading-text">LOADING</div>
+            <div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div>
+        </div>
+    </div>
+
+    <div class="bg-layer" id="bgLayer">
+        <div class="bg-wallpaper"></div>
+        <canvas id="particleCanvas"></canvas>
+        <div class="grid-overlay" id="gridOverlay"></div>
+        <div class="glow-orb orb1"></div>
+        <div class="glow-orb orb2"></div>
+    </div>
+
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="sidebar-mask" id="sidebarMask"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">◆</span>
+            <span class="logo-text">LengMeng</span>
+            <button class="icon-btn dark-btn logo-dark-btn" id="darkBtn" title="切换暗黑模式">
+                <span class="icon-sun">☀</span>
+                <span class="icon-moon">☾</span>
+            </button>
+        </div>
+        <div class="sidebar-tool">
+            <span class="weather-info" id="weatherInfo">
+                <span class="weather-icon">◌</span>
+                <span class="weather-text">加载中...</span>
+            </span>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="index.html"><span class="nav-icon">⌂</span>首页</a></li>
+                <li><a href="about.html"><span class="nav-icon">◉</span>关于我</a></li>
+                <li><a href="works.html"><span class="nav-icon">◆</span>项目作品</a></li>
+                <li><a href="blog.html"><span class="nav-icon">▤</span>博客</a></li>
+<li class="active"><a href="album.html"><span class="nav-icon">▣</span>相册</a></li>
+                <li class="has-submenu open">
+                    <a href="javascript:void(0)" class="submenu-toggle">
+                        <span class="nav-icon">◈</span>生活
+                        <span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="cook.html">菜谱</a></li>
+                        <li><a href="stock.html">股票走势</a></li>
+                        <li><a href="anime.html">动漫</a></li>
+                    </ul>
+                </li>
+                <li><a href="contact.html"><span class="nav-icon">✉</span>联系我</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-container page-container">
+        <div class="page-header animate-fade-up">
+            <h1 class="page-title">光影相册</h1>
+            <p class="page-subtitle">Album · 记录生活的瞬间</p>
+        </div>
+
+        <div class="album-filter animate-on-scroll">
+            <button class="album-filter-btn active" data-filter="all">全部</button>
+            <button class="album-filter-btn" data-filter="life">生活</button>
+            <button class="album-filter-btn" data-filter="travel">旅行</button>
+            <button class="album-filter-btn" data-filter="anime">动漫</button>
+            <button class="album-filter-btn" data-filter="car">汽车</button>
+            <button class="album-filter-btn" data-filter="beauty">人像</button>
+        </div>
+
+        <div class="album-grid">
+            <!-- 生活/旅行 -->
+            <div class="album-item animate-on-scroll" data-category="life" style="--i:0">
+                <div class="album-thumb">
+                    <img src="./images/page1.jpg" alt="生活记录01" loading="lazy">
+                </div>
+                <div class="album-info">
+                    <span class="album-title">生活记录 01</span>
+                    <span class="album-date">2026.08</span>
+                </div>
+            </div>
+            <div class="album-item animate-on-scroll tall" data-category="travel" style="--i:1">
+                <div class="album-thumb">
+                    <img src="./images/page2.jpg" alt="旅行记录01" loading="lazy">
+                </div>
+                <div class="album-info">
+                    <span class="album-title">旅行记录 01</span>
+                    <span class="album-date">2026.07</span>
+                </div>
+            </div>
+            <div class="album-item animate-on-scroll" data-category="life" style="--i:2">
+                <div class="album-thumb">
+                    <img src="./images/page4.jpg" alt="生活记录02" loading="lazy">
+                </div>
+                <div class="album-info">
+                    <span class="album-title">生活记录 02</span>
+                    <span class="album-date">2026.06</span>
+                </div>
+            </div>
+            <div class="album-item animate-on-scroll wide" data-category="travel" style="--i:3">
+                <div class="album-thumb">
+                    <img src="./images/page5.jpg" alt="旅行记录02" loading="lazy">
+                </div>
+                <div class="album-info">
+                    <span class="album-title">旅行记录 02</span>
+                    <span class="album-date">2026.05</span>
+                </div>
+            </div>
+            <div class="album-item animate-on-scroll" data-category="life" style="--i:4">
+                <div class="album-thumb">
+                    <img src="./images/page6.jpg" alt="生活记录03" loading="lazy">
+                </div>
+                <div class="album-info">
+                    <span class="album-title">生活记录 03</span>
+                    <span class="album-date">2026.04</span>
+                </div>
+            </div>
+
+            <!-- 动漫 -->
+            <div class="album-item animate-on-scroll" data-category="anime" style="--i:5">
+                <div class="album-thumb">
+                    <img src="https://picsum.photos/seed/anime1/400/300" alt="动漫收藏01" loading="lazy">
+                </div>
+                <div class="album-info">
+                    <span class="album-title">动漫收藏 01</span>
+                    <span class="album-date">2026.08</span>
+                </div>
+            </div>
+            <div class="album-item animate-on-scroll tall" data-category="anime" style="--i:6">
+                <div class="album-thumb">
+                    <img src="https://picsum.photos/seed/anime2/400/500" alt="动漫收藏02" loading="lazy">
+                </div>
+                <div class="album-info">
+                    <span class="album-title">动漫收藏 02</span>
+                    <span class="album-date">2026.07</span>
+                </div>
+            </div>
+            <div class="album-item animate-on-scroll" data-category="anime" style="--i:7">
+                <div class="album-thumb">
+                    <img src="https://picsum.photos/seed/anime3/400/300" alt="动漫收藏03" loading="lazy">
+                </div>
+                <div class="album-info">
+                    <span class="album-title">动漫收藏 03</span>
+                    <span class="album-date">2026.06</span>
+                </div>
+            </div>
+            <div class="album-item animate-on-scroll wide" data-category="anime" style="--i:8">
+                <div class="album-thumb">
+                    <img src="https://picsum.photos/seed/anime4/600/300" alt="动漫收藏04" loading="lazy">
+                </div>
+                <div class="album-info">
+                    <span class="album-title">动漫收藏 04</span>
+                    <span class="album-date">2026.05</span>
+                </div>
+            </div>
+
+            <!-- 汽车 -->
+            <div class="album-item animate-on-scroll" data-category="car" style="--i:9">
+                <div class="album-thumb">
+                    <img src="https://picsum.photos/seed/car1/400/300" alt="汽车摄影01" loading="lazy">
+                </div>
+                <div class="album-info">
+                    <span class="album-title">汽车摄影 01</span>
+                    <span class="album-date">2026.08</span>
+                </div>
+            </div>
+            <div class="album-item animate-on-scroll tall" data-category="car" style="--i:10">
+                <div class="album-thumb">
+                    <img src="https://picsum.photos/seed/car2/400/500" alt="汽车摄影02" loading="lazy">
+                </div>
+                <div class="album-info">
+                    <span class="album-title">汽车摄影 02</span>
+                    <span class="album-date">2026.07</span>
+                </div>
+            </div>
+            <div class="album-item animate-on-scroll" data-category="car" style="--i:11">
+                <div class="album-thumb">
+                    <img src="https://picsum.photos/seed/car3/400/300" alt="汽车摄影03" loading="lazy">
+                </div>
+                <div class="album-info">
+                    <span class="album-title">汽车摄影 03</span>
+                    <span class="album-date">2026.06</span>
+                </div>
+            </div>
+            <div class="album-item animate-on-scroll wide" data-category="car" style="--i:12">
+                <div class="album-thumb">
+                    <img src="https://picsum.photos/seed/car4/600/300" alt="汽车摄影04" loading="lazy">
+                </div>
+                <div class="album-info">
+                    <span class="album-title">汽车摄影 04</span>
+                    <span class="album-date">2026.05</span>
+                </div>
+            </div>
+
+            <!-- 美女 -->
+            <div class="album-item animate-on-scroll" data-category="beauty" style="--i:13">
+                <div class="album-thumb">
+                    <img src="https://picsum.photos/seed/beauty1/400/300" alt="人像摄影01" loading="lazy">
+                </div>
+                <div class="album-info">
+                    <span class="album-title">人像摄影 01</span>
+                    <span class="album-date">2026.08</span>
+                </div>
+            </div>
+            <div class="album-item animate-on-scroll tall" data-category="beauty" style="--i:14">
+                <div class="album-thumb">
+                    <img src="https://picsum.photos/seed/beauty2/400/500" alt="人像摄影02" loading="lazy">
+                </div>
+                <div class="album-info">
+                    <span class="album-title">人像摄影 02</span>
+                    <span class="album-date">2026.07</span>
+                </div>
+            </div>
+            <div class="album-item animate-on-scroll" data-category="beauty" style="--i:15">
+                <div class="album-thumb">
+                    <img src="https://picsum.photos/seed/beauty3/400/300" alt="人像摄影03" loading="lazy">
+                </div>
+                <div class="album-info">
+                    <span class="album-title">人像摄影 03</span>
+                    <span class="album-date">2026.06</span>
+                </div>
+            </div>
+            <div class="album-item animate-on-scroll wide" data-category="beauty" style="--i:16">
+                <div class="album-thumb">
+                    <img src="https://picsum.photos/seed/beauty4/600/300" alt="人像摄影04" loading="lazy">
+                </div>
+                <div class="album-info">
+                    <span class="album-title">人像摄影 04</span>
+                    <span class="album-date">2026.05</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图片预览灯箱 -->
+        <div class="lightbox" id="lightbox">
+            <div class="lightbox-mask" id="lightboxMask"></div>
+            <div class="lightbox-content">
+                <button class="lightbox-close" id="lightboxClose">✕</button>
+                <div class="lightbox-image" id="lightboxImage">
+                    <span class="album-icon">◉</span>
+                </div>
+                <div class="lightbox-caption" id="lightboxCaption">图片标题</div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2026 LengMeng · All Rights Reserved</p>
+            <p class="footer-link">
+                <a href="https://lengmeng.online" target="_blank">lengmeng.online</a>
+                <span>·</span>
+                <span>Powered by Vercel</span>
+            </p>
+        </div>
+    </footer>
+
+    <audio id="bgMusic" loop muted preload="auto">
+        <source src="./music/bgm.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="./js/theme.js"></script>
+    <script src="./js/animate.js"></script>
+    <script src="./js/weather.js"></script>
+    <script src="./js/music.js"></script>
+    <script src="./js/sentence.js"></script>
+    <script src="./js/visitor.js"></script>
+    <script src="./js/darkmode.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+</html>

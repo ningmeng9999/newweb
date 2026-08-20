@@ -1,0 +1,277 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night" data-dark="false">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关于我 | LengMeng</title>
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/animate.css">
+    <link rel="stylesheet" href="./css/theme.css">
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <div class="loading-box" id="loadingBox">
+        <div class="loading-core">
+            <div class="loading-ring"></div>
+            <div class="loading-ring ring2"></div>
+            <div class="loading-text">LOADING</div>
+            <div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div>
+        </div>
+    </div>
+
+    <div class="bg-layer" id="bgLayer">
+        <div class="bg-wallpaper"></div>
+        <canvas id="particleCanvas"></canvas>
+        <div class="grid-overlay" id="gridOverlay"></div>
+        <div class="glow-orb orb1"></div>
+        <div class="glow-orb orb2"></div>
+    </div>
+
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="sidebar-mask" id="sidebarMask"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">◆</span>
+            <span class="logo-text">LengMeng</span>
+            <button class="icon-btn dark-btn logo-dark-btn" id="darkBtn" title="切换暗黑模式">
+                <span class="icon-sun">☀</span>
+                <span class="icon-moon">☾</span>
+            </button>
+        </div>
+        <div class="sidebar-tool">
+            <span class="weather-info" id="weatherInfo">
+                <span class="weather-icon">◌</span>
+                <span class="weather-text">加载中...</span>
+            </span>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="index.html"><span class="nav-icon">⌂</span>首页</a></li>
+                <li class="active"><a href="about.html"><span class="nav-icon">◉</span>关于我</a></li>
+                <li><a href="works.html"><span class="nav-icon">◆</span>项目作品</a></li>
+                <li><a href="blog.html"><span class="nav-icon">▤</span>博客</a></li>
+                <li><a href="album.html"><span class="nav-icon">▣</span>相册</a></li>
+                <li class="has-submenu open">
+                    <a href="javascript:void(0)" class="submenu-toggle">
+                        <span class="nav-icon">◈</span>生活
+                        <span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="cook.html">菜谱</a></li>
+                        <li><a href="stock.html">股票走势</a></li>
+                        <li><a href="anime.html">动漫</a></li>
+                    </ul>
+                </li>
+                <li><a href="contact.html"><span class="nav-icon">✉</span>联系我</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-container page-container">
+        <div class="page-header animate-fade-up">
+            <h1 class="page-title">关于我</h1>
+            <p class="page-subtitle">About Me · 认识一下我</p>
+        </div>
+
+        <div class="about-layout">
+            <!-- 左侧个人信息 -->
+            <aside class="about-side animate-on-scroll">
+                <div class="profile-card">
+                    <div class="profile-avatar">
+                        <div class="avatar-ring"></div>
+                        <div class="avatar-core">
+                            <img src="./images/头像.jpg" alt="LengMeng">
+                        </div>
+                    </div>
+                    <h2 class="profile-name">LengMeng</h2>
+                    <p class="profile-role">跨境电商运营 / 数据分析师</p>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <span class="stat-num" data-count="30">0</span>
+                            <span class="stat-label">项目</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-num" data-count="120">0</span>
+                            <span class="stat-label">文章</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-num" data-count="5">0</span>
+                            <span class="stat-label">年经验</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3 class="card-title">基本信息</h3>
+                    <ul class="info-list">
+                        <li><span class="info-label">📍 坐标</span><span class="info-value">浙江·杭州</span></li>
+                        <li><span class="info-label">💼 职业</span><span class="info-value">跨境电商运营</span></li>
+                        <li><span class="info-label">🎓 学历</span><span class="info-value">电子商务本科</span></li>
+                        <li><span class="info-label">🎂 生日</span><span class="info-value">2003.10.29</span></li>
+                        <li><span class="info-label">🌐 站点</span><span class="info-value">lengmeng.online</span></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- 右侧内容 -->
+            <div class="about-main">
+                <section class="content-card animate-on-scroll">
+                    <h3 class="card-title">个人简介</h3>
+                    <div class="card-content">
+                        <p>你好，我是 LengMeng，电子商务专业本科，GPA 专业前 10%。专注跨境电商运营与数据分析，熟悉亚马逊 / TikTok Shop 全链路运营，擅长用 Python、Tableau 等工具做竞品抓取、销量预测与用户舆情分析。</p>
+                        <p>持有多项 Python、数学建模国家级竞赛奖项，数据化运营功底扎实。相信数据驱动决策，也相信持续深耕的力量。在这里记录我的成长与思考，欢迎交流。</p>
+                    </div>
+                </section>
+
+                <section class="content-card animate-on-scroll">
+                    <h3 class="card-title">专业技能</h3>
+                    <div class="card-content">
+                        <div class="skill-group">
+                            <span class="skill-label">数据分析</span>
+                            <div class="skill-tags">
+                                <span class="skill-tag">Python</span>
+                                <span class="skill-tag">Pandas</span>
+                                <span class="skill-tag">Scikit-Learn</span>
+                                <span class="skill-tag">Matplotlib</span>
+                                <span class="skill-tag">影刀RPA</span>
+                                <span class="skill-tag">爬虫</span>
+                            </div>
+                        </div>
+                        <div class="skill-group">
+                            <span class="skill-label">数据工具</span>
+                            <div class="skill-tags">
+                                <span class="skill-tag">Tableau</span>
+                                <span class="skill-tag">MySQL</span>
+                                <span class="skill-tag">SPSS</span>
+                                <span class="skill-tag">Excel透视表</span>
+                                <span class="skill-tag">VLOOKUP</span>
+                            </div>
+                        </div>
+                        <div class="skill-group">
+                            <span class="skill-label">跨境运营</span>
+                            <div class="skill-tags">
+                                <span class="skill-tag">亚马逊</span>
+                                <span class="skill-tag">TikTok Shop</span>
+                                <span class="skill-tag">速卖通</span>
+                                <span class="skill-tag">Listing优化</span>
+                                <span class="skill-tag">SP广告</span>
+                                <span class="skill-tag">领星ERP</span>
+                                <span class="skill-tag">紫鸟浏览器</span>
+                                <span class="skill-tag">卖家精灵</span>
+                            </div>
+                        </div>
+                        <div class="skill-group">
+                            <span class="skill-label">语言 & 其他</span>
+                            <div class="skill-tags">
+                                <span class="skill-tag">英语CET-6</span>
+                                <span class="skill-tag">英文文案</span>
+                                <span class="skill-tag">PS</span>
+                                <span class="skill-tag">视频剪辑</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content-card animate-on-scroll">
+                    <h3 class="card-title">工作经历</h3>
+                    <div class="card-content">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <span class="timeline-date">2026.04 - 2026.08</span>
+                                    <h4>浙江睿改进出口有限公司 · 亚马逊运营助理</h4>
+                                    <ul class="exp-list">
+                                        <li>负责亚马逊欧美多站点精品店铺日常运营，运用领星ERP完成库存测算、物流补货与数据复盘，依托紫鸟浏览器实现多账号安全运维；同步完成速卖通商品上架与页面优化，处理站内消息、差评整改、A-to-Z索赔及退货纠纷，保障账号零违规风险。</li>
+                                        <li>熟练搭建优化亚马逊SP广告投放结构，结合LD秒杀、Coupon、网红联盟、SHEIN营销活动及站外社媒推广，独立孵化3款垂直类目新品，搭建自然流量+付费广告双驱动流量模型。</li>
+                                        <li>持续优化Listing权重与转化，核心链接点击率提升11.5%；每日复盘广告数据，动态调整定价、预算及投放策略，推动店铺月度GMV环比提升13%。</li>
+                                        <li>梳理搭建新品上架SOP与SP广告常态化复盘体系，提升自然流量占比、优化ACOS与广告投产比，协助团队超额完成年度、季度销售目标。</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <span class="timeline-date">2025.11 - 2026.03</span>
+                                    <h4>库课文化传媒有限公司 · 亚马逊运营助理</h4>
+                                    <ul class="exp-list">
+                                        <li>负责亚马逊精品店铺日常运维，开展市场关键词调研、新品Listing上架、文案迭代优化；跟进FBA库存周转、补货计划，处理买家咨询、差评及A-to-Z纠纷，订单延迟率下降10%，维护账号ODR风险指标处于安全区间。</li>
+                                        <li>使用Python实现竞品数据自动化采集，持续监控竞品价格策略、评论痛点、广告打法；按月输出竞品分析与市场机会报告，策划Coupon、限时促销、亚马逊联盟推广方案，成功孵化2款潜力新品。</li>
+                                        <li>主导商品视觉内容规划，输出主图、A+页面优化需求，独立剪辑产品短视频用于广告素材与站外引流；持续优化Listing搜索权重，商品点击率提升9.2%；每日复盘自然流量、广告转化、ACOS等指标，助力店铺月度GMV环比上涨10%。</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content-card animate-on-scroll">
+                    <h3 class="card-title">获奖证书</h3>
+                    <div class="card-content">
+                        <div class="cert-group">
+                            <span class="cert-label">资质证书</span>
+                            <div class="cert-tags">
+                                <span class="cert-tag">大学英语四级（CET-4）</span>
+                                <span class="cert-tag">大学英语六级（CET-6）</span>
+                                <span class="cert-tag">计算机二级 Python 程序设计</span>
+                            </div>
+                        </div>
+                        <div class="cert-group">
+                            <span class="cert-label">国家级奖项</span>
+                            <div class="cert-tags">
+                                <span class="cert-tag">亚太地区数学建模竞赛 国家级三等奖</span>
+                                <span class="cert-tag">全国商务数据分析竞赛 国家级三等奖</span>
+                                <span class="cert-tag">职业技能大赛 Python 国家三等奖</span>
+                            </div>
+                        </div>
+                        <div class="cert-group">
+                            <span class="cert-label">省级奖项</span>
+                            <div class="cert-tags">
+                                <span class="cert-tag">数学建模竞赛 省级二等奖</span>
+                                <span class="cert-tag">统计建模竞赛 省级三等奖</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content-card animate-on-scroll">
+                    <h3 class="card-title">自我评价</h3>
+                    <div class="card-content">
+                        <ul class="exp-list">
+                            <li><strong>专业数据优势：</strong>电子商务本科，GPA专业前10%，精通Python、Tableau等数据分析工具，擅长用爬虫、机器学习模型完成跨境竞品抓取、销量预测、用户舆情分析，具备数据驱动选品的实操能力。</li>
+                            <li><strong>跨境业务能力：</strong>熟悉亚马逊/TikTok Shop全链路运营，掌握Listing优化、短视频内容制作；英语读写流利，可独立撰写海外商品文案、解读买家评论。</li>
+                            <li><strong>团队与执行：</strong>多次以队长身份带队竞赛，统筹分工、输出完整商业分析方案；做事目标导向，逻辑清晰，擅长拆解运营数据问题并落地优化方案。</li>
+                            <li><strong>个人特质：</strong>持续深耕跨境电商赛道，主动学习平台新玩法，对海外市场、爆款选品具备较强商业敏感度，愿意沉淀成长，以数据成果助力店铺流量与业绩提升。</li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2026 LengMeng · All Rights Reserved</p>
+            <p class="footer-link">
+                <a href="https://lengmeng.online" target="_blank">lengmeng.online</a>
+                <span>·</span>
+                <span>Powered by Vercel</span>
+            </p>
+        </div>
+    </footer>
+
+    <audio id="bgMusic" loop muted preload="auto">
+        <source src="./music/bgm.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="./js/theme.js"></script>
+    <script src="./js/animate.js"></script>
+    <script src="./js/weather.js"></script>
+    <script src="./js/music.js"></script>
+    <script src="./js/sentence.js"></script>
+    <script src="./js/visitor.js"></script>
+    <script src="./js/darkmode.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+</html>

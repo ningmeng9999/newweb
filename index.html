@@ -1,0 +1,197 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night" data-dark="false">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LengMeng 个人科技风主页 - 四时动态主题，赛博光影">
+    <title>LengMeng | 个人科技风主页</title>
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/animate.css">
+    <link rel="stylesheet" href="./css/theme.css">
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <!-- 加载动画 -->
+    <div class="loading-box" id="loadingBox">
+        <div class="loading-core">
+            <div class="loading-ring"></div>
+            <div class="loading-ring ring2"></div>
+            <div class="loading-text">SYSTEM INITIALIZING</div>
+            <div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div>
+        </div>
+    </div>
+
+    <!-- 动态背景 -->
+    <div class="bg-layer" id="bgLayer">
+        <div class="bg-wallpaper"></div>
+        <canvas id="particleCanvas"></canvas>
+        <div class="grid-overlay" id="gridOverlay"></div>
+        <div class="glow-orb orb1"></div>
+        <div class="glow-orb orb2"></div>
+    </div>
+
+    <!-- 移动端侧边栏切换 -->
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="sidebar-mask" id="sidebarMask"></div>
+
+    <!-- 侧边栏导航 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">◆</span>
+            <span class="logo-text">LengMeng</span>
+            <button class="icon-btn dark-btn logo-dark-btn" id="darkBtn" title="切换暗黑模式">
+                <span class="icon-sun">☀</span>
+                <span class="icon-moon">☾</span>
+            </button>
+        </div>
+        <div class="sidebar-tool">
+            <span class="weather-info" id="weatherInfo">
+                <span class="weather-icon">◌</span>
+                <span class="weather-text">加载中...</span>
+            </span>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li class="active"><a href="index.html"><span class="nav-icon">⌂</span>首页</a></li>
+                <li><a href="about.html"><span class="nav-icon">◉</span>关于我</a></li>
+                <li><a href="works.html"><span class="nav-icon">◆</span>项目作品</a></li>
+                <li><a href="blog.html"><span class="nav-icon">▤</span>博客</a></li>
+                <li><a href="album.html"><span class="nav-icon">▣</span>相册</a></li>
+                <li class="has-submenu open">
+                    <a href="javascript:void(0)" class="submenu-toggle">
+                        <span class="nav-icon">◈</span>生活
+                        <span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="cook.html">菜谱</a></li>
+                        <li><a href="stock.html">股票走势</a></li>
+                        <li><a href="anime.html">动漫</a></li>
+                    </ul>
+                </li>
+                <li><a href="contact.html"><span class="nav-icon">✉</span>联系我</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- 首页主体 -->
+    <main class="main-container index-main">
+        <section class="hero-section">
+            <div class="hero-avatar-wrap animate-fade-up">
+                <div class="hero-avatar">
+                    <div class="avatar-ring"></div>
+                    <div class="avatar-core">
+                        <img src="./images/头像.jpg" alt="LengMeng">
+                    </div>
+                </div>
+                <div class="avatar-status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">在线</span>
+                </div>
+            </div>
+
+            <h1 class="hero-name animate-fade-up" style="animation-delay:.15s">
+                <span class="name-text">LengMeng</span>
+                <span class="name-cursor">_</span>
+            </h1>
+
+            <p class="hero-desc animate-fade-up" style="animation-delay:.3s" id="sentenceText">
+                正在加载专属语录...
+            </p>
+
+            <div class="hero-meta animate-fade-up" style="animation-delay:.45s">
+                <span class="meta-item">
+                    <span class="meta-icon">◷</span>
+                    <span id="currentTime">--:--:--</span>
+                </span>
+                <span class="meta-divider">|</span>
+                <span class="meta-item">
+                    <span class="meta-icon">◉</span>
+                    <span id="visitNum">访问 0 次</span>
+                </span>
+                <span class="meta-divider">|</span>
+                <span class="meta-item">
+                    <span class="meta-icon">◈</span>
+                    <span id="themeLabel">夜间模式</span>
+                </span>
+            </div>
+
+            <div class="hero-btn-group animate-fade-up" style="animation-delay:.6s">
+                <a href="works.html" class="tech-btn">
+                    <span>查看作品</span>
+                    <span class="btn-arrow">→</span>
+                </a>
+                <a href="contact.html" class="tech-btn outline">
+                    <span>联系我</span>
+                </a>
+            </div>
+
+            <div class="hero-scroll-hint animate-fade-up" style="animation-delay:.75s">
+                <span>向下滚动</span>
+                <div class="scroll-arrow">↓</div>
+            </div>
+        </section>
+
+        <!-- 快速入口卡片 -->
+        <section class="quick-section">
+            <h2 class="section-title animate-on-scroll">
+                <span class="title-line"></span>
+                快速导航
+                <span class="title-line"></span>
+            </h2>
+            <div class="quick-grid">
+                <a href="about.html" class="quick-card animate-on-scroll">
+                    <div class="quick-icon">◉</div>
+                    <h3>关于我</h3>
+                    <p>个人简介与工作经历</p>
+                    <span class="quick-arrow">→</span>
+                </a>
+                <a href="works.html" class="quick-card animate-on-scroll" style="transition-delay:.1s">
+                    <div class="quick-icon">◆</div>
+                    <h3>项目作品</h3>
+                    <p>竞赛项目与运营案例</p>
+                    <span class="quick-arrow">→</span>
+                </a>
+                <a href="blog.html" class="quick-card animate-on-scroll" style="transition-delay:.2s">
+                    <div class="quick-icon">▤</div>
+                    <h3>技术博客</h3>
+                    <p>学习笔记与运营思考</p>
+                    <span class="quick-arrow">→</span>
+                </a>
+                <a href="album.html" class="quick-card animate-on-scroll" style="transition-delay:.3s">
+                    <div class="quick-icon">▣</div>
+                    <h3>光影相册</h3>
+                    <p>记录生活的瞬间</p>
+                    <span class="quick-arrow">→</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2026 LengMeng · All Rights Reserved</p>
+            <p class="footer-link">
+                <a href="https://lengmeng.online" target="_blank">lengmeng.online</a>
+                <span>·</span>
+                <span>Powered by Vercel</span>
+            </p>
+        </div>
+    </footer>
+
+    <!-- 背景音乐 -->
+    <audio id="bgMusic" loop muted preload="auto">
+        <source src="./music/bgm.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- JS -->
+    <script src="./js/theme.js"></script>
+    <script src="./js/animate.js"></script>
+    <script src="./js/weather.js"></script>
+    <script src="./js/music.js"></script>
+    <script src="./js/sentence.js"></script>
+    <script src="./js/visitor.js"></script>
+    <script src="./js/darkmode.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+</html>

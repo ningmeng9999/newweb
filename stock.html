@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night" data-dark="false">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>股票走势 | LengMeng</title>
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/animate.css">
+    <link rel="stylesheet" href="./css/theme.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/stock.css">
+</head>
+<body>
+    <div class="loading-box" id="loadingBox">
+        <div class="loading-core">
+            <div class="loading-ring"></div>
+            <div class="loading-ring ring2"></div>
+            <div class="loading-text">LOADING</div>
+            <div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div>
+        </div>
+    </div>
+
+    <div class="bg-layer" id="bgLayer">
+        <div class="bg-wallpaper"></div>
+        <canvas id="particleCanvas"></canvas>
+        <div class="grid-overlay" id="gridOverlay"></div>
+        <div class="glow-orb orb1"></div>
+        <div class="glow-orb orb2"></div>
+    </div>
+
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="sidebar-mask" id="sidebarMask"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">◆</span>
+            <span class="logo-text">LengMeng</span>
+            <button class="icon-btn dark-btn logo-dark-btn" id="darkBtn" title="切换暗黑模式">
+                <span class="icon-sun">☀</span>
+                <span class="icon-moon">☾</span>
+            </button>
+        </div>
+        <div class="sidebar-tool">
+            <span class="weather-info" id="weatherInfo">
+                <span class="weather-icon">◌</span>
+                <span class="weather-text">加载中...</span>
+            </span>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="index.html"><span class="nav-icon">⌂</span>首页</a></li>
+                <li><a href="about.html"><span class="nav-icon">◉</span>关于我</a></li>
+                <li><a href="works.html"><span class="nav-icon">◆</span>项目作品</a></li>
+                <li><a href="blog.html"><span class="nav-icon">▤</span>博客</a></li>
+                <li><a href="album.html"><span class="nav-icon">▣</span>相册</a></li>
+                <li class="has-submenu open">
+                    <a href="javascript:void(0)" class="submenu-toggle">
+                        <span class="nav-icon">◈</span>生活
+                        <span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="cook.html">菜谱</a></li>
+                        <li class="active"><a href="stock.html">股票走势</a></li>
+                        <li><a href="anime.html">动漫</a></li>
+                    </ul>
+                </li>
+                <li><a href="contact.html"><span class="nav-icon">✉</span>联系我</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-container page-container stock-page">
+        <div class="page-header animate-fade-up">
+            <h1 class="page-title">股票走势</h1>
+            <p class="page-subtitle">实时行情 · 大盘指标 · 自选池 · 选股策略 · 盈亏云图</p>
+        </div>
+
+        <!-- 大盘指标 -->
+        <div class="market-bar animate-on-scroll" id="marketBar">
+            <!-- 动态生成 -->
+        </div>
+
+        <!-- 行情概览 -->
+        <div class="stock-overview animate-on-scroll">
+            <div class="overview-card">
+                <span class="overview-label">自选股数</span>
+                <span class="overview-value" id="totalCount">0</span>
+            </div>
+            <div class="overview-card">
+                <span class="overview-label">总持仓市值</span>
+                <span class="overview-value" id="totalValue">¥0.00</span>
+            </div>
+            <div class="overview-card">
+                <span class="overview-label">总盈亏</span>
+                <span class="overview-value" id="totalPnl">¥0.00</span>
+            </div>
+            <div class="overview-card">
+                <span class="overview-label">总收益率</span>
+                <span class="overview-value" id="totalPnlRate">0.00%</span>
+            </div>
+            <div class="overview-card">
+                <span class="overview-label">数据更新</span>
+                <span class="overview-value" id="updateTime">--:--:--</span>
+            </div>
+        </div>
+
+        <!-- 加载全市场数据按钮 -->
+        <div class="animate-on-scroll" style="text-align:center;margin-bottom:1rem">
+            <button class="stock-btn" id="loadAllBtn" style="background:linear-gradient(135deg,#00d4ff,#0099cc);min-width:200px">加载全市场数据</button>
+            <div id="loadAllProgress" style="display:none;margin-top:0.8rem;font-size:0.85rem;color:var(--text-muted)">
+                <div style="width:280px;margin:0 auto;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden">
+                    <div id="loadAllBar" style="height:100%;width:0%;background:linear-gradient(90deg,#00d4ff,#00ffcc);transition:width 0.3s"></div>
+                </div>
+                <div id="loadAllText" style="margin-top:0.4rem">准备中...</div>
+            </div>
+        </div>
+
+        <!-- 搜索框 -->
+        <div class="stock-search-wrap animate-on-scroll">
+            <div class="stock-search">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="stockSearch" placeholder="输入股票名称或代码，回车搜索（如：茅台、600519）" autocomplete="off">
+                <button class="search-btn" id="searchBtn">搜索</button>
+            </div>
+        </div>
+
+        <!-- 搜索结果（独立板块，默认隐藏） -->
+        <section class="stock-section animate-on-scroll" id="searchResultSection" style="display:none">
+            <div class="section-header">
+                <h2 class="section-h2" id="searchResultTitle">搜索结果</h2>
+                <span class="section-tip" id="searchResultTip"></span>
+            </div>
+            <div class="hot-grid" id="searchResultGrid">
+                <!-- 动态生成 -->
+            </div>
+            <div class="search-progress" id="searchProgress" style="display:none">
+                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                <span class="progress-text" id="progressText">加载中...</span>
+            </div>
+        </section>
+
+        <!-- 人气热门榜 -->
+        <section class="stock-section animate-on-scroll">
+            <div class="section-header">
+                <h2 class="section-h2">人气热门榜</h2>
+                <span class="section-tip">综合股吧/雪球/社区热度 · 点击「+自选」加入，默认买入100股</span>
+            </div>
+            <div class="hot-grid" id="hotGrid">
+                <!-- 动态生成 -->
+            </div>
+        </section>
+
+        <!-- 自选股票池 -->
+        <section class="stock-section animate-on-scroll">
+            <div class="section-header">
+                <h2 class="section-h2">我的自选池</h2>
+                <div class="section-actions">
+                    <button class="stock-btn" id="refreshBtn">刷新行情</button>
+                    <button class="stock-btn outline" id="exportBtn">导出数据</button>
+                    <button class="stock-btn outline" id="importBtn">导入数据</button>
+                    <input type="file" id="importFile" accept=".json" style="display:none">
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table class="stock-table" id="stockTable">
+                    <thead>
+                        <tr>
+                            <th>股票名称</th>
+                            <th>代码</th>
+                            <th>加入日期</th>
+                            <th>买入价</th>
+                            <th>现价</th>
+                            <th>涨跌幅</th>
+                            <th>持仓(股)</th>
+                            <th>盈亏</th>
+                            <th>收益率</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stockTbody">
+                        <tr class="empty-row">
+                            <td colspan="10">暂无自选股，从上方热门股票中添加</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 选股策略 -->
+        <section class="stock-section animate-on-scroll">
+            <div class="section-header">
+                <h2 class="section-h2">选股策略</h2>
+                <div class="section-actions">
+                    <button class="stock-btn" id="createStrategyBtn">+ 新建策略</button>
+                </div>
+            </div>
+            <div class="strategy-layout">
+                <div class="strategy-sidebar">
+                    <h3 class="strategy-sidebar-title">我的策略</h3>
+                    <div class="strategy-list" id="strategyList">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+                <div class="strategy-main">
+                    <div class="screen-result" id="screenResult">
+                        <div class="screen-placeholder">选择或创建选股策略后，在此显示筛选结果</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 盈利云图 -->
+        <section class="stock-section animate-on-scroll">
+            <div class="section-header">
+                <h2 class="section-h2">持仓分析</h2>
+                <div class="section-actions">
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="bubble">气泡云图</button>
+                        <button class="view-btn" data-view="heatmap">热力矩形图</button>
+                    </div>
+                </div>
+            </div>
+            <div class="cloud-wrap">
+                <canvas id="cloudCanvas" width="900" height="420"></canvas>
+                <div class="cloud-legend">
+                    <span class="legend-item"><i class="legend-dot up"></i>盈利</span>
+                    <span class="legend-item"><i class="legend-dot down"></i>亏损</span>
+                    <span class="legend-item"><i class="legend-dot flat"></i>持平</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 选股策略弹窗 -->
+    <div class="strategy-modal" id="strategyModal">
+        <div class="strategy-modal-content">
+            <div class="strategy-modal-header">
+                <h3>新建选股策略</h3>
+                <button class="modal-close" id="closeModalBtn">×</button>
+            </div>
+            <div class="strategy-modal-body">
+                <div class="strategy-name-row">
+                    <label>策略名称</label>
+                    <input type="text" id="strategyNameInput" placeholder="例如：低估值高成长" maxlength="20">
+                </div>
+                <div class="strategy-conditions-title">筛选条件（留空则不限制）</div>
+                <div class="condition-container" id="conditionContainer">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+            <div class="strategy-modal-footer">
+                <button class="stock-btn outline" id="closeModalBtn2">取消</button>
+                <button class="stock-btn" id="saveStrategyBtn">保存策略</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2026 LengMeng · All Rights Reserved</p>
+            <p class="footer-link">
+                <a href="https://lengmeng.online" target="_blank">lengmeng.online</a>
+                <span>·</span>
+                <span>行情来源：腾讯财经</span>
+            </p>
+        </div>
+    </footer>
+
+    <audio id="bgMusic" loop muted preload="auto">
+        <source src="./music/bgm.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="./js/theme.js"></script>
+    <script src="./js/animate.js"></script>
+    <script src="./js/weather.js"></script>
+    <script src="./js/music.js"></script>
+    <script src="./js/sentence.js"></script>
+    <script src="./js/visitor.js"></script>
+    <script src="./js/darkmode.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/stock.js"></script>
+</body>
+</html>

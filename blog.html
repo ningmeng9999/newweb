@@ -1,0 +1,222 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night" data-dark="false">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客 | LengMeng</title>
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/animate.css">
+    <link rel="stylesheet" href="./css/theme.css">
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <div class="loading-box" id="loadingBox">
+        <div class="loading-core">
+            <div class="loading-ring"></div>
+            <div class="loading-ring ring2"></div>
+            <div class="loading-text">LOADING</div>
+            <div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div>
+        </div>
+    </div>
+
+    <div class="bg-layer" id="bgLayer">
+        <div class="bg-wallpaper"></div>
+        <canvas id="particleCanvas"></canvas>
+        <div class="grid-overlay" id="gridOverlay"></div>
+        <div class="glow-orb orb1"></div>
+        <div class="glow-orb orb2"></div>
+    </div>
+
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="sidebar-mask" id="sidebarMask"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">◆</span>
+            <span class="logo-text">LengMeng</span>
+            <button class="icon-btn dark-btn logo-dark-btn" id="darkBtn" title="切换暗黑模式">
+                <span class="icon-sun">☀</span>
+                <span class="icon-moon">☾</span>
+            </button>
+        </div>
+        <div class="sidebar-tool">
+            <span class="weather-info" id="weatherInfo">
+                <span class="weather-icon">◌</span>
+                <span class="weather-text">加载中...</span>
+            </span>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="index.html"><span class="nav-icon">⌂</span>首页</a></li>
+                <li><a href="about.html"><span class="nav-icon">◉</span>关于我</a></li>
+                <li><a href="works.html"><span class="nav-icon">◆</span>项目作品</a></li>
+                <li class="active"><a href="blog.html"><span class="nav-icon">▤</span>博客</a></li>
+                <li><a href="album.html"><span class="nav-icon">▣</span>相册</a></li>
+                <li class="has-submenu open">
+                    <a href="javascript:void(0)" class="submenu-toggle">
+                        <span class="nav-icon">◈</span>生活
+                        <span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="cook.html">菜谱</a></li>
+                        <li><a href="stock.html">股票走势</a></li>
+                        <li><a href="anime.html">动漫</a></li>
+                    </ul>
+                </li>
+                <li><a href="contact.html"><span class="nav-icon">✉</span>联系我</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-container page-container">
+        <div class="page-header animate-fade-up">
+            <h1 class="page-title">技术博客</h1>
+            <p class="page-subtitle">Blog · 学习笔记与技术分享</p>
+        </div>
+
+        <div class="blog-layout">
+            <div class="blog-list">
+                <article class="blog-card animate-on-scroll">
+                    <div class="blog-meta">
+                        <span class="blog-date">2026-08-18</span>
+                        <span class="blog-category">前端</span>
+                    </div>
+                    <h2 class="blog-title"><a href="#">用 CSS 变量搭建一套可维护的主题系统</a></h2>
+                    <p class="blog-excerpt">主题切换不只是换个颜色。从变量命名规范到层级覆盖，从暗黑模式到四时主题，聊聊如何设计一套扩展性强、维护成本低的 CSS 主题方案，以及过渡动画的细节处理...</p>
+                    <div class="blog-footer">
+                        <span class="blog-tag">CSS3</span>
+                        <span class="blog-tag">主题设计</span>
+                        <span class="blog-read">阅读全文 →</span>
+                    </div>
+                </article>
+
+                <article class="blog-card animate-on-scroll">
+                    <div class="blog-meta">
+                        <span class="blog-date">2026-08-12</span>
+                        <span class="blog-category">运维</span>
+                    </div>
+                    <h2 class="blog-title"><a href="#">静态站点部署踩坑记：从域名解析到 HTTPS</a></h2>
+                    <p class="blog-excerpt">把一个纯静态网站部署到 Vercel 并绑定自定义域名，听起来简单，但 DNS 配置、证书签发、国内访问速度每一步都有坑。记录一次完整的部署流程与优化思路...</p>
+                    <div class="blog-footer">
+                        <span class="blog-tag">Vercel</span>
+                        <span class="blog-tag">DNS</span>
+                        <span class="blog-read">阅读全文 →</span>
+                    </div>
+                </article>
+
+                <article class="blog-card animate-on-scroll">
+                    <div class="blog-meta">
+                        <span class="blog-date">2026-08-05</span>
+                        <span class="blog-category">数据</span>
+                    </div>
+                    <h2 class="blog-title"><a href="#">Python 爬虫到可视化：一条完整的数据流</a></h2>
+                    <p class="blog-excerpt">从数据采集、清洗、存储到最终的可视化呈现，用 Python 走通整条链路。聊聊 requests + BeautifulSoup 的采集技巧，Pandas 的数据清洗套路，以及 Tableau 出图的经验...</p>
+                    <div class="blog-footer">
+                        <span class="blog-tag">Python</span>
+                        <span class="blog-tag">数据可视化</span>
+                        <span class="blog-read">阅读全文 →</span>
+                    </div>
+                </article>
+
+                <article class="blog-card animate-on-scroll">
+                    <div class="blog-meta">
+                        <span class="blog-date">2026-07-28</span>
+                        <span class="blog-category">前端</span>
+                    </div>
+                    <h2 class="blog-title"><a href="#">Canvas 粒子动画：好看和性能可以兼得</a></h2>
+                    <p class="blog-excerpt">粒子背景是科技风网站的标配，但粒子数一多就掉帧。从离屏渲染、对象池到 requestAnimationFrame 调度，分享几个让粒子系统流畅跑在移动端的优化手段...</p>
+                    <div class="blog-footer">
+                        <span class="blog-tag">Canvas</span>
+                        <span class="blog-tag">性能优化</span>
+                        <span class="blog-read">阅读全文 →</span>
+                    </div>
+                </article>
+
+                <article class="blog-card animate-on-scroll">
+                    <div class="blog-meta">
+                        <span class="blog-date">2026-07-20</span>
+                        <span class="blog-category">随笔</span>
+                    </div>
+                    <h2 class="blog-title"><a href="#">做跨境电商后，我学会了用数据说话</a></h2>
+                    <p class="blog-excerpt">运营不是拍脑袋。从点击率到转化率，从广告 ROAS 到库存周转，每一个决策背后都应该有数据支撑。记录一些从技术视角看电商运营的思考与感悟...</p>
+                    <div class="blog-footer">
+                        <span class="blog-tag">电商</span>
+                        <span class="blog-tag">运营思考</span>
+                        <span class="blog-read">阅读全文 →</span>
+                    </div>
+                </article>
+
+                <article class="blog-card animate-on-scroll">
+                    <div class="blog-meta">
+                        <span class="blog-date">2026-07-10</span>
+                        <span class="blog-category">工具</span>
+                    </div>
+                    <h2 class="blog-title"><a href="#">效率工具合集：那些让我少加班的小工具</a></h2>
+                    <p class="blog-excerpt">RPA 自动化重复操作、浏览器插件管理多账号、命令行工具批量处理文件。分享几个日常高频使用的效率工具，以及如何用它们把琐碎的事情自动化...</p>
+                    <div class="blog-footer">
+                        <span class="blog-tag">效率</span>
+                        <span class="blog-tag">RPA</span>
+                        <span class="blog-read">阅读全文 →</span>
+                    </div>
+                </article>
+            </div>
+
+            <aside class="blog-sidebar">
+                <div class="sidebar-card animate-on-scroll">
+                    <h3 class="sidebar-title">分类</h3>
+                    <ul class="category-list">
+                        <li><a href="#">前端开发 <span>12</span></a></li>
+                        <li><a href="#">后端技术 <span>8</span></a></li>
+                        <li><a href="#">运维部署 <span>5</span></a></li>
+                        <li><a href="#">数据分析 <span>6</span></a></li>
+                        <li><a href="#">随笔思考 <span>4</span></a></li>
+                    </ul>
+                </div>
+                <div class="sidebar-card animate-on-scroll">
+                    <h3 class="sidebar-title">标签云</h3>
+                    <div class="tag-cloud">
+                        <span>JavaScript</span><span>CSS3</span><span>Vue</span>
+                        <span>Python</span><span>Node.js</span><span>Vercel</span>
+                        <span>Canvas</span><span>电商</span><span>Linux</span>
+                    </div>
+                </div>
+                <div class="sidebar-card animate-on-scroll">
+                    <h3 class="sidebar-title">关注我</h3>
+                    <a href="https://www.douyin.com/user/88819671669" target="_blank" class="social-link douyin-link">
+                        <span class="social-icon">♪</span>
+                        <div class="social-info">
+                            <span class="social-name">抖音</span>
+                            <span class="social-id">88819671669</span>
+                        </div>
+                        <span class="social-arrow">→</span>
+                    </a>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2026 LengMeng · All Rights Reserved</p>
+            <p class="footer-link">
+                <a href="https://lengmeng.online" target="_blank">lengmeng.online</a>
+                <span>·</span>
+                <span>Powered by Vercel</span>
+            </p>
+        </div>
+    </footer>
+
+    <audio id="bgMusic" loop muted preload="auto">
+        <source src="./music/bgm.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="./js/theme.js"></script>
+    <script src="./js/animate.js"></script>
+    <script src="./js/weather.js"></script>
+    <script src="./js/music.js"></script>
+    <script src="./js/sentence.js"></script>
+    <script src="./js/visitor.js"></script>
+    <script src="./js/darkmode.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+</html>
