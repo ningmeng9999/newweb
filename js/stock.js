@@ -277,70 +277,40 @@
         });
     }
 
-    // 获取单页A股行情（通过Vercel代理请求新浪财经）
+    // 获取单页A股行情（直接请求新浪财经API，支持CORS，不需要后端代理）
     async function fetchAStockPage(pn, retries) {
         retries = retries || 0;
-        const url = '/api/stock?page=' + pn + '&size=100';
+        const url = 'https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=' + pn + '&num=100&sort=changepercent&asc=0&node=hs_a';
         try {
             const res = await fetch(url);
             if (!res.ok) throw new Error('HTTP ' + res.status);
-            const data = await res.json();
-            // diff 可能是数组或对象，统一转为数组
-            let rawDiff = [];
-            if (data.data && data.data.diff) {
-                if (Array.isArray(data.data.diff)) {
-                    rawDiff = data.data.diff;
-                } else if (typeof data.data.diff === 'object') {
-                    rawDiff = Object.values(data.data.diff);
-                }
-            }
-            // 调试：第一页输出到页面和控制台
-            if (pn === 1 && retries === 0) {
-                const debugInfo = {
-                    total: data.data && data.data.total,
-                    rawCount: rawDiff.length,
-                    firstItem: rawDiff[0] ? JSON.stringify(rawDiff[0]).substring(0, 300) : 'empty',
-                    firstF12: rawDiff[0] ? rawDiff[0].f12 : 'none',
-                    firstF14: rawDiff[0] ? rawDiff[0].f14 : 'none'
-                };
-                console.log('[stock] JSONP第1页:', debugInfo);
-                // 在页面上显示调试信息
-                if (loadAllText) {
-                    loadAllText.innerHTML = '调试: total=' + debugInfo.total + ', rawCount=' + debugInfo.rawCount + '<br>' +
-                        'firstF12=' + debugInfo.firstF12 + ', firstF14=' + debugInfo.firstF14 + '<br>' +
-                        'firstItem=' + debugInfo.firstItem;
-                }
-            }
-            const list = rawDiff.map(item => {
-                let rawCode = item.f12;
-                if (rawCode === undefined || rawCode === null || rawCode === '-' || rawCode === '') return null;
-                rawCode = String(rawCode).trim().toUpperCase().replace(/^(SH|SZ|BJ)/, '');
-                let code = convertCode(rawCode);
-                if (!code) code = rawCode; // 备用：直接用原始代码
+            const rawList = await res.json();
+            if (!Array.isArray(rawList)) throw new Error('返回格式错误');
+            const list = rawList.map(item => {
+                const rawCode = String(item.code || '').trim();
                 return {
-                    code: code, rawCode: rawCode, name: item.f14,
-                    price: parseFloat(item.f2) || 0,
-                    changeRate: parseFloat(item.f3) || 0,
-                    change: parseFloat(item.f4) || 0,
-                    volume: parseFloat(item.f5) || 0,
-                    amount: parseFloat(item.f6) || 0,
-                    amplitude: parseFloat(item.f7) || 0,
-                    turnover: parseFloat(item.f8) || 0,
-                    pe: parseFloat(item.f9) || 0,
-                    volumeRatio: parseFloat(item.f10) || 0,
-                    high: parseFloat(item.f15) || 0,
-                    low: parseFloat(item.f16) || 0,
-                    open: parseFloat(item.f17) || 0,
-                    prevClose: parseFloat(item.f18) || 0,
-                    totalCap: (parseFloat(item.f20) || 0) / 1e8,
-                    marketCap: (parseFloat(item.f21) || 0) / 1e8,
-                    pb: parseFloat(item.f23) || 0
+                    code: rawCode,
+                    rawCode: rawCode,
+                    name: item.name || '',
+                    price: parseFloat(item.trade) || 0,
+                    changeRate: parseFloat(item.changepercent) || 0,
+                    change: parseFloat(item.pricechange) || 0,
+                    volume: parseFloat(item.volume) || 0,
+                    amount: parseFloat(item.amount) || 0,
+                    amplitude: 0,
+                    turnover: parseFloat(item.turnoverratio) || 0,
+                    pe: parseFloat(item.per) || 0,
+                    volumeRatio: 0,
+                    high: parseFloat(item.high) || 0,
+                    low: parseFloat(item.low) || 0,
+                    open: parseFloat(item.open) || 0,
+                    prevClose: parseFloat(item.settlement) || 0,
+                    totalCap: (parseFloat(item.mktcap) || 0) / 10000,
+                    marketCap: (parseFloat(item.nmc) || 0) / 10000,
+                    pb: parseFloat(item.pb) || 0
                 };
-            }).filter(Boolean);
-            if (pn === 1 && retries === 0) {
-                console.log('[stock] 第1页解析:', { rawCount: rawDiff.length, validCount: list.length, firstStock: list[0] });
-            }
-            return { total: data.data && data.data.total ? data.data.total : 0, list: list };
+            }).filter(s => s.code && s.name);
+            return { total: -1, list: list };
         } catch (e) {
             console.warn('[stock] 第' + pn + '页加载失败(第' + (retries+1) + '次):', e.message);
             if (retries < 3) {
