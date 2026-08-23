@@ -3,11 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>博客 | LengMeng</title>
+    <title>工作 | LengMeng</title>
     <link rel="stylesheet" href="./css/common.css">
     <link rel="stylesheet" href="./css/animate.css">
     <link rel="stylesheet" href="./css/theme.css">
     <link rel="stylesheet" href="./css/style.css">
+    <style>
+        .work-hero {
+            text-align: center;
+            padding: 40px 20px 30px;
+        }
+        .work-hero h1 {
+            font-size: 2.4rem;
+            margin: 0 0 10px;
+            background: linear-gradient(135deg, #00d4ff, #7b61ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .work-hero p {
+            color: var(--text-secondary, #8892b0);
+            font-size: 1rem;
+            margin: 0;
+        }
+        .work-category {
+            margin-bottom: 40px;
+        }
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color, rgba(0,212,255,0.15));
+            cursor: pointer;
+            user-select: none;
+            transition: opacity 0.2s;
+        }
+        .category-header:hover { opacity: 0.85; }
+        .category-toggle {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: var(--text-secondary, #8892b0);
+            transition: transform 0.3s;
+        }
+        .work-category.collapsed .category-toggle {
+            transform: rotate(-90deg);
+        }
+        .work-category.collapsed .tool-grid {
+            display: none;
+        }
+        .work-category.collapsed .category-header {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+        .category-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(123,97,255,0.15));
+            border: 1px solid rgba(0,212,255,0.2);
+        }
+        .category-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary, #e6f1ff);
+        }
+        .category-count {
+            font-size: 0.8rem;
+            color: var(--text-secondary, #8892b0);
+            background: var(--card-bg, rgba(10,25,47,0.6));
+            padding: 2px 10px;
+            border-radius: 12px;
+        }
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        .tool-card {
+            display: block;
+            padding: 20px;
+            border-radius: 14px;
+            background: var(--card-bg, rgba(10,25,47,0.5));
+            border: 1px solid var(--border-color, rgba(0,212,255,0.1));
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00d4ff, #7b61ff);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+        .tool-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0,212,255,0.4);
+            box-shadow: 0 8px 30px rgba(0,212,255,0.15);
+        }
+        .tool-card:hover::before {
+            transform: scaleX(1);
+        }
+        .tool-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .tool-favicon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--card-bg, rgba(10,25,47,0.8));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            border: 1px solid var(--border-color, rgba(0,212,255,0.1));
+        }
+        .tool-name {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary, #e6f1ff);
+        }
+        .tool-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary, #8892b0);
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+        .tool-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .tool-tag {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(0,212,255,0.08);
+            color: #00d4ff;
+            border: 1px solid rgba(0,212,255,0.15);
+        }
+        .tool-arrow {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            color: var(--text-secondary, #8892b0);
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .tool-card:hover .tool-arrow {
+            opacity: 1;
+            transform: translateX(4px);
+        }
+        @media (max-width: 600px) {
+            .tool-grid { grid-template-columns: 1fr; }
+            .work-hero h1 { font-size: 1.8rem; }
+        }
+    </style>
 </head>
 <body>
     <div class="loading-box" id="loadingBox">
@@ -50,9 +217,19 @@
                 <li><a href="index.html"><span class="nav-icon">⌂</span>首页</a></li>
                 <li><a href="about.html"><span class="nav-icon">◉</span>关于我</a></li>
                 <li><a href="works.html"><span class="nav-icon">◆</span>项目作品</a></li>
-                <li class="active"><a href="blog.html"><span class="nav-icon">▤</span>博客</a></li>
-                <li><a href="album.html"><span class="nav-icon">▣</span>相册</a></li>
                 <li class="has-submenu open">
+                    <a href="javascript:void(0)" class="submenu-toggle">
+                        <span class="nav-icon">▤</span>工作
+                        <span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li class="active"><a href="blog.html">实用工具</a></li>
+                        <li><a href="finance-news.html">新闻大事</a></li>
+                        <li><a href="dashboard.html">店铺管理</a></li>
+                    </ul>
+                </li>
+                <li><a href="album.html"><span class="nav-icon">▣</span>相册</a></li>
+                <li class="has-submenu">
                     <a href="javascript:void(0)" class="submenu-toggle">
                         <span class="nav-icon">◈</span>生活
                         <span class="submenu-arrow">▶</span>
@@ -69,129 +246,390 @@
     </aside>
 
     <main class="main-container page-container">
-        <div class="page-header animate-fade-up">
-            <h1 class="page-title">技术博客</h1>
-            <p class="page-subtitle">Blog · 学习笔记与技术分享</p>
+        <div class="work-hero animate-fade-up">
+            <h1>实用工具导航</h1>
+            <p>Work Tools · 精选高效工具与AI平台</p>
         </div>
 
-        <div class="blog-layout">
-            <div class="blog-list">
-                <article class="blog-card animate-on-scroll">
-                    <div class="blog-meta">
-                        <span class="blog-date">2026-08-18</span>
-                        <span class="blog-category">前端</span>
-                    </div>
-                    <h2 class="blog-title"><a href="#">用 CSS 变量搭建一套可维护的主题系统</a></h2>
-                    <p class="blog-excerpt">主题切换不只是换个颜色。从变量命名规范到层级覆盖，从暗黑模式到四时主题，聊聊如何设计一套扩展性强、维护成本低的 CSS 主题方案，以及过渡动画的细节处理...</p>
-                    <div class="blog-footer">
-                        <span class="blog-tag">CSS3</span>
-                        <span class="blog-tag">主题设计</span>
-                        <span class="blog-read">阅读全文 →</span>
-                    </div>
-                </article>
-
-                <article class="blog-card animate-on-scroll">
-                    <div class="blog-meta">
-                        <span class="blog-date">2026-08-12</span>
-                        <span class="blog-category">运维</span>
-                    </div>
-                    <h2 class="blog-title"><a href="#">静态站点部署踩坑记：从域名解析到 HTTPS</a></h2>
-                    <p class="blog-excerpt">把一个纯静态网站部署到 Vercel 并绑定自定义域名，听起来简单，但 DNS 配置、证书签发、国内访问速度每一步都有坑。记录一次完整的部署流程与优化思路...</p>
-                    <div class="blog-footer">
-                        <span class="blog-tag">Vercel</span>
-                        <span class="blog-tag">DNS</span>
-                        <span class="blog-read">阅读全文 →</span>
-                    </div>
-                </article>
-
-                <article class="blog-card animate-on-scroll">
-                    <div class="blog-meta">
-                        <span class="blog-date">2026-08-05</span>
-                        <span class="blog-category">数据</span>
-                    </div>
-                    <h2 class="blog-title"><a href="#">Python 爬虫到可视化：一条完整的数据流</a></h2>
-                    <p class="blog-excerpt">从数据采集、清洗、存储到最终的可视化呈现，用 Python 走通整条链路。聊聊 requests + BeautifulSoup 的采集技巧，Pandas 的数据清洗套路，以及 Tableau 出图的经验...</p>
-                    <div class="blog-footer">
-                        <span class="blog-tag">Python</span>
-                        <span class="blog-tag">数据可视化</span>
-                        <span class="blog-read">阅读全文 →</span>
-                    </div>
-                </article>
-
-                <article class="blog-card animate-on-scroll">
-                    <div class="blog-meta">
-                        <span class="blog-date">2026-07-28</span>
-                        <span class="blog-category">前端</span>
-                    </div>
-                    <h2 class="blog-title"><a href="#">Canvas 粒子动画：好看和性能可以兼得</a></h2>
-                    <p class="blog-excerpt">粒子背景是科技风网站的标配，但粒子数一多就掉帧。从离屏渲染、对象池到 requestAnimationFrame 调度，分享几个让粒子系统流畅跑在移动端的优化手段...</p>
-                    <div class="blog-footer">
-                        <span class="blog-tag">Canvas</span>
-                        <span class="blog-tag">性能优化</span>
-                        <span class="blog-read">阅读全文 →</span>
-                    </div>
-                </article>
-
-                <article class="blog-card animate-on-scroll">
-                    <div class="blog-meta">
-                        <span class="blog-date">2026-07-20</span>
-                        <span class="blog-category">随笔</span>
-                    </div>
-                    <h2 class="blog-title"><a href="#">做跨境电商后，我学会了用数据说话</a></h2>
-                    <p class="blog-excerpt">运营不是拍脑袋。从点击率到转化率，从广告 ROAS 到库存周转，每一个决策背后都应该有数据支撑。记录一些从技术视角看电商运营的思考与感悟...</p>
-                    <div class="blog-footer">
-                        <span class="blog-tag">电商</span>
-                        <span class="blog-tag">运营思考</span>
-                        <span class="blog-read">阅读全文 →</span>
-                    </div>
-                </article>
-
-                <article class="blog-card animate-on-scroll">
-                    <div class="blog-meta">
-                        <span class="blog-date">2026-07-10</span>
-                        <span class="blog-category">工具</span>
-                    </div>
-                    <h2 class="blog-title"><a href="#">效率工具合集：那些让我少加班的小工具</a></h2>
-                    <p class="blog-excerpt">RPA 自动化重复操作、浏览器插件管理多账号、命令行工具批量处理文件。分享几个日常高频使用的效率工具，以及如何用它们把琐碎的事情自动化...</p>
-                    <div class="blog-footer">
-                        <span class="blog-tag">效率</span>
-                        <span class="blog-tag">RPA</span>
-                        <span class="blog-read">阅读全文 →</span>
-                    </div>
-                </article>
+        <!-- 益智趣味 -->
+        <div class="work-category animate-on-scroll">
+            <div class="category-header">
+                <div class="category-icon">🧩</div>
+                <span class="category-title">益智趣味</span>
+                <span class="category-count">6 个</span>
             </div>
-
-            <aside class="blog-sidebar">
-                <div class="sidebar-card animate-on-scroll">
-                    <h3 class="sidebar-title">分类</h3>
-                    <ul class="category-list">
-                        <li><a href="#">前端开发 <span>12</span></a></li>
-                        <li><a href="#">后端技术 <span>8</span></a></li>
-                        <li><a href="#">运维部署 <span>5</span></a></li>
-                        <li><a href="#">数据分析 <span>6</span></a></li>
-                        <li><a href="#">随笔思考 <span>4</span></a></li>
-                    </ul>
-                </div>
-                <div class="sidebar-card animate-on-scroll">
-                    <h3 class="sidebar-title">标签云</h3>
-                    <div class="tag-cloud">
-                        <span>JavaScript</span><span>CSS3</span><span>Vue</span>
-                        <span>Python</span><span>Node.js</span><span>Vercel</span>
-                        <span>Canvas</span><span>电商</span><span>Linux</span>
+            <div class="tool-grid">
+                <a href="https://toolonline.net/brain" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🧠</div>
+                        <div class="tool-name">ToolOnline Brain</div>
                     </div>
-                </div>
-                <div class="sidebar-card animate-on-scroll">
-                    <h3 class="sidebar-title">关注我</h3>
-                    <a href="https://www.douyin.com/user/88819671669" target="_blank" class="social-link douyin-link">
-                        <span class="social-icon">♪</span>
-                        <div class="social-info">
-                            <span class="social-name">抖音</span>
-                            <span class="social-id">88819671669</span>
-                        </div>
-                        <span class="social-arrow">→</span>
-                    </a>
-                </div>
-            </aside>
+                    <p class="tool-desc">免费益智游戏合集，数独、2048、记忆训练、逻辑推理等多种脑力游戏，边玩边锻炼思维。</p>
+                    <div class="tool-tags"><span class="tool-tag">免费</span><span class="tool-tag">益智</span><span class="tool-tag">脑力训练</span></div>
+                </a>
+                <a href="https://sudoku.com" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🔢</div>
+                        <div class="tool-name">数独 Sudoku</div>
+                    </div>
+                    <p class="tool-desc">经典数独游戏，多难度等级，每日挑战，锻炼逻辑推理和数字敏感度。</p>
+                    <div class="tool-tags"><span class="tool-tag">数独</span><span class="tool-tag">逻辑</span><span class="tool-tag">免费</span></div>
+                </a>
+                <a href="https://play2048.co" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🎲</div>
+                        <div class="tool-name">2048</div>
+                    </div>
+                    <p class="tool-desc">经典数字合并游戏，滑动方块合成2048，简单上瘾，考验策略规划能力。</p>
+                    <div class="tool-tags"><span class="tool-tag">数字</span><span class="tool-tag">策略</span><span class="tool-tag">经典</span></div>
+                </a>
+                <a href="https://www.chess.com" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">♟️</div>
+                        <div class="tool-name">Chess.com</div>
+                    </div>
+                    <p class="tool-desc">全球最大国际象棋平台，在线对弈、战术训练、残局解谜，提升棋艺和战略思维。</p>
+                    <div class="tool-tags"><span class="tool-tag">国际象棋</span><span class="tool-tag">对弈</span><span class="tool-tag">策略</span></div>
+                </a>
+                <a href="https://www.jigsawexplorer.com" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🧩</div>
+                        <div class="tool-name">Jigsaw Explorer</div>
+                    </div>
+                    <p class="tool-desc">在线拼图游戏，海量图片可选，支持自定义难度，放松身心锻炼专注力。</p>
+                    <div class="tool-tags"><span class="tool-tag">拼图</span><span class="tool-tag">放松</span><span class="tool-tag">专注</span></div>
+                </a>
+                <a href="https://www.mentalup.co" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🚀</div>
+                        <div class="tool-name">MentalUP</div>
+                    </div>
+                    <p class="tool-desc">科学脑力训练平台，注意力、记忆力、逻辑思维游戏化训练，适合全年龄段。</p>
+                    <div class="tool-tags"><span class="tool-tag">脑力训练</span><span class="tool-tag">注意力</span><span class="tool-tag">记忆</span></div>
+                </a>
+            </div>
+        </div>
+
+        <!-- AI 工具 -->
+        <div class="work-category animate-on-scroll">
+            <div class="category-header">
+                <div class="category-icon">🤖</div>
+                <span class="category-title">AI 工具</span>
+                <span class="category-count">9 个</span>
+            </div>
+            <div class="tool-grid">
+                <a href="https://www.coze.cn" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🔗</div>
+                        <div class="tool-name">扣子 Coze</div>
+                    </div>
+                    <p class="tool-desc">字节跳动推出的AI工作流平台，零代码搭建智能体、插件和工作流，支持多平台发布。</p>
+                    <div class="tool-tags"><span class="tool-tag">工作流</span><span class="tool-tag">智能体</span><span class="tool-tag">免费</span></div>
+                </a>
+                <a href="https://dify.ai" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">⚡</div>
+                        <div class="tool-name">Dify</div>
+                    </div>
+                    <p class="tool-desc">开源LLM应用开发平台，可视化编排AI工作流，支持私有部署和多种模型接入。</p>
+                    <div class="tool-tags"><span class="tool-tag">开源</span><span class="tool-tag">LLM</span><span class="tool-tag">私有部署</span></div>
+                </a>
+                <a href="https://www.doubao.com" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🫘</div>
+                        <div class="tool-name">豆包</div>
+                    </div>
+                    <p class="tool-desc">字节跳动AI助手，支持对话、写作、翻译、代码生成，国内访问流畅。</p>
+                    <div class="tool-tags"><span class="tool-tag">对话</span><span class="tool-tag">写作</span><span class="tool-tag">国内</span></div>
+                </a>
+                <a href="https://kimi.moonshot.cn" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🌙</div>
+                        <div class="tool-name">Kimi</div>
+                    </div>
+                    <p class="tool-desc">月之暗面出品，支持超长文本理解，可上传文件和网页链接进行深度分析。</p>
+                    <div class="tool-tags"><span class="tool-tag">长文本</span><span class="tool-tag">文件分析</span></div>
+                </a>
+                <a href="https://chatglm.cn" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🧠</div>
+                        <div class="tool-name">智谱清言</div>
+                    </div>
+                    <p class="tool-desc">智谱AI推出的通用大模型助手，支持代码、数据分析、文档处理等多种场景。</p>
+                    <div class="tool-tags"><span class="tool-tag">大模型</span><span class="tool-tag">代码</span></div>
+                </a>
+                <a href="https://tongyi.aliyun.com" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🐑</div>
+                        <div class="tool-name">通义千问</div>
+                    </div>
+                    <p class="tool-desc">阿里达摩院大模型，集成通义听悟、通义万相等多模态能力，企业级应用丰富。</p>
+                    <div class="tool-tags"><span class="tool-tag">多模态</span><span class="tool-tag">企业</span></div>
+                </a>
+                <a href="https://yiyan.baidu.com" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">✍️</div>
+                        <div class="tool-name">文心一言</div>
+                    </div>
+                    <p class="tool-desc">百度大模型，支持文案创作、绘画、代码生成，与百度搜索生态深度整合。</p>
+                    <div class="tool-tags"><span class="tool-tag">绘画</span><span class="tool-tag">文案</span></div>
+                </a>
+                <a href="https://chat.openai.com" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">💬</div>
+                        <div class="tool-name">ChatGPT</div>
+                    </div>
+                    <p class="tool-desc">OpenAI旗舰产品，GPT-4o多模态能力，支持图像识别、语音对话和代码生成。</p>
+                    <div class="tool-tags"><span class="tool-tag">GPT-4o</span><span class="tool-tag">多模态</span></div>
+                </a>
+                <a href="https://claude.ai" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">📎</div>
+                        <div class="tool-name">Claude</div>
+                    </div>
+                    <p class="tool-desc">Anthropic出品，长上下文处理能力强，代码和写作质量高，支持Artifacts。</p>
+                    <div class="tool-tags"><span class="tool-tag">长上下文</span><span class="tool-tag">代码</span></div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 在线工具集合 -->
+        <div class="work-category animate-on-scroll">
+            <div class="category-header">
+                <div class="category-icon">🧰</div>
+                <span class="category-title">在线工具集</span>
+                <span class="category-count">4 个</span>
+            </div>
+            <div class="tool-grid">
+                <a href="https://www.kgtools.cn" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🛠️</div>
+                        <div class="tool-name">KG Tools</div>
+                    </div>
+                    <p class="tool-desc">聚合数百种在线工具，涵盖文本处理、图片编辑、开发工具、单位换算等，开箱即用。</p>
+                    <div class="tool-tags"><span class="tool-tag">工具集合</span><span class="tool-tag">免费</span></div>
+                </a>
+                <a href="https://tool.lu" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🔧</div>
+                        <div class="tool-name">在线工具箱</div>
+                    </div>
+                    <p class="tool-desc">程序员常用在线工具，JSON格式化、正则测试、加密解密、编码转换等。</p>
+                    <div class="tool-tags"><span class="tool-tag">开发</span><span class="tool-tag">格式化</span></div>
+                </a>
+                <a href="https://www.toolfk.com" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">⚙️</div>
+                        <div class="tool-name">Toolfk</div>
+                    </div>
+                    <p class="tool-desc">在线代码运行、文本对比、图片处理、PDF工具等，支持多种编程语言在线执行。</p>
+                    <div class="tool-tags"><span class="tool-tag">代码运行</span><span class="tool-tag">PDF</span></div>
+                </a>
+                <a href="https://www.jyshare.com" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">📦</div>
+                        <div class="tool-name">菜鸟工具</div>
+                    </div>
+                    <p class="tool-desc">日常实用工具大全，二维码生成、短链接、图片压缩、字体转换等生活办公工具。</p>
+                    <div class="tool-tags"><span class="tool-tag">日常</span><span class="tool-tag">办公</span></div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 开发工具 -->
+        <div class="work-category animate-on-scroll">
+            <div class="category-header">
+                <div class="category-icon">💻</div>
+                <span class="category-title">开发工具</span>
+                <span class="category-count">6 个</span>
+            </div>
+            <div class="tool-grid">
+                <a href="https://github.com" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🐙</div>
+                        <div class="tool-name">GitHub</div>
+                    </div>
+                    <p class="tool-desc">全球最大代码托管平台，开源项目协作、版本控制、CI/CD一体化。</p>
+                    <div class="tool-tags"><span class="tool-tag">代码托管</span><span class="tool-tag">开源</span></div>
+                </a>
+                <a href="https://codepen.io" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">✏️</div>
+                        <div class="tool-name">CodePen</div>
+                    </div>
+                    <p class="tool-desc">前端代码在线编辑器，实时预览HTML/CSS/JS，海量创意作品和组件灵感。</p>
+                    <div class="tool-tags"><span class="tool-tag">前端</span><span class="tool-tag">在线编辑</span></div>
+                </a>
+                <a href="https://stackblitz.com" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">⚡</div>
+                        <div class="tool-name">StackBlitz</div>
+                    </div>
+                    <p class="tool-desc">浏览器内运行的完整开发环境，支持React/Vue/Angular，秒级启动项目。</p>
+                    <div class="tool-tags"><span class="tool-tag">WebIDE</span><span class="tool-tag">React</span></div>
+                </a>
+                <a href="https://caniuse.com" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">✅</div>
+                        <div class="tool-name">Can I Use</div>
+                    </div>
+                    <p class="tool-desc">前端技术兼容性查询表，CSS/JS/API各浏览器支持情况一目了然。</p>
+                    <div class="tool-tags"><span class="tool-tag">兼容性</span><span class="tool-tag">查询</span></div>
+                </a>
+                <a href="https://regexr.com" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🔍</div>
+                        <div class="tool-name">RegExr</div>
+                    </div>
+                    <p class="tool-desc">正则表达式在线测试工具，实时匹配、语法高亮、社区模式库。</p>
+                    <div class="tool-tags"><span class="tool-tag">正则</span><span class="tool-tag">测试</span></div>
+                </a>
+                <a href="https://www.json.cn" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">📋</div>
+                        <div class="tool-name">JSON中文网</div>
+                    </div>
+                    <p class="tool-desc">JSON格式化、压缩、转义、校验，支持树形视图和在线编辑。</p>
+                    <div class="tool-tags"><span class="tool-tag">JSON</span><span class="tool-tag">格式化</span></div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 设计工具 -->
+        <div class="work-category animate-on-scroll">
+            <div class="category-header">
+                <div class="category-icon">🎨</div>
+                <span class="category-title">设计工具</span>
+                <span class="category-count">5 个</span>
+            </div>
+            <div class="tool-grid">
+                <a href="https://www.figma.com" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🎯</div>
+                        <div class="tool-name">Figma</div>
+                    </div>
+                    <p class="tool-desc">协作式UI设计工具，实时多人编辑、组件库、原型交互，设计师必备。</p>
+                    <div class="tool-tags"><span class="tool-tag">UI设计</span><span class="tool-tag">协作</span></div>
+                </a>
+                <a href="https://js.design" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🎨</div>
+                        <div class="tool-name">即时设计</div>
+                    </div>
+                    <p class="tool-desc">国产在线UI设计工具，兼容Figma，中文社区资源丰富，国内访问流畅。</p>
+                    <div class="tool-tags"><span class="tool-tag">国产</span><span class="tool-tag">UI设计</span></div>
+                </a>
+                <a href="https://www.remove.bg" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🖼️</div>
+                        <div class="tool-name">Remove.bg</div>
+                    </div>
+                    <p class="tool-desc">AI一键抠图，上传图片自动去除背景，支持批量处理和高清下载。</p>
+                    <div class="tool-tags"><span class="tool-tag">抠图</span><span class="tool-tag">AI</span></div>
+                </a>
+                <a href="https://tinypng.com" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🗜️</div>
+                        <div class="tool-name">TinyPNG</div>
+                    </div>
+                    <p class="tool-desc">智能PNG/JPEG图片压缩，保持画质的同时大幅减小文件体积。</p>
+                    <div class="tool-tags"><span class="tool-tag">压缩</span><span class="tool-tag">图片</span></div>
+                </a>
+                <a href="https://www.gaoding.com" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🖌️</div>
+                        <div class="tool-name">稿定设计</div>
+                    </div>
+                    <p class="tool-desc">在线平面设计平台，海量模板，海报、PPT、社交媒体图快速制作。</p>
+                    <div class="tool-tags"><span class="tool-tag">平面设计</span><span class="tool-tag">模板</span></div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 效率与资讯 -->
+        <div class="work-category animate-on-scroll">
+            <div class="category-header">
+                <div class="category-icon">🚀</div>
+                <span class="category-title">效率与资讯</span>
+                <span class="category-count">5 个</span>
+            </div>
+            <div class="tool-grid">
+                <a href="https://www.notion.so" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">📝</div>
+                        <div class="tool-name">Notion</div>
+                    </div>
+                    <p class="tool-desc">All-in-one工作空间，笔记、知识库、项目管理、数据库一体化。</p>
+                    <div class="tool-tags"><span class="tool-tag">笔记</span><span class="tool-tag">项目管理</span></div>
+                </a>
+                <a href="https://www.yuque.com" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">📚</div>
+                        <div class="tool-name">语雀</div>
+                    </div>
+                    <p class="tool-desc">蚂蚁集团出品的知识管理平台，文档、知识库、团队协作，国内访问稳定。</p>
+                    <div class="tool-tags"><span class="tool-tag">知识库</span><span class="tool-tag">国产</span></div>
+                </a>
+                <a href="https://www.feishu.cn" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🐦</div>
+                        <div class="tool-name">飞书</div>
+                    </div>
+                    <p class="tool-desc">字节跳动企业协作平台，即时通讯、文档、日历、会议一站式。</p>
+                    <div class="tool-tags"><span class="tool-tag">协作</span><span class="tool-tag">办公</span></div>
+                </a>
+                <a href="https://tophub.today" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">🔥</div>
+                        <div class="tool-name">今日热榜</div>
+                    </div>
+                    <p class="tool-desc">聚合全网热点，微博、知乎、B站、百度等平台热榜一站式查看。</p>
+                    <div class="tool-tags"><span class="tool-tag">热榜</span><span class="tool-tag">资讯</span></div>
+                </a>
+                <a href="https://dida365.com" target="_blank" class="tool-card">
+                    <span class="tool-arrow">→</span>
+                    <div class="tool-top">
+                        <div class="tool-favicon">✅</div>
+                        <div class="tool-name">滴答清单</div>
+                    </div>
+                    <p class="tool-desc">跨平台待办事项管理，日历视图、番茄钟、习惯打卡，高效时间管理。</p>
+                    <div class="tool-tags"><span class="tool-tag">待办</span><span class="tool-tag">时间管理</span></div>
+                </a>
+            </div>
         </div>
     </main>
 
@@ -218,5 +656,25 @@
     <script src="./js/visitor.js"></script>
     <script src="./js/darkmode.js"></script>
     <script src="./js/main.js"></script>
+    <script>
+    (function() {
+        // 工具分类折叠功能
+        const categories = document.querySelectorAll('.work-category');
+        categories.forEach((cat, idx) => {
+            const header = cat.querySelector('.category-header');
+            if (!header) return;
+            // 添加折叠箭头
+            const arrow = document.createElement('span');
+            arrow.className = 'category-toggle';
+            arrow.textContent = '▼';
+            header.appendChild(arrow);
+            // 默认第一个展开，其余折叠
+            if (idx > 0) cat.classList.add('collapsed');
+            header.addEventListener('click', () => {
+                cat.classList.toggle('collapsed');
+            });
+        });
+    })();
+    </script>
 </body>
 </html>

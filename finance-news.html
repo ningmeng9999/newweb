@@ -1,0 +1,1066 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night" data-dark="false">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新闻大事 | LengMeng</title>
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/animate.css">
+    <link rel="stylesheet" href="./css/theme.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <style>
+        .news-hero {
+            text-align: center;
+            padding: 40px 20px 20px;
+        }
+        .news-hero h1 {
+            font-size: 2.4rem;
+            margin: 0 0 10px;
+            background: linear-gradient(135deg, #ff6b6b, #ffa502);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .news-hero p {
+            color: var(--text-secondary, #8892b0);
+            font-size: 1rem;
+            margin: 0;
+        }
+        .news-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .news-tab {
+            padding: 8px 20px;
+            border-radius: 20px;
+            background: var(--card-bg, rgba(10,25,47,0.5));
+            border: 1px solid var(--border-color, rgba(0,212,255,0.15));
+            color: var(--text-secondary, #8892b0);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .news-tab:hover { border-color: rgba(255,107,107,0.4); color: var(--text-primary, #e6f1ff); }
+        .news-tab.active {
+            background: linear-gradient(135deg, rgba(255,107,107,0.2), rgba(255,165,2,0.2));
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+        .news-layout {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 24px;
+        }
+        .news-list { display: flex; flex-direction: column; gap: 16px; }
+        .news-card {
+            padding: 20px;
+            border-radius: 14px;
+            background: var(--card-bg, rgba(10,25,47,0.5));
+            border: 1px solid var(--border-color, rgba(0,212,255,0.1));
+            transition: all 0.3s;
+            display: flex;
+            gap: 16px;
+        }
+        .news-card:hover {
+            border-color: rgba(255,107,107,0.3);
+            transform: translateX(4px);
+            box-shadow: 0 4px 20px rgba(255,107,107,0.1);
+        }
+        .news-thumb {
+            width: 120px;
+            height: 80px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,165,2,0.1));
+            flex-shrink: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        .news-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .news-content { flex: 1; min-width: 0; }
+        .news-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary, #e6f1ff);
+            margin: 0 0 8px;
+            line-height: 1.4;
+        }
+        .news-title a { color: inherit; text-decoration: none; }
+        .news-title a:hover { color: #ff6b6b; }
+        .news-summary {
+            font-size: 0.85rem;
+            color: var(--text-secondary, #8892b0);
+            line-height: 1.6;
+            margin: 0 0 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .news-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.75rem;
+        }
+        .news-source {
+            color: #00d4ff;
+            background: rgba(0,212,255,0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .news-time { color: var(--text-secondary, #8892b0); }
+        .news-credibility {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .star { color: #ffa502; font-size: 0.7rem; }
+        .star.empty { color: var(--border-color, #444); }
+        .news-stocks {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-left: 12px;
+            flex-shrink: 0;
+            min-width: 110px;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .stock-tag {
+            font-size: 0.9rem;
+            padding: 5px 12px;
+            border-radius: 6px;
+            background: rgba(255,107,107,0.1);
+            color: #ff6b6b;
+            border: 1px solid rgba(255,107,107,0.2);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+        .stock-tag:hover { background: rgba(255,107,107,0.25); transform: scale(1.05); }
+        .news-sidebar { display: flex; flex-direction: column; gap: 16px; }
+        .sidebar-panel {
+            padding: 18px;
+            border-radius: 14px;
+            background: var(--card-bg, rgba(10,25,47,0.5));
+            border: 1px solid var(--border-color, rgba(0,212,255,0.1));
+        }
+        .sidebar-panel h3 {
+            font-size: 1rem;
+            margin: 0 0 14px;
+            color: var(--text-primary, #e6f1ff);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .hot-topic {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color, rgba(0,212,255,0.08));
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .hot-topic:last-child { border-bottom: none; }
+        .hot-topic:hover { padding-left: 4px; }
+        .hot-rank {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .hot-rank.top1 { background: #ff6b6b; color: #fff; }
+        .hot-rank.top2 { background: #ffa502; color: #fff; }
+        .hot-rank.top3 { background: #ffd93d; color: #333; }
+        .hot-rank.other { background: var(--border-color, rgba(0,212,255,0.1)); color: var(--text-secondary, #8892b0); }
+        .hot-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary, #a8b2d1);
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .sentiment-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: var(--border-color, rgba(0,212,255,0.1));
+            overflow: hidden;
+            margin: 8px 0;
+        }
+        .sentiment-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #00cc88, #ffa502, #ff6b6b);
+            transition: width 0.5s;
+        }
+        .sentiment-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-secondary, #8892b0);
+        }
+        .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary, #8892b0);
+        }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color, rgba(0,212,255,0.1));
+            border-top-color: #ff6b6b;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .refresh-btn {
+            padding: 6px 16px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(255,107,107,0.2), rgba(255,165,2,0.2));
+            border: 1px solid rgba(255,107,107,0.3);
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+        .refresh-btn:hover { background: rgba(255,107,107,0.3); }
+        .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .mode-btn {
+            padding: 6px 16px;
+            border-radius: 16px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary, #8892b0);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        .mode-btn.active {
+            background: linear-gradient(135deg, rgba(255,107,107,0.3), rgba(255,165,2,0.3));
+            color: #ff6b6b;
+        }
+        .sum-mode-btn {
+            flex: 1;
+            padding: 6px;
+            border-radius: 6px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary, #8892b0);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+        .sum-mode-btn.active {
+            background: linear-gradient(135deg, rgba(0,212,255,0.3), rgba(0,212,255,0.1));
+            color: #00d4ff;
+        }
+        .embed-site-btn {
+            padding: 6px 14px;
+            border-radius: 6px;
+            background: rgba(0,212,255,0.05);
+            border: 1px solid rgba(0,212,255,0.2);
+            color: #8892b0;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+        .embed-site-btn.active {
+            background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(0,255,136,0.1));
+            color: #00d4ff;
+            border-color: rgba(0,212,255,0.5);
+        }
+        @media (max-width: 900px) {
+            .news-layout { grid-template-columns: 1fr; }
+            .news-sidebar { order: -1; }
+        }
+        @media (max-width: 600px) {
+            .news-card { flex-direction: column; }
+            .news-thumb { width: 100%; height: 140px; }
+            .news-hero h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-box" id="loadingBox">
+        <div class="loading-core">
+            <div class="loading-ring"></div>
+            <div class="loading-ring ring2"></div>
+            <div class="loading-text">LOADING</div>
+            <div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div>
+        </div>
+    </div>
+
+    <div class="bg-layer" id="bgLayer">
+        <div class="bg-wallpaper"></div>
+        <canvas id="particleCanvas"></canvas>
+        <div class="grid-overlay" id="gridOverlay"></div>
+        <div class="glow-orb orb1"></div>
+        <div class="glow-orb orb2"></div>
+    </div>
+
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="sidebar-mask" id="sidebarMask"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">◆</span>
+            <span class="logo-text">LengMeng</span>
+            <button class="icon-btn dark-btn logo-dark-btn" id="darkBtn" title="切换暗黑模式">
+                <span class="icon-sun">☀</span>
+                <span class="icon-moon">☾</span>
+            </button>
+        </div>
+        <div class="sidebar-tool">
+            <span class="weather-info" id="weatherInfo">
+                <span class="weather-icon">◌</span>
+                <span class="weather-text">加载中...</span>
+            </span>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="index.html"><span class="nav-icon">⌂</span>首页</a></li>
+                <li><a href="about.html"><span class="nav-icon">◉</span>关于我</a></li>
+                <li><a href="works.html"><span class="nav-icon">◆</span>项目作品</a></li>
+                <li class="has-submenu open">
+                    <a href="javascript:void(0)" class="submenu-toggle">
+                        <span class="nav-icon">▤</span>工作
+                        <span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="blog.html">实用工具</a></li>
+                        <li class="active"><a href="finance-news.html">新闻大事</a></li>
+                        <li><a href="dashboard.html">店铺管理</a></li>
+                    </ul>
+                </li>
+                <li><a href="album.html"><span class="nav-icon">▣</span>相册</a></li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle">
+                        <span class="nav-icon">◈</span>生活
+                        <span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="cook.html">菜谱</a></li>
+                        <li><a href="stock.html">股票走势</a></li>
+                        <li><a href="anime.html">动漫</a></li>
+                    </ul>
+                </li>
+                <li><a href="contact.html"><span class="nav-icon">✉</span>联系我</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-container page-container">
+        <div class="news-hero animate-fade-up">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <h1 id="mainTitle" style="margin:0;">财经新闻</h1>
+                    <div style="display:flex;gap:4px;background:var(--card-bg,rgba(10,25,47,0.5));padding:4px;border-radius:20px;border:1px solid var(--border-color,rgba(0,212,255,0.15));">
+                        <button class="mode-btn active" data-mode="finance" onclick="switchMode('finance')">财经</button>
+                        <button class="mode-btn" data-mode="headline" onclick="switchMode('headline')">头条</button>
+                    </div>
+                </div>
+                <button class="refresh-btn" id="topRefreshBtn">🔄 刷新</button>
+            </div>
+            <p id="newsSubtitle" style="margin-top:8px;">财经大事 · 关联个股与行业</p>
+        </div>
+
+        <div class="news-tabs" id="newsTabs">
+            <div class="news-tab active" data-lid="2516">全部</div>
+            <div class="news-tab" data-lid="2517">股票</div>
+            <div class="news-tab" data-lid="2517">热门股</div>
+            <div class="news-tab" data-lid="2544">年报增长</div>
+        </div>
+
+        <div class="news-layout">
+            <div class="news-list" id="newsList">
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p>正在加载新闻大事...</p>
+                </div>
+            </div>
+
+            <aside class="news-sidebar">
+                <div class="sidebar-panel">
+                    <h3>📊 市场情绪</h3>
+                    <div class="sentiment-bar"><div class="sentiment-fill" id="sentimentFill" style="width:60%"></div></div>
+                    <div class="sentiment-labels">
+                        <span>恐慌</span>
+                        <span id="sentimentText">中性偏乐观</span>
+                        <span>贪婪</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-panel">
+                    <h3>🔥 热门话题</h3>
+                    <div id="hotTopics">
+                        <div class="hot-topic"><span class="hot-rank top1">1</span><span class="hot-text">A股市场动态</span></div>
+                        <div class="hot-topic"><span class="hot-rank top2">2</span><span class="hot-text">新能源产业链</span></div>
+                        <div class="hot-topic"><span class="hot-rank top3">3</span><span class="hot-text">半导体芯片</span></div>
+                        <div class="hot-topic"><span class="hot-rank other">4</span><span class="hot-text">人工智能</span></div>
+                        <div class="hot-topic"><span class="hot-rank other">5</span><span class="hot-text">房地产政策</span></div>
+                        <div class="hot-topic"><span class="hot-rank other">6</span><span class="hot-text">消费复苏</span></div>
+                        <div class="hot-topic"><span class="hot-rank other">7</span><span class="hot-text">医药生物</span></div>
+                    </div>
+                </div>
+
+                <div class="sidebar-panel">
+                    <h3>📈 相关个股</h3>
+                    <div id="relatedStocks">
+                        <p style="font-size:0.8rem;color:var(--text-secondary,#8892b0);margin:0;">加载中...</p>
+                    </div>
+                </div>
+
+                <div class="sidebar-panel">
+                    <h3>🤖 智能总结</h3>
+                    <div id="aiSummary">
+                        <div style="display:flex;gap:4px;margin-bottom:10px;background:var(--card-bg,rgba(10,25,47,0.5));padding:4px;border-radius:8px;border:1px solid var(--border-color,rgba(0,212,255,0.15));">
+                            <button class="sum-mode-btn active" data-mode="local" onclick="switchSumMode('local')">本地总结</button>
+                            <button class="sum-mode-btn" data-mode="ai" onclick="switchSumMode('ai')">AI总结</button>
+                        </div>
+                        <div id="aiConfig" style="display:none;margin-bottom:8px;">
+                            <select id="aiModel" style="width:100%;padding:6px;margin-bottom:6px;background:var(--card-bg,rgba(10,25,47,0.5));color:var(--text-primary,#ccd6f6);border:1px solid var(--border-color,rgba(0,212,255,0.15));border-radius:6px;font-size:0.8rem;">
+                                <option value="doubao">豆包 (Doubao)</option>
+                                <option value="qwen">通义千问 (Qwen)</option>
+                            </select>
+                            <input type="password" id="aiApiKey" placeholder="输入 API Key" style="width:100%;padding:6px;background:var(--card-bg,rgba(10,25,47,0.5));color:var(--text-primary,#ccd6f6);border:1px solid var(--border-color,rgba(0,212,255,0.15));border-radius:6px;font-size:0.8rem;">
+                        </div>
+                        <button id="aiSummarizeBtn" style="width:100%;padding:8px;background:linear-gradient(135deg,rgba(0,212,255,0.2),rgba(0,212,255,0.1));color:#00d4ff;border:1px solid rgba(0,212,255,0.3);border-radius:6px;cursor:pointer;font-size:0.85rem;transition:all 0.3s;">✨ 一键总结当前新闻</button>
+                        <div id="aiResult" style="margin-top:10px;font-size:0.8rem;line-height:1.8;color:var(--text-secondary,#8892b0);max-height:400px;overflow-y:auto;display:none;white-space:pre-wrap;"></div>
+                        <p id="sumTip" style="font-size:0.7rem;color:#666;margin-top:8px;line-height:1.4;">本地算法生成，无需API Key，秒出结果</p>
+                    </div>
+                </div>
+
+                <div class="sidebar-panel">
+                    <h3>📌 数据说明</h3>
+                    <p style="font-size:0.8rem;color:var(--text-secondary,#8892b0);line-height:1.6;margin:0;">
+                        新闻来源：新浪财经滚动<br>
+                        可信度：根据来源媒体评级<br>
+                        相关个股：关键词智能匹配<br>
+                        国内/国际：综合财经资讯<br>
+                        热门股/年报：股票与公司公告
+                    </p>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2026 LengMeng · All Rights Reserved</p>
+            <p class="footer-link">
+                <a href="https://lengmeng.online" target="_blank">lengmeng.online</a>
+                <span>·</span>
+                <span>Powered by Vercel</span>
+            </p>
+        </div>
+    </footer>
+
+    <audio id="bgMusic" loop muted preload="auto">
+        <source src="./music/bgm.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="./js/theme.js"></script>
+    <script src="./js/animate.js"></script>
+    <script src="./js/weather.js"></script>
+    <script src="./js/music.js"></script>
+    <script src="./js/sentence.js"></script>
+    <script src="./js/visitor.js"></script>
+    <script src="./js/darkmode.js"></script>
+    <script src="./js/main.js"></script>
+    <script>
+    // 全局调试信息
+    window.newsDebug = '脚本已加载';
+    console.log('[finance-news] 脚本开始执行');
+
+    const NEWS_API = 'https://feed.mix.sina.com.cn/api/roll/get?pageid=153&lid={LID}&num=30&page=1';
+    let currentLid = '2516';
+    let currentMode = 'finance'; // finance 财经 | headline 头条
+    let currentHeadlineCat = 'all'; // all 全部 | domestic 国内 | international 国际
+    let jsonpScript = null;
+    let jsonpTimer = null;
+    let headlineCache = null; // 头条数据缓存
+
+    // 国际关键词
+    const INTL_KEYWORDS = ['美国','日本','韩国','欧洲','欧盟','英国','法国','德国','俄罗斯','乌克兰','以色列','巴勒斯坦','印度','越南','泰国','新加坡','澳大利亚','加拿大','巴西','阿根廷','墨西哥','南非','埃及','沙特','伊朗','伊拉克','阿富汗','巴基斯坦','孟加拉','印尼','菲律宾','马来西亚','联合国','北约','G7','G20','美联储','欧央行','白宫','五角大楼','克里姆林宫','唐宁街','爱丽舍宫','国际','全球','海外','外媒','美元','欧元','日元','英镑','原油','黄金','比特币','加密货币'];
+
+    function isInternational(title) {
+        return INTL_KEYWORDS.some(k => title.includes(k));
+    }
+
+    // 切换财经/头条模式
+    function switchMode(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.mode-btn').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelector('.mode-btn[data-mode="' + mode + '"]').classList.add('active');
+        const tabsEl = document.getElementById('newsTabs');
+        if (mode === 'finance') {
+            document.getElementById('mainTitle').textContent = '财经新闻';
+            document.getElementById('newsSubtitle').textContent = '财经大事 · 关联个股与行业';
+            tabsEl.innerHTML = '<div class="news-tab active" data-lid="2516">全部</div><div class="news-tab" data-lid="2517">股票</div><div class="news-tab" data-lid="2517">热门股</div><div class="news-tab" data-lid="2544">年报增长</div>';
+            bindFinanceTabs();
+            loadNews('2516');
+        } else {
+            document.getElementById('mainTitle').textContent = '国内国际头条';
+            document.getElementById('newsSubtitle').textContent = '综合热点 · 实时资讯';
+            tabsEl.innerHTML = '<div class="news-tab active" data-cat="all">全部</div><div class="news-tab" data-cat="domestic">国内</div><div class="news-tab" data-cat="international">国际</div><div class="news-tab" data-cat="embed">📺 嵌入新闻</div>';
+            bindHeadlineTabs();
+            loadHeadlines('all');
+        }
+    }
+
+    function bindFinanceTabs() {
+        document.querySelectorAll('#newsTabs .news-tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('#newsTabs .news-tab').forEach(function(t) { t.classList.remove('active'); });
+                tab.classList.add('active');
+                loadNews(tab.dataset.lid);
+            });
+        });
+    }
+
+    function bindHeadlineTabs() {
+        document.querySelectorAll('#newsTabs .news-tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('#newsTabs .news-tab').forEach(function(t) { t.classList.remove('active'); });
+                tab.classList.add('active');
+                loadHeadlines(tab.dataset.cat);
+            });
+        });
+    }
+
+    // 加载头条（百度热搜API）
+    function loadHeadlines(cat) {
+        currentHeadlineCat = cat;
+        const listEl = document.getElementById('newsList');
+
+        // 嵌入模式
+        if (cat === 'embed') {
+            listEl.innerHTML = `
+                <div style="background:var(--card-bg,rgba(10,25,47,0.5));border:1px solid var(--border-color,rgba(0,212,255,0.15));border-radius:12px;overflow:hidden;">
+                    <div style="display:flex;gap:8px;padding:12px;border-bottom:1px solid var(--border-color,rgba(0,212,255,0.1));flex-wrap:wrap;">
+                        <button class="embed-site-btn active" onclick="switchEmbedSite('https://www.thepaper.cn/', this)">澎湃新闻</button>
+                        <button class="embed-site-btn" onclick="switchEmbedSite('https://36kr.com/', this)">36氪</button>
+                        <button class="embed-site-btn" onclick="switchEmbedSite('https://news.sina.com.cn/', this)">新浪新闻</button>
+                    </div>
+                    <iframe id="embedFrame" src="https://www.thepaper.cn/" style="width:100%;height:70vh;border:none;background:#fff;"></iframe>
+                </div>
+            `;
+            document.getElementById('relatedStocks').innerHTML = '<p style="font-size:0.8rem;color:var(--text-secondary,#8892b0);margin:0;">嵌入模式无个股关联</p>';
+            return;
+        }
+
+        listEl.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><p>正在加载百度热搜...</p></div>';
+        console.log('[finance-news] 加载百度热搜, cat=' + cat);
+
+        fetch('/api/toutiao')
+            .then(function(res) { return res.json(); })
+            .then(function(json) {
+                if (!json.success) {
+                    listEl.innerHTML = '<div class="loading-state"><p>加载失败：' + (json.error || '未知错误') + '</p><p style="font-size:0.8rem;">点击刷新重试</p></div>';
+                    return;
+                }
+                let list = json.data || [];
+                console.log('[finance-news] 百度热搜原始数据:', list.length, '条');
+                if (cat === 'domestic') {
+                    list = list.filter(function(item) { return !item.isInternational; });
+                } else if (cat === 'international') {
+                    list = list.filter(function(item) { return item.isInternational; });
+                }
+                console.log('[finance-news] 过滤后:', list.length, '条');
+                if (list.length === 0) {
+                    listEl.innerHTML = '<div class="loading-state"><p>暂无' + (cat === 'international' ? '国际' : '国内') + '相关热搜</p></div>';
+                    document.getElementById('relatedStocks').innerHTML = '<p style="font-size:0.8rem;color:var(--text-secondary,#8892b0);margin:0;">头条模式无个股关联</p>';
+                    return;
+                }
+                renderHeadlines(list);
+            })
+            .catch(function(e) {
+                console.error('[finance-news] 百度热搜加载失败:', e);
+                listEl.innerHTML = '<div class="loading-state"><p>加载失败：' + e.message + '</p><p style="font-size:0.8rem;">请确保已部署 api/toutiao.js 到Vercel</p></div>';
+            });
+    }
+
+    function switchEmbedSite(url, btn) {
+        document.getElementById('embedFrame').src = url;
+        document.querySelectorAll('.embed-site-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+    }
+
+    function renderHeadlines(list) {
+        const listEl = document.getElementById('newsList');
+        let html = '';
+        list.forEach(function(item) {
+            const title = item.title || '';
+            const hot = item.hot || '';
+            const url = item.url || '#';
+            const desc = item.desc || '';
+            const rank = item.rank || 0;
+            const isIntl = item.isInternational;
+            const rankClass = rank <= 3 ? 'top' + rank : 'other';
+            html += '<article class="news-card">';
+            html += '<div class="news-thumb" style="font-size:1.5rem;font-weight:bold;color:' + (rank<=3?'#ff6b6b':'#8892b0') + ';">' + rank + '</div>';
+            html += '<div class="news-content">';
+            html += '<h2 class="news-title"><a href="' + url + '" target="_blank" rel="noopener">' + title + '</a></h2>';
+            if (desc) html += '<p class="news-summary">' + desc + '</p>';
+            html += '<div class="news-meta">';
+            html += '<span class="news-source">百度热搜</span>';
+            if (hot) html += '<span class="news-time" style="color:#ff6b6b;">🔥 ' + (parseInt(hot)/10000).toFixed(0) + '万热度</span>';
+            html += '<span class="news-credibility">' + (isIntl ? '🌍 国际' : '🇨🇳 国内') + '</span>';
+            html += '</div></div></article>';
+        });
+        listEl.innerHTML = html;
+        document.getElementById('relatedStocks').innerHTML = '<p style="font-size:0.8rem;color:var(--text-secondary,#8892b0);margin:0;">头条模式无个股关联</p>';
+    }
+
+    // 可信度评级
+    const CREDIBILITY = {
+        '新华社': 5, '人民日报': 5, '央视': 5, '经济日报': 5,
+        '证券时报': 4, '中国证券报': 4, '上海证券报': 4, '证券日报': 4,
+        '财新': 4, '第一财经': 4, '华尔街见闻': 4, '界面新闻': 4,
+        '21世纪经济报道': 4, '每日经济新闻': 4,
+        '新浪财经': 3, '腾讯财经': 3, '网易财经': 3, '凤凰财经': 3,
+        '市场资讯': 3, '证券时': 3,
+        'default': 3
+    };
+
+    // 关键词 -> 相关股票
+    const KEYWORD_STOCKS = {
+        '新能源': ['宁德时代', '比亚迪', '隆基绿能', '阳光电源'],
+        '光伏': ['隆基绿能', '通威股份', '阳光电源', '晶澳科技'],
+        '半导体': ['中芯国际', '韦尔股份', '北方华创', '中微公司'],
+        '芯片': ['中芯国际', '寒武纪', '海光信息', '紫光国微'],
+        '人工智能': ['科大讯飞', '三六零', '寒武纪', '海光信息'],
+        'AI': ['科大讯飞', '三六零', '寒武纪', '昆仑万维'],
+        '汽车': ['比亚迪', '长安汽车', '长城汽车', '赛力斯'],
+        '电动车': ['比亚迪', '宁德时代', '赛力斯', '理想汽车'],
+        '房地产': ['万科A', '保利发展', '招商蛇口', '金地集团'],
+        '银行': ['招商银行', '平安银行', '宁波银行', '工商银行'],
+        '医药': ['恒瑞医药', '药明康德', '迈瑞医疗', '片仔癀'],
+        '医疗': ['恒瑞医药', '药明康德', '迈瑞医疗', '爱尔眼科'],
+        '消费': ['贵州茅台', '五粮液', '伊利股份', '海天味业'],
+        '白酒': ['贵州茅台', '五粮液', '泸州老窖', '山西汾酒'],
+        '5G': ['中兴通讯', '中国联通', '烽火通信', '信维通信'],
+        '军工': ['中航沈飞', '航发动力', '中航光电', '振华科技'],
+        '券商': ['东方财富', '中信证券', '华泰证券', '国泰君安'],
+        '数字经济': ['用友网络', '金山办公', '广联达', '石基信息'],
+        '机器人': ['埃斯顿', '汇川技术', '绿的谐波', '拓斯达'],
+        '储能': ['宁德时代', '阳光电源', '派能科技', '亿纬锂能']
+    };
+
+    function getCredibility(media) {
+        if (!media) return 3;
+        for (const key in CREDIBILITY) {
+            if (media.includes(key)) return CREDIBILITY[key];
+        }
+        return CREDIBILITY.default;
+    }
+
+    function renderStars(level) {
+        let html = '';
+        for (let i = 1; i <= 5; i++) {
+            html += '<span class="star' + (i <= level ? '' : ' empty') + '">★</span>';
+        }
+        return html;
+    }
+
+    function matchStocks(title, summary) {
+        const text = (title + summary).toLowerCase();
+        const matched = new Set();
+        for (const keyword in KEYWORD_STOCKS) {
+            if (text.includes(keyword.toLowerCase())) {
+                KEYWORD_STOCKS[keyword].forEach(s => matched.add(s));
+            }
+        }
+        return Array.from(matched).slice(0, 4);
+    }
+
+    function formatTime(timestamp) {
+        const date = new Date(timestamp * 1000);
+        const now = new Date();
+        const diff = (now - date) / 1000;
+        if (diff < 60) return '刚刚';
+        if (diff < 3600) return Math.floor(diff / 60) + '分钟前';
+        if (diff < 86400) return Math.floor(diff / 3600) + '小时前';
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        const h = String(date.getHours()).padStart(2, '0');
+        const min = String(date.getMinutes()).padStart(2, '0');
+        return m + '-' + d + ' ' + h + ':' + min;
+    }
+
+    function renderNews(news) {
+        const listEl = document.getElementById('newsList');
+        if (!listEl) { console.error('找不到newsList元素'); return; }
+        let html = '';
+        news.forEach(item => {
+            const title = item.title || '';
+            const summary = item.intro || item.summary || '';
+            const link = item.url || '#';
+            const media = item.media_name || '新浪财经';
+            const time = formatTime(item.ctime || Date.now() / 1000);
+            const credibility = getCredibility(media);
+            const stocks = matchStocks(title, summary);
+            const thumb = (item.images && item.images[0] && item.images[0].u) || (item.img && item.img.u) || '';
+            html += '<article class="news-card">';
+            html += '<div class="news-thumb">';
+            if (thumb) {
+                html += '<img src="' + thumb.replace('http://', 'https://') + '" alt="" onerror="this.style.display=\'none\';this.parentNode.innerHTML=\'📰\'">';
+            } else { html += '📰'; }
+            html += '</div><div class="news-content">';
+            html += '<h2 class="news-title"><a href="' + link + '" target="_blank" rel="noopener">' + title + '</a></h2>';
+            if (summary) html += '<p class="news-summary">' + summary + '</p>';
+            html += '<div class="news-meta">';
+            html += '<span class="news-source">' + media + '</span>';
+            html += '<span class="news-time">' + time + '</span>';
+            html += '<span class="news-credibility">' + renderStars(credibility) + '</span>';
+            html += '</div>';
+            html += '</div>';
+            if (stocks.length > 0) {
+                html += '<div class="news-stocks">';
+                stocks.forEach(s => { html += '<span class="stock-tag" onclick="location.href=\'stock.html\'">📈 ' + s + '</span>'; });
+                html += '</div>';
+            }
+            html += '</article>';
+        });
+        listEl.innerHTML = html;
+        window.newsDebug = '渲染完成，共' + news.length + '条';
+        console.log('[finance-news] 渲染完成，共' + news.length + '条');
+        updateSentiment(news);
+        updateRelatedStocks(news);
+    }
+
+    function updateRelatedStocks(news) {
+        const stockCount = {};
+        news.forEach(item => {
+            const text = (item.title || '') + (item.intro || '');
+            for (const keyword in KEYWORD_STOCKS) {
+                if (text.includes(keyword)) {
+                    KEYWORD_STOCKS[keyword].forEach(s => {
+                        stockCount[s] = (stockCount[s] || 0) + 1;
+                    });
+                }
+            }
+        });
+        const sorted = Object.entries(stockCount).sort((a, b) => b[1] - a[1]).slice(0, 8);
+        const el = document.getElementById('relatedStocks');
+        if (!el) return;
+        if (sorted.length === 0) {
+            el.innerHTML = '<p style="font-size:0.8rem;color:var(--text-secondary,#8892b0);margin:0;">暂无相关个股</p>';
+            return;
+        }
+        let html = '';
+        sorted.forEach(([name, count], idx) => {
+            const rankClass = idx < 3 ? 'top' + (idx + 1) : 'other';
+            html += '<div class="hot-topic" onclick="location.href=\'stock.html\'" style="cursor:pointer;">';
+            html += '<span class="hot-rank ' + rankClass + '">' + (idx + 1) + '</span>';
+            html += '<span class="hot-text">📈 ' + name + '</span>';
+            html += '<span style="font-size:0.7rem;color:#ff6b6b;">' + count + '篇</span>';
+            html += '</div>';
+        });
+        el.innerHTML = html;
+    }
+
+    function updateSentiment(news) {
+        const positiveWords = ['涨', '升', '利好', '增长', '突破', '新高', '复苏', '盈利', '上涨', '走强'];
+        const negativeWords = ['跌', '降', '利空', '亏损', '下跌', '新低', '风险', '退市', 'ST', '处罚'];
+        let pos = 0, neg = 0;
+        news.forEach(item => {
+            const text = (item.title || '') + (item.intro || '');
+            positiveWords.forEach(w => { if (text.includes(w)) pos++; });
+            negativeWords.forEach(w => { if (text.includes(w)) neg++; });
+        });
+        const total = pos + neg || 1;
+        const ratio = pos / total;
+        const fill = document.getElementById('sentimentFill');
+        const txt = document.getElementById('sentimentText');
+        if (fill) fill.style.width = Math.round(ratio * 100) + '%';
+        if (txt) {
+            let t = '中性';
+            if (ratio > 0.65) t = '偏乐观';
+            else if (ratio > 0.55) t = '中性偏乐观';
+            else if (ratio < 0.35) t = '偏悲观';
+            else if (ratio < 0.45) t = '中性偏悲观';
+            txt.textContent = t;
+        }
+    }
+
+    // 最简单的JSONP：全局回调函数
+    function loadNews(lid) {
+        const listEl = document.getElementById('newsList');
+        if (!listEl) { console.error('找不到newsList'); return; }
+        listEl.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><p>正在加载新闻大事...（JSONP请求中）</p></div>';
+        currentLid = lid;
+        window.newsDebug = '开始加载 lid=' + lid;
+        console.log('[finance-news] 开始加载 lid=' + lid);
+
+        // 清理之前的
+        if (jsonpTimer) { clearTimeout(jsonpTimer); jsonpTimer = null; }
+        if (jsonpScript && jsonpScript.parentNode) jsonpScript.parentNode.removeChild(jsonpScript);
+
+        // 定义全局回调
+        window.sinaNewsCallback = function(data) {
+            window.newsDebug = '回调已触发';
+            console.log('[finance-news] JSONP回调触发，数据:', data);
+            if (jsonpTimer) { clearTimeout(jsonpTimer); jsonpTimer = null; }
+            if (jsonpScript && jsonpScript.parentNode) jsonpScript.parentNode.removeChild(jsonpScript);
+            if (data && data.result && data.result.data && data.result.data.length > 0) {
+                renderNews(data.result.data);
+            } else {
+                listEl.innerHTML = '<div class="loading-state"><p>暂无新闻数据</p><p style="font-size:0.8rem;">返回数据结构异常</p></div>';
+                window.newsDebug = '数据为空或结构异常';
+            }
+        };
+
+        const url = NEWS_API.replace('{LID}', lid) + '&callback=sinaNewsCallback';
+        console.log('[finance-news] 请求URL:', url);
+        window.newsDebug = '创建script: ' + url;
+
+        jsonpScript = document.createElement('script');
+        jsonpScript.src = url;
+        jsonpScript.onerror = function() {
+            window.newsDebug = 'script加载失败';
+            console.error('[finance-news] script加载失败');
+            listEl.innerHTML = '<div class="loading-state"><p>加载失败：script标签加载失败</p><p style="font-size:0.8rem;">可能是网络问题或API不可达</p></div>';
+        };
+        document.head.appendChild(jsonpScript);
+
+        // 15秒超时
+        jsonpTimer = setTimeout(function() {
+            window.newsDebug = '请求超时';
+            console.error('[finance-news] 请求超时');
+            listEl.innerHTML = '<div class="loading-state"><p>加载超时（15秒）</p><p style="font-size:0.8rem;">新浪API响应超时，请点击刷新重试</p></div>';
+        }, 15000);
+    }
+
+    // 初始绑定财经分类
+    bindFinanceTabs();
+
+    // 顶部刷新按钮
+    var topRefreshBtn = document.getElementById('topRefreshBtn');
+    if (topRefreshBtn) {
+        topRefreshBtn.addEventListener('click', function() {
+            this.disabled = true;
+            this.textContent = '加载中...';
+            if (currentMode === 'finance') {
+                loadNews(currentLid);
+            } else {
+                loadHeadlines(currentHeadlineCat);
+            }
+            var btn = this;
+            setTimeout(function() { btn.disabled = false; btn.textContent = '🔄 刷新'; }, 2000);
+        });
+    }
+
+    // 初始加载
+    console.log('[finance-news] 准备初始加载');
+    loadNews('2516');
+    console.log('[finance-news] 初始加载已调用');
+
+    // ========== 智能总结（本地+AI双模式） ==========
+    let sumMode = 'local'; // local | ai
+
+    const AI_CONFIG = {
+        doubao: {
+            name: '豆包',
+            url: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
+            model: 'doubao-1-5-pro-32k-250115'
+        },
+        qwen: {
+            name: '通义千问',
+            url: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+            model: 'qwen-turbo'
+        }
+    };
+
+    function switchSumMode(mode) {
+        sumMode = mode;
+        document.querySelectorAll('.sum-mode-btn').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelector('.sum-mode-btn[data-mode="' + mode + '"]').classList.add('active');
+        document.getElementById('aiConfig').style.display = mode === 'ai' ? 'block' : 'none';
+        document.getElementById('sumTip').textContent = mode === 'ai' ? '调用大模型生成，需API Key' : '本地算法生成，无需API Key，秒出结果';
+    }
+
+    // 加载保存的AI设置
+    const savedModel = localStorage.getItem('ai_model');
+    const savedKey = localStorage.getItem('ai_api_key');
+    if (savedModel) document.getElementById('aiModel').value = savedModel;
+    if (savedKey) document.getElementById('aiApiKey').value = savedKey;
+
+    document.getElementById('aiModel').addEventListener('change', function() {
+        localStorage.setItem('ai_model', this.value);
+    });
+    document.getElementById('aiApiKey').addEventListener('input', function() {
+        localStorage.setItem('ai_api_key', this.value);
+    });
+
+    function localSummarize(titles, mode) {
+        const result = [];
+        const modeName = mode === 'finance' ? '财经新闻' : '国内国际头条';
+
+        const stopWords = ['的','了','在','是','我','有','和','就','不','人','都','一','一个','上','也','很','到','说','要','去','你','会','着','没有','看','好','自己','这','那','他','她','它','我们','你们','他们','这个','那个','什么','怎么','为什么','因为','所以','但是','而且','或者','如果','虽然','然而','并且','以及','还是','不是','就是','可以','已经','正在','将','被','把','让','使','从','向','对','与','及','等','中','里','前','后','时','年','月','日','今天','明天','昨天'];
+        const keywords = {};
+        titles.forEach(title => {
+            for (let len = 2; len <= 4; len++) {
+                for (let i = 0; i <= title.length - len; i++) {
+                    const word = title.substring(i, i + len);
+                    if (!stopWords.includes(word) && !/^\d+$/.test(word) && !/[a-zA-Z]/.test(word)) {
+                        keywords[word] = (keywords[word] || 0) + 1;
+                    }
+                }
+            }
+        });
+        const topKeywords = Object.entries(keywords)
+            .filter(([k, v]) => v >= 2)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 8);
+
+        const industries = {
+            '新能源': ['新能源','光伏','锂电','储能','电动车','充电桩','风电','氢能'],
+            '半导体': ['半导体','芯片','集成电路','晶圆','封测','光刻','EDA'],
+            '人工智能': ['人工智能','AI','大模型','算力','机器人','深度学习','GPT'],
+            '医药': ['医药','医疗','疫苗','创新药','医保','CXO','生物'],
+            '消费': ['消费','白酒','食品','零售','电商','免税','餐饮'],
+            '房地产': ['房地产','楼市','房价','房企','物业','房贷','限购'],
+            '金融': ['银行','券商','保险','基金','理财','信托','期货'],
+            '军工': ['军工','航天','航空','导弹','国防','航母','战机'],
+            '汽车': ['汽车','车企','新能源汽车','自动驾驶','造车','销量'],
+            '互联网': ['互联网','平台','电商','直播','短视频','游戏']
+        };
+        const industryCount = {};
+        for (const ind in industries) {
+            industryCount[ind] = titles.filter(t => industries[ind].some(k => t.includes(k))).length;
+        }
+        const topIndustries = Object.entries(industryCount)
+            .filter(([k, v]) => v > 0)
+            .sort((a, b) => b[1] - a[1]);
+
+        const posWords = ['涨','升','利好','增长','突破','新高','复苏','盈利','上涨','走强','增','扩产','订单','签约','获批','上线'];
+        const negWords = ['跌','降','利空','亏损','下跌','新低','风险','退市','处罚','减','裁员','破产','违约','调查','罚款','暴跌'];
+        let pos = 0, neg = 0;
+        titles.forEach(t => {
+            posWords.forEach(w => { if (t.includes(w)) pos++; });
+            negWords.forEach(w => { if (t.includes(w)) neg++; });
+        });
+        let sentiment = '中性';
+        if (pos > neg * 1.5) sentiment = '偏乐观 📈';
+        else if (neg > pos * 1.5) sentiment = '偏悲观 📉';
+
+        result.push(`📊 ${modeName}智能总结`);
+        result.push(`━━━━━━━━━━━━━━━`);
+        result.push(`📰 共 ${titles.length} 条新闻`);
+        result.push(`💹 市场情绪：${sentiment}（利好${pos} / 利空${neg}）`);
+
+        if (topKeywords.length > 0) {
+            result.push(``);
+            result.push(`🔥 高频关键词：`);
+            topKeywords.slice(0, 6).forEach(([k, v]) => {
+                result.push(`   • ${k} (${v}次)`);
+            });
+        }
+
+        if (topIndustries.length > 0) {
+            result.push(``);
+            result.push(`🏭 热门行业分布：`);
+            topIndustries.slice(0, 5).forEach(([k, v]) => {
+                const bar = '█'.repeat(Math.min(v, 10)) + '░'.repeat(Math.max(0, 10 - v));
+                result.push(`   ${k.padEnd(6, ' ')} ${bar} ${v}条`);
+            });
+        }
+
+        const importantWords = ['重磅','突发','紧急','涨停','暴跌','创新高','历史首次','万亿','千亿','证监会','央行','国务院'];
+        const important = titles.filter(t => importantWords.some(w => t.includes(w))).slice(0, 3);
+        if (important.length > 0) {
+            result.push(``);
+            result.push(`⚡ 重点关注：`);
+            important.forEach(t => result.push(`   • ${t.substring(0, 35)}${t.length > 35 ? '...' : ''}`));
+        }
+
+        result.push(``);
+        result.push(`💡 以上由本地算法生成，仅供参考`);
+
+        return result.join('\n');
+    }
+
+    document.getElementById('aiSummarizeBtn').addEventListener('click', function() {
+        const titles = [];
+        document.querySelectorAll('.news-title a').forEach(function(a) {
+            titles.push(a.textContent);
+        });
+        const resultEl = document.getElementById('aiResult');
+        const btn = this;
+
+        if (titles.length === 0) {
+            resultEl.style.display = 'block';
+            resultEl.innerHTML = '<span style="color:#ff6b6b;">⚠️ 暂无新闻可总结</span>';
+            return;
+        }
+
+        resultEl.style.display = 'block';
+        resultEl.style.color = '#ccd6f6';
+
+        if (sumMode === 'local') {
+            resultEl.textContent = localSummarize(titles, currentMode);
+            return;
+        }
+
+        // AI模式
+        const model = document.getElementById('aiModel').value;
+        const apiKey = document.getElementById('aiApiKey').value.trim();
+        if (!apiKey) {
+            resultEl.innerHTML = '<span style="color:#ff6b6b;">⚠️ 请先输入 API Key，或切换到本地总结模式</span>';
+            return;
+        }
+
+        const modeName = currentMode === 'finance' ? '财经新闻' : '国内国际头条';
+        const prompt = '请总结以下' + modeName + '的要点，分3-5条，每条不超过30字，用中文：\n\n' + titles.slice(0, 15).join('\n');
+        const config = AI_CONFIG[model];
+
+        resultEl.innerHTML = '<span style="color:#00d4ff;">⏳ AI正在总结...</span>';
+        btn.disabled = true;
+        btn.textContent = '总结中...';
+
+        fetch(config.url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + apiKey
+            },
+            body: JSON.stringify({
+                model: config.model,
+                messages: [{ role: 'user', content: prompt }],
+                temperature: 0.3,
+                max_tokens: 500
+            })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(json) {
+            const summary = json.choices && json.choices[0] && json.choices[0].message ? json.choices[0].message.content : JSON.stringify(json);
+            resultEl.textContent = summary;
+        })
+        .catch(function(e) {
+            resultEl.innerHTML = '<span style="color:#ff6b6b;">❌ 总结失败：' + e.message + '</span>';
+        })
+        .finally(function() {
+            btn.disabled = false;
+            btn.textContent = '✨ 一键总结当前新闻';
+        });
+    });
+    </script>
+</body>
+</html>

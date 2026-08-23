@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>店铺管理 - 亚马逊异常监控 | LengMeng</title>
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/theme.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg-primary, #0a0e27); color: var(--text-primary, #fff); font-family: 'Microsoft YaHei', sans-serif; min-height: 100vh; }
+        .shop-container { padding: 20px; max-width: 1400px; margin: 0 auto; position: relative; z-index: 1; }
+        .shop-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+        .shop-title { font-size: 1.6rem; font-weight: bold; background: linear-gradient(90deg, #ff6b6b, #ffa502); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .shop-actions { display: flex; gap: 10px; align-items: center; }
+        .btn { padding: 10px 20px; border-radius: 8px; cursor: pointer; border: none; font-size: 0.9rem; transition: all 0.3s; }
+        .btn-primary { background: linear-gradient(135deg, #ff6b6b, #ffa502); color: #fff; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255,107,107,0.3); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-outline { background: transparent; border: 1px solid rgba(0,212,255,0.3); color: #00d4ff; }
+        .btn-outline:hover { background: rgba(0,212,255,0.1); }
+        .last-check { color: var(--text-secondary, #8892b0); font-size: 0.85rem; margin-top: 4px; }
+
+        .alert-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 20px; }
+        .alert-card { background: var(--card-bg, rgba(10,25,47,0.5)); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 12px; padding: 18px; position: relative; overflow: hidden; transition: all 0.3s; cursor: pointer; }
+        .alert-card:hover { transform: translateY(-3px); }
+        .alert-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .alert-card.review::before { background: #ff6b6b; }
+        .alert-card.stock::before { background: #ffa502; }
+        .alert-card.bsr::before { background: #a55eea; }
+        .alert-card.perf::before { background: #ff4757; }
+        .alert-card.active { border-color: rgba(255,107,107,0.5); box-shadow: 0 0 20px rgba(255,107,107,0.15); }
+        .alert-icon { font-size: 1.8rem; margin-bottom: 8px; }
+        .alert-count { font-size: 2rem; font-weight: bold; }
+        .alert-count.has-alert { color: #ff6b6b; }
+        .alert-label { font-size: 0.85rem; color: var(--text-secondary, #8892b0); margin-top: 4px; }
+        .alert-badge { position: absolute; top: 12px; right: 12px; background: #ff6b6b; color: #fff; font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; display: none; }
+        .alert-card.has-alert .alert-badge { display: block; }
+
+        .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+        .filter-btn { padding: 8px 16px; border-radius: 6px; cursor: pointer; background: var(--card-bg, rgba(10,25,47,0.5)); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); color: var(--text-secondary, #8892b0); font-size: 0.85rem; transition: all 0.3s; }
+        .filter-btn.active { background: linear-gradient(135deg, rgba(255,107,107,0.2), rgba(255,165,2,0.1)); color: #ff6b6b; border-color: rgba(255,107,107,0.4); }
+        .filter-btn:hover { color: #ff6b6b; }
+
+        .alert-list { display: flex; flex-direction: column; gap: 12px; }
+        .alert-item { background: var(--card-bg, rgba(10,25,47,0.5)); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 10px; padding: 16px; display: flex; gap: 14px; align-items: flex-start; transition: all 0.3s; }
+        .alert-item:hover { border-color: rgba(255,107,107,0.3); }
+        .alert-item.resolved, .alert-item.ignored { opacity: 0.5; }
+        .alert-type-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+        .alert-type-icon.review { background: rgba(255,107,107,0.15); }
+        .alert-type-icon.stock { background: rgba(255,165,2,0.15); }
+        .alert-type-icon.bsr { background: rgba(165,94,234,0.15); }
+        .alert-type-icon.perf { background: rgba(255,71,87,0.15); }
+        .alert-content { flex: 1; min-width: 0; }
+        .alert-title { font-size: 1rem; font-weight: 600; margin-bottom: 4px; }
+        .alert-desc { font-size: 0.85rem; color: var(--text-secondary, #8892b0); line-height: 1.5; }
+        .alert-meta { display: flex; gap: 12px; margin-top: 8px; font-size: 0.75rem; color: var(--text-secondary, #8892b0); flex-wrap: wrap; }
+        .alert-status { padding: 3px 10px; border-radius: 4px; font-size: 0.75rem; }
+        .status-pending { background: rgba(255,107,107,0.15); color: #ff6b6b; }
+        .status-resolved { background: rgba(46,213,115,0.15); color: #2ed573; }
+        .status-ignored { background: rgba(136,146,176,0.15); color: #8892b0; }
+        .alert-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .action-btn { padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; border: 1px solid; background: transparent; transition: all 0.2s; }
+        .action-btn.resolve { color: #2ed573; border-color: rgba(46,213,115,0.3); }
+        .action-btn.resolve:hover { background: rgba(46,213,115,0.1); }
+        .action-btn.ignore { color: #8892b0; border-color: rgba(136,146,176,0.3); }
+        .action-btn.ignore:hover { background: rgba(136,146,176,0.1); }
+
+        .config-panel { background: var(--card-bg, rgba(10,25,47,0.5)); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 12px; padding: 20px; margin-top: 24px; display: none; }
+        .config-panel.show { display: block; }
+        .config-title { font-size: 1.1rem; color: #00d4ff; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .config-title::before { content: ''; width: 4px; height: 18px; background: linear-gradient(180deg, #00d4ff, #00ff88); border-radius: 2px; }
+        .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+        .config-group { display: flex; flex-direction: column; gap: 6px; }
+        .config-group label { font-size: 0.8rem; color: var(--text-secondary, #8892b0); }
+        .config-group input, .config-group select { padding: 8px 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 6px; color: var(--text-primary, #fff); font-size: 0.85rem; }
+        .config-group input:focus { outline: none; border-color: #00d4ff; }
+        .config-actions { margin-top: 16px; display: flex; gap: 10px; align-items: center; }
+        .config-hint { font-size: 0.75rem; color: #8892b0; line-height: 1.6; background: rgba(0,212,255,0.05); padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; }
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state-icon { font-size: 3.5rem; margin-bottom: 16px; }
+        .empty-state-text { color: var(--text-secondary, #8892b0); font-size: 1rem; }
+        .empty-state-sub { color: var(--text-secondary, #8892b0); font-size: 0.85rem; margin-top: 6px; }
+        .loading-state { text-align: center; padding: 40px; color: #8892b0; }
+        .loading-spinner { display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(0,212,255,0.2); border-top-color: #00d4ff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 768px) {
+            .alert-item { flex-direction: column; }
+            .alert-actions { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="shop-container">
+        <div class="shop-header">
+            <div>
+                <div class="shop-title">⚠️ 亚马逊异常监控中心</div>
+                <div class="last-check" id="lastCheck">正在加载...</div>
+            </div>
+            <div class="shop-actions">
+                <button class="btn btn-outline" id="configBtn" type="button">⚙️ 配置</button>
+                <button class="btn btn-primary" id="checkBtn" type="button">🔍 立即检查</button>
+            </div>
+        </div>
+
+        <div class="alert-overview" id="alertOverview">
+            <div class="alert-card review" data-type="review">
+                <div class="alert-badge" id="badge-review">0</div>
+                <div class="alert-icon">⭐</div>
+                <div class="alert-count" id="count-review">0</div>
+                <div class="alert-label">新增差评/Feedback</div>
+            </div>
+            <div class="alert-card stock" data-type="stock">
+                <div class="alert-badge" id="badge-stock">0</div>
+                <div class="alert-icon">📦</div>
+                <div class="alert-count" id="count-stock">0</div>
+                <div class="alert-label">库存断货预警</div>
+            </div>
+            <div class="alert-card bsr" data-type="bsr">
+                <div class="alert-badge" id="badge-bsr">0</div>
+                <div class="alert-icon">📉</div>
+                <div class="alert-count" id="count-bsr">0</div>
+                <div class="alert-label">BSR排名暴跌</div>
+            </div>
+            <div class="alert-card perf" data-type="perf">
+                <div class="alert-badge" id="badge-perf">0</div>
+                <div class="alert-icon">🚨</div>
+                <div class="alert-count" id="count-perf">0</div>
+                <div class="alert-label">账号绩效警告</div>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <button class="filter-btn active" data-filter="all">全部</button>
+            <button class="filter-btn" data-filter="pending">待处理</button>
+            <button class="filter-btn" data-filter="resolved">已处理</button>
+            <button class="filter-btn" data-filter="ignored">已忽略</button>
+        </div>
+
+        <div class="alert-list" id="alertList">
+            <div class="loading-state"><div class="loading-spinner"></div><div>正在加载异常数据...</div></div>
+        </div>
+
+        <div class="config-panel" id="configPanel">
+            <div class="config-title">系统配置</div>
+            <div class="config-hint">
+                ⚠️ SP-API凭证（Client ID/Secret、Refresh Token、AWS Key）和邮箱配置请在 <strong>Vercel 项目设置 → Environment Variables</strong> 中配置，避免敏感信息暴露在前端。<br>
+                此处仅配置告警阈值，保存后存储在本地浏览器。
+            </div>
+            <div class="config-grid">
+                <div class="config-group">
+                    <label>库存断货阈值（天）</label>
+                    <input type="number" id="cfgStockThreshold" value="7" min="1">
+                </div>
+                <div class="config-group">
+                    <label>BSR暴跌阈值（名）</label>
+                    <input type="number" id="cfgBsrThreshold" value="500" min="10">
+                </div>
+                <div class="config-group">
+                    <label>ODR超标阈值（%）</label>
+                    <input type="number" id="cfgOdrThreshold" value="1" step="0.1" min="0.1">
+                </div>
+                <div class="config-group">
+                    <label>迟发率超标阈值（%）</label>
+                    <input type="number" id="cfgLateThreshold" value="4" step="0.1" min="0.1">
+                </div>
+            </div>
+            <div class="config-actions">
+                <button class="btn btn-primary" id="saveConfigBtn" type="button">💾 保存阈值</button>
+                <span id="configMsg" style="color:#2ed573;font-size:0.85rem;"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let alerts = [];
+        let currentFilter = 'all';
+        let currentTypeFilter = null;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadThresholdConfig();
+            bindEvents();
+            loadAlertsFromBackend();
+        });
+
+        function bindEvents() {
+            document.getElementById('configBtn').addEventListener('click', toggleConfig);
+            document.getElementById('checkBtn').addEventListener('click', runCheck);
+            document.getElementById('saveConfigBtn').addEventListener('click', saveThresholdConfig);
+
+            document.querySelectorAll('.filter-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+                    btn.classList.add('active');
+                    currentFilter = btn.dataset.filter;
+                    currentTypeFilter = null;
+                    document.querySelectorAll('.alert-card').forEach(function(c) { c.classList.remove('active'); });
+                    renderAlerts();
+                });
+            });
+
+            document.querySelectorAll('.alert-card').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    var type = card.dataset.type;
+                    if (currentTypeFilter === type) {
+                        currentTypeFilter = null;
+                        card.classList.remove('active');
+                    } else {
+                        currentTypeFilter = type;
+                        document.querySelectorAll('.alert-card').forEach(function(c) { c.classList.remove('active'); });
+                        card.classList.add('active');
+                    }
+                    currentFilter = 'all';
+                    document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+                    document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
+                    renderAlerts();
+                });
+            });
+        }
+
+        // 从后台加载异常数据
+        function loadAlertsFromBackend() {
+            var listEl = document.getElementById('alertList');
+            listEl.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><div>正在从后台加载异常数据...</div></div>';
+
+            fetch('/api/shop-monitor', { method: 'GET' })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success && data.alerts) {
+                        alerts = data.alerts;
+                    } else {
+                        alerts = [];
+                    }
+                    if (data.checkedAt) {
+                        document.getElementById('lastCheck').textContent = '上次检查：' + data.checkedAt;
+                    } else {
+                        document.getElementById('lastCheck').textContent = '尚未执行检查';
+                    }
+                    renderAlerts();
+                    updateOverview();
+                })
+                .catch(function() {
+                    // 后台不可用时显示空状态
+                    alerts = [];
+                    document.getElementById('lastCheck').textContent = '后台服务未连接';
+                    renderAlerts();
+                    updateOverview();
+                });
+        }
+
+        function runCheck() {
+            var btn = document.getElementById('checkBtn');
+            btn.disabled = true;
+            btn.textContent = '检查中...';
+
+            fetch('/api/shop-monitor', { method: 'POST' })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success && data.newAlerts) {
+                        data.newAlerts.forEach(function(a) {
+                            if (!alerts.find(function(e) { return e.id === a.id; })) {
+                                alerts.unshift(a);
+                            }
+                        });
+                    }
+                    if (data.checkedAt) {
+                        document.getElementById('lastCheck').textContent = '上次检查：' + data.checkedAt;
+                    }
+                    renderAlerts();
+                    updateOverview();
+                })
+                .catch(function() {
+                    document.getElementById('lastCheck').textContent = '检查失败，请检查后台配置';
+                })
+                .finally(function() {
+                    btn.disabled = false;
+                    btn.textContent = '🔍 立即检查';
+                });
+        }
+
+        function updateOverview() {
+            var types = ['review', 'stock', 'bsr', 'perf'];
+            types.forEach(function(type) {
+                var total = alerts.filter(function(a) { return a.type === type; }).length;
+                var pending = alerts.filter(function(a) { return a.type === type && a.status === 'pending'; }).length;
+                document.getElementById('count-' + type).textContent = total;
+                document.getElementById('badge-' + type).textContent = pending;
+                var card = document.querySelector('.alert-card.' + type);
+                var countEl = document.getElementById('count-' + type);
+                if (pending > 0) {
+                    card.classList.add('has-alert');
+                    countEl.classList.add('has-alert');
+                } else {
+                    card.classList.remove('has-alert');
+                    countEl.classList.remove('has-alert');
+                }
+            });
+        }
+
+        function renderAlerts() {
+            var listEl = document.getElementById('alertList');
+            var filtered = alerts;
+            if (currentTypeFilter) filtered = filtered.filter(function(a) { return a.type === currentTypeFilter; });
+            if (currentFilter !== 'all') filtered = filtered.filter(function(a) { return a.status === currentFilter; });
+            filtered = filtered.sort(function(a, b) { return new Date(b.time) - new Date(a.time); });
+
+            if (filtered.length === 0) {
+                var msg = '店铺运行良好，暂无异常警告';
+                if (currentFilter === 'resolved') msg = '暂无已处理记录';
+                if (currentFilter === 'ignored') msg = '暂无已忽略记录';
+                if (currentTypeFilter) msg = '该类型暂无异常';
+                listEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">✅</div><div class="empty-state-text">' + msg + '</div><div class="empty-state-sub">点击「立即检查」可手动触发监控</div></div>';
+                return;
+            }
+
+            var typeMap = { review: { icon: '⭐', name: '差评' }, stock: { icon: '📦', name: '库存' }, bsr: { icon: '📉', name: 'BSR' }, perf: { icon: '🚨', name: '绩效' } };
+            var statusMap = { pending: { text: '待处理', class: 'status-pending' }, resolved: { text: '已处理', class: 'status-resolved' }, ignored: { text: '已忽略', class: 'status-ignored' } };
+
+            listEl.innerHTML = filtered.map(function(a) {
+                var t = typeMap[a.type] || { icon: '⚠️', name: a.type };
+                var s = statusMap[a.status] || statusMap.pending;
+                var actions = a.status === 'pending'
+                    ? '<button class="action-btn resolve" data-id="' + a.id + '" data-action="resolved">✓ 处理</button><button class="action-btn ignore" data-id="' + a.id + '" data-action="ignored">忽略</button>'
+                    : '<button class="action-btn ignore" data-id="' + a.id + '" data-action="pending">恢复</button>';
+                return '<div class="alert-item ' + a.status + '">' +
+                    '<div class="alert-type-icon ' + a.type + '">' + t.icon + '</div>' +
+                    '<div class="alert-content">' +
+                        '<div class="alert-title">' + a.title + '</div>' +
+                        '<div class="alert-desc">' + a.desc + '</div>' +
+                        '<div class="alert-meta">' +
+                            '<span>🕐 ' + a.time + '</span>' +
+                            '<span>📋 ' + t.name + '</span>' +
+                            '<span class="alert-status ' + s.class + '">' + s.text + '</span>' +
+                            (a.orderId ? '<span>订单: ' + a.orderId + '</span>' : '') +
+                            (a.sku ? '<span>SKU: ' + a.sku + '</span>' : '') +
+                            (a.asin ? '<span>ASIN: ' + a.asin + '</span>' : '') +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="alert-actions">' + actions + '</div>' +
+                '</div>';
+            }).join('');
+
+            // 绑定状态按钮
+            listEl.querySelectorAll('.action-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    updateStatus(parseInt(btn.dataset.id), btn.dataset.action);
+                });
+            });
+        }
+
+        function updateStatus(id, status) {
+            var alert = alerts.find(function(a) { return a.id === id; });
+            if (alert) {
+                alert.status = status;
+                renderAlerts();
+                updateOverview();
+            }
+        }
+
+        function toggleConfig() {
+            var panel = document.getElementById('configPanel');
+            panel.classList.toggle('show');
+        }
+
+        function saveThresholdConfig() {
+            var config = {
+                stockThreshold: document.getElementById('cfgStockThreshold').value,
+                bsrThreshold: document.getElementById('cfgBsrThreshold').value,
+                odrThreshold: document.getElementById('cfgOdrThreshold').value,
+                lateThreshold: document.getElementById('cfgLateThreshold').value
+            };
+            localStorage.setItem('amazon_threshold', JSON.stringify(config));
+            var msg = document.getElementById('configMsg');
+            msg.textContent = '✓ 阈值已保存';
+            setTimeout(function() { msg.textContent = ''; }, 3000);
+        }
+
+        function loadThresholdConfig() {
+            var config = JSON.parse(localStorage.getItem('amazon_threshold') || '{}');
+            if (config.stockThreshold) document.getElementById('cfgStockThreshold').value = config.stockThreshold;
+            if (config.bsrThreshold) document.getElementById('cfgBsrThreshold').value = config.bsrThreshold;
+            if (config.odrThreshold) document.getElementById('cfgOdrThreshold').value = config.odrThreshold;
+            if (config.lateThreshold) document.getElementById('cfgLateThreshold').value = config.lateThreshold;
+        }
+    </script>
+</body>
+</html>

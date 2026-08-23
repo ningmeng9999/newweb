@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN" data-theme="night" data-dark="false">
 <head>
     <meta charset="UTF-8">
@@ -8,6 +8,22 @@
     <link rel="stylesheet" href="./css/animate.css">
     <link rel="stylesheet" href="./css/theme.css">
     <link rel="stylesheet" href="./css/style.css">
+    <style>
+        .work-cover-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .work-cover:hover .work-cover-img {
+            transform: scale(1.05);
+        }
+        .work-cover {
+            position: relative;
+            overflow: hidden;
+        }
+    </style>
 </head>
 <body>
     <div class="loading-box" id="loadingBox">
@@ -50,7 +66,17 @@
                 <li><a href="index.html"><span class="nav-icon">⌂</span>首页</a></li>
                 <li><a href="about.html"><span class="nav-icon">◉</span>关于我</a></li>
                 <li class="active"><a href="works.html"><span class="nav-icon">◆</span>项目作品</a></li>
-                <li><a href="blog.html"><span class="nav-icon">▤</span>博客</a></li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle">
+                        <span class="nav-icon">▤</span>工作
+                        <span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="blog.html">实用工具</a></li>
+                        <li><a href="finance-news.html">新闻大事</a></li>
+                        <li><a href="dashboard.html">店铺管理</a></li>
+                    </ul>
+                </li>
                 <li><a href="album.html"><span class="nav-icon">▣</span>相册</a></li>
                 <li class="has-submenu open">
                     <a href="javascript:void(0)" class="submenu-toggle">
@@ -77,6 +103,7 @@
         <div class="filter-bar animate-on-scroll">
             <button class="filter-btn active" data-filter="all">全部</button>
             <button class="filter-btn" data-filter="data">数据分析</button>
+            <button class="filter-btn" data-filter="shop">店铺管理</button>
             <button class="filter-btn" data-filter="web">Web应用</button>
             <button class="filter-btn" data-filter="ecom">跨境电商</button>
         </div>
@@ -192,6 +219,74 @@
                     <p class="work-desc">基于腾讯财经免费接口的A股实时行情工具，含大盘指数微缩走势图、50只龙头股选股策略（18个筛选条件）、自选池盈亏追踪、气泡云图与热力矩形图双视图，数据存本地localStorage。</p>
                     <div class="work-tags">
                         <span>JavaScript</span><span>Canvas</span><span>JSONP</span><span>K线分析</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="work-card animate-on-scroll" data-category="shop">
+                <div class="work-cover">
+                    <img src="images/dashboard-1.png" alt="跨境电商销售数据大屏" class="work-cover-img">
+                    <div class="work-overlay">
+                        <span class="work-link">数据看板</span>
+                    </div>
+                </div>
+                <div class="work-info">
+                    <h3 class="work-title">跨境电商销售数据大屏</h3>
+                    <p class="work-meta">数据可视化 · 多平台销售监控</p>
+                    <p class="work-desc">整合亚马逊、速卖通、Shein多平台销售数据，实时展示GMV趋势、区域热力分布、品类占比、转化率漏斗，支持时间维度下钻与多平台对比分析。</p>
+                    <div class="work-tags">
+                        <span>ECharts</span><span>实时监控</span><span>销售分析</span><span>多平台</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="work-card animate-on-scroll" data-category="shop">
+                <div class="work-cover">
+                    <img src="images/dashboard-2.png" alt="亚马逊运营监控看板" class="work-cover-img">
+                    <div class="work-overlay">
+                        <span class="work-link">数据看板</span>
+                    </div>
+                </div>
+                <div class="work-info">
+                    <h3 class="work-title">亚马逊运营监控看板</h3>
+                    <p class="work-meta">数据可视化 · 广告与库存管理</p>
+                    <p class="work-desc">亚马逊店铺运营核心指标监控，含SP广告ACOS趋势、库存周转天数、Listing评分、BSR排名追踪、利润核算，支持异常指标预警与周度复盘数据导出。</p>
+                    <div class="work-tags">
+                        <span>ECharts</span><span>亚马逊</span><span>广告分析</span><span>库存管理</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="work-card animate-on-scroll" data-category="shop">
+                <div class="work-cover">
+                    <img src="images/dashboard-3.png" alt="财务分析可视化大屏" class="work-cover-img">
+                    <div class="work-overlay">
+                        <span class="work-link">数据看板</span>
+                    </div>
+                </div>
+                <div class="work-info">
+                    <h3 class="work-title">财务分析可视化大屏</h3>
+                    <p class="work-meta">数据可视化 · 营收与成本分析</p>
+                    <p class="work-desc">企业财务核心指标可视化，含营收同比环比、成本结构拆解、毛利率趋势、现金流预测、应收应付账龄分析，支持多部门维度数据切换与月度对比。</p>
+                    <div class="work-tags">
+                        <span>ECharts</span><span>财务分析</span><span>成本核算</span><span>现金流</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="work-card animate-on-scroll" data-category="shop">
+                <div class="work-cover">
+                    <img src="images/dashboard-4.png" alt="综合数据监控中心" class="work-cover-img">
+                    <div class="work-overlay">
+                        <span class="work-link">数据看板</span>
+                    </div>
+                </div>
+                <div class="work-info">
+                    <h3 class="work-title">综合数据监控中心</h3>
+                    <p class="work-meta">数据可视化 · 全维度运营看板</p>
+                    <p class="work-desc">企业级综合数据监控平台，整合销售、运营、财务、用户四大模块，核心指标实时刷新，支持大屏投屏展示与移动端适配，异常数据自动标红预警。</p>
+                    <div class="work-tags">
+                        <span>ECharts</span><span>综合看板</span><span>实时监控</span><span>大屏投屏</span>
                     </div>
                 </div>
             </article>
