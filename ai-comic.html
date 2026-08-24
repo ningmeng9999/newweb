@@ -1,0 +1,777 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night" data-dark="false">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI漫剧工坊 | LengMeng</title>
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/animate.css">
+    <link rel="stylesheet" href="./css/theme.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <style>
+        .page-content { padding: 30px; max-width: 1200px; margin: 0 auto; }
+        .page-header { margin-bottom: 30px; }
+        .page-title { font-size: 2rem; font-weight: bold; background: linear-gradient(90deg, #a55eea, #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+        .page-subtitle { color: var(--text-secondary, #8892b0); font-size: 0.95rem; }
+        .tech-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+        .tech-tag { padding: 4px 12px; background: rgba(165,94,234,0.1); border: 1px solid rgba(165,94,234,0.3); border-radius: 12px; font-size: 0.75rem; color: #a55eea; }
+        .section { margin-bottom: 36px; }
+        .section-title { font-size: 1.2rem; color: #a55eea; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .section-title::before { content: ''; width: 4px; height: 20px; background: linear-gradient(180deg, #a55eea, #ff6b6b); border-radius: 2px; }
+        .generator-panel { background: var(--card-bg, rgba(10,25,47,0.5)); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 12px; padding: 24px; }
+        .input-area { width: 100%; min-height: 120px; padding: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 8px; color: var(--text-primary, #fff); font-size: 0.9rem; resize: vertical; font-family: inherit; }
+        .input-area:focus { outline: none; border-color: #a55eea; }
+        .input-area::placeholder { color: #555; }
+        .param-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-top: 16px; }
+        .param-group { display: flex; flex-direction: column; gap: 6px; }
+        .param-group label { font-size: 0.8rem; color: var(--text-secondary, #8892b0); }
+        .param-group select, .param-group input { padding: 8px 10px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 6px; color: var(--text-primary, #fff); font-size: 0.85rem; }
+        .generate-btn { margin-top: 16px; padding: 12px 32px; background: linear-gradient(135deg, #a55eea, #ff6b6b); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.95rem; transition: all 0.3s; }
+        .generate-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(165,94,234,0.3); }
+        .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .result-panel { margin-top: 24px; display: none; }
+        .result-panel.show { display: block; }
+        .result-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .result-tab { padding: 8px 16px; border-radius: 6px; cursor: pointer; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); font-size: 0.85rem; color: var(--text-secondary, #8892b0); transition: all 0.3s; }
+        .result-tab.active { background: rgba(165,94,234,0.2); color: #a55eea; border-color: rgba(165,94,234,0.4); }
+        .result-content { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 20px; min-height: 200px; }
+        .storyboard-item { border-left: 3px solid #a55eea; padding: 12px 16px; margin-bottom: 12px; background: rgba(165,94,234,0.05); border-radius: 0 8px 8px 0; }
+        .storyboard-num { font-size: 0.75rem; color: #a55eea; font-weight: bold; }
+        .storyboard-scene { font-size: 0.95rem; margin: 4px 0; }
+        .storyboard-prompt { font-size: 0.8rem; color: var(--text-secondary, #8892b0); font-style: italic; }
+        .character-card { display: inline-block; background: rgba(165,94,234,0.1); border: 1px solid rgba(165,94,234,0.3); border-radius: 10px; padding: 14px; margin: 0 10px 10px 0; min-width: 160px; }
+        .char-name { font-size: 1rem; font-weight: 600; color: #a55eea; margin-bottom: 6px; }
+        .char-desc { font-size: 0.8rem; color: var(--text-secondary, #8892b0); line-height: 1.5; }
+        .script-line { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+        .script-speaker { color: #ff6b6b; font-weight: 600; }
+        .script-dialogue { color: var(--text-primary, #fff); }
+        .script-action { color: var(--text-secondary, #8892b0); font-style: italic; }
+        .sample-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+        .sample-card { background: var(--card-bg, rgba(10,25,47,0.5)); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.3s; }
+        .sample-card:hover { transform: translateY(-3px); border-color: rgba(165,94,234,0.4); }
+        .sample-thumb { width: 100%; height: 140px; background: linear-gradient(135deg, rgba(165,94,234,0.2), rgba(255,107,107,0.2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin-bottom: 10px; }
+        .sample-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+        .sample-desc { font-size: 0.8rem; color: var(--text-secondary, #8892b0); }
+        .loading-text { text-align: center; padding: 40px; color: #a55eea; }
+        .loading-spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid rgba(165,94,234,0.2); border-top-color: #a55eea; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 10px; vertical-align: middle; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .tool-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+        .tool-card { background: var(--card-bg, rgba(10,25,47,0.5)); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 12px; padding: 18px; text-decoration: none; color: inherit; transition: all 0.3s; display: block; }
+        .tool-card:hover { transform: translateY(-3px); border-color: rgba(165,94,234,0.4); box-shadow: 0 8px 25px rgba(165,94,234,0.15); }
+        .tool-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; }
+        .tool-name { font-size: 1rem; font-weight: 600; margin-bottom: 4px; }
+        .tool-desc { font-size: 0.78rem; color: var(--text-secondary, #8892b0); line-height: 1.4; }
+        .prompt-list { display: flex; flex-direction: column; gap: 10px; }
+        .prompt-item { background: var(--card-bg, rgba(10,25,47,0.5)); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 10px; overflow: hidden; transition: all 0.3s; }
+        .prompt-item:hover { border-color: rgba(165,94,234,0.3); }
+        .prompt-header { padding: 14px 18px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .prompt-header:hover { background: rgba(165,94,234,0.05); }
+        .prompt-title { font-size: 0.95rem; font-weight: 600; flex: 1; }
+        .prompt-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+        .prompt-tag { padding: 2px 8px; background: rgba(165,94,234,0.1); border-radius: 8px; font-size: 0.7rem; color: #a55eea; }
+        .prompt-arrow { color: #8892b0; transition: transform 0.3s; font-size: 0.8rem; }
+        .prompt-item.open .prompt-arrow { transform: rotate(180deg); }
+        .prompt-body { display: none; padding: 0 18px 16px; }
+        .prompt-item.open .prompt-body { display: block; }
+        .prompt-text { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 12px; font-size: 0.82rem; line-height: 1.7; color: var(--text-secondary, #c0c8d8); white-space: pre-wrap; margin-bottom: 10px; }
+        .prompt-actions { display: flex; gap: 8px; }
+        .copy-btn { padding: 6px 14px; background: rgba(165,94,234,0.15); border: 1px solid rgba(165,94,234,0.3); border-radius: 6px; color: #a55eea; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
+        .copy-btn:hover { background: rgba(165,94,234,0.25); }
+        .copy-btn.copied { background: rgba(46,213,115,0.15); border-color: rgba(46,213,115,0.3); color: #2ed573; }
+        .prompt-filter { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+        .prompt-filter-btn { padding: 6px 14px; border-radius: 6px; cursor: pointer; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); color: var(--text-secondary, #8892b0); font-size: 0.8rem; transition: all 0.2s; }
+        .prompt-filter-btn:hover { color: #a55eea; border-color: rgba(165,94,234,0.3); }
+        .prompt-filter-btn.active { background: rgba(165,94,234,0.15); color: #a55eea; border-color: rgba(165,94,234,0.4); }
+        .prompt-toolbar { display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+        .prompt-search-wrap { flex-shrink: 0; }
+        .prompt-search { padding: 7px 14px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 6px; color: var(--text-primary, #fff); font-size: 0.8rem; width: 200px; outline: none; transition: border-color 0.2s; }
+        .prompt-search:focus { border-color: #a55eea; }
+        .prompt-search::placeholder { color: #666; }
+        .result-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+        .result-actions { display: flex; gap: 8px; }
+        .result-action-btn { padding: 6px 14px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 6px; color: var(--text-secondary, #8892b0); font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
+        .result-action-btn:hover { color: #a55eea; border-color: rgba(165,94,234,0.4); background: rgba(165,94,234,0.1); }
+        .history-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; }
+        .history-modal.show { display: flex; align-items: center; justify-content: center; }
+        .history-modal-mask { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+        .history-modal-box { position: relative; background: var(--card-bg, #0d1b2a); border: 1px solid rgba(165,94,234,0.3); border-radius: 12px; width: 90%; max-width: 600px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .history-modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border-color, rgba(0,212,255,0.15)); display: flex; justify-content: space-between; align-items: center; font-size: 1rem; font-weight: 600; color: #a55eea; }
+        .history-close { background: none; border: none; color: #8892b0; font-size: 1.1rem; cursor: pointer; padding: 4px 8px; border-radius: 4px; }
+        .history-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .history-modal-body { padding: 12px 20px; overflow-y: auto; flex: 1; }
+        .history-empty { text-align: center; color: #666; padding: 40px 0; font-size: 0.9rem; }
+        .history-item { padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+        .history-item:hover { border-color: rgba(165,94,234,0.3); background: rgba(165,94,234,0.05); }
+        .history-item-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 4px; color: var(--text-primary, #fff); }
+        .history-item-meta { font-size: 0.75rem; color: #8892b0; display: flex; gap: 12px; }
+        .history-item-del { float: right; color: #ff6b6b; font-size: 0.75rem; cursor: pointer; opacity: 0.6; }
+        .history-item-del:hover { opacity: 1; }
+        @media (max-width: 768px) {
+            .prompt-toolbar { flex-direction: column; align-items: stretch; }
+            .prompt-search { width: 100%; }
+            .result-toolbar { flex-direction: column; align-items: stretch; }
+            .result-actions { justify-content: flex-end; }
+            .page-content { padding: 16px; }
+            .page-title { font-size: 1.5rem; }
+            .param-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-box" id="loadingBox">
+        <div class="loading-core"><div class="loading-ring"></div><div class="loading-ring ring2"></div><div class="loading-text">LOADING</div><div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div></div>
+    </div>
+    <div class="bg-layer" id="bgLayer"><div class="bg-wallpaper"></div><canvas id="particleCanvas"></canvas><div class="grid-overlay" id="gridOverlay"></div><div class="glow-orb orb1"></div><div class="glow-orb orb2"></div></div>
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="sidebar-mask" id="sidebarMask"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo"><span class="logo-icon">◆</span><span class="logo-text">LengMeng</span><button class="icon-btn dark-btn logo-dark-btn" id="darkBtn"><span class="icon-sun">☀</span><span class="icon-moon">☾</span></button></div>
+        <div class="sidebar-tool"><span class="weather-info" id="weatherInfo"><span class="weather-icon">◌</span><span class="weather-text">加载中...</span></span></div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="index.html"><span class="nav-icon">⌂</span>首页</a></li>
+                <li><a href="about.html"><span class="nav-icon">◉</span>关于我</a></li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle">
+                        <span class="nav-icon">▤</span>工作<span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="blog.html">实用工具</a></li>
+                        <li><a href="finance-news.html">新闻大事</a></li>
+                        <li><a href="dashboard.html">店铺管理</a></li>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle">
+                        <span class="nav-icon">◈</span>生活<span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="cook.html">菜谱</a></li>
+                        <li><a href="stock.html">股票走势</a></li>
+                        <li><a href="anime.html">动漫</a></li>
+                    </ul>
+                </li>
+                <li class="has-submenu open">
+                    <a href="javascript:void(0)" class="submenu-toggle">
+                        <span class="nav-icon">⚡</span>AI工具<span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="ecommerce-rpa.html">电商RPA自动化</a></li>
+                        <li class="active"><a href="ai-comic.html">AI漫剧工坊</a></li>
+                    </ul>
+                </li>
+                <li><a href="works.html"><span class="nav-icon">◆</span>项目作品</a></li>
+                <li><a href="album.html"><span class="nav-icon">▣</span>相册</a></li>
+                <li><a href="contact.html"><span class="nav-icon">✉</span>联系我</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-container">
+        <div class="page-content">
+            <div class="page-header">
+                <h1 class="page-title">🎬 AI漫剧工坊</h1>
+                <p class="page-subtitle">输入文案剧本，AI自动生成分镜提示词、角色设定与漫剧脚本，前端做提示词编排，成品视频由后端/本地工具生成</p>
+                <div class="tech-tags">
+                    <span class="tech-tag">AI绘画</span><span class="tech-tag">分镜生成</span><span class="tech-tag">角色设定</span><span class="tech-tag">剧本编排</span><span class="tech-tag">提示词工程</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">🚀 AI漫剧工具直达</div>
+                <div class="tool-grid">
+                    <a href="https://jimeng.jianying.com/" target="_blank" class="tool-card">
+                        <div class="tool-icon" style="background:linear-gradient(135deg,#ff6b6b,#ffa502);">即</div>
+                        <div class="tool-name">即梦AI</div>
+                        <div class="tool-desc">字节出品，文生图/图生视频，漫剧首选</div>
+                    </a>
+                    <a href="https://klingai.com/" target="_blank" class="tool-card">
+                        <div class="tool-icon" style="background:linear-gradient(135deg,#00d4ff,#0066ff);">可</div>
+                        <div class="tool-name">可灵AI</div>
+                        <div class="tool-desc">快手出品，视频生成质量高，支持长视频</div>
+                    </a>
+                    <a href="https://runwayml.com/" target="_blank" class="tool-card">
+                        <div class="tool-icon" style="background:linear-gradient(135deg,#a55eea,#ff6b6b);">R</div>
+                        <div class="tool-name">Runway</div>
+                        <div class="tool-desc">海外老牌，Gen-3视频生成，电影级画质</div>
+                    </a>
+                    <a href="https://pika.art/" target="_blank" class="tool-card">
+                        <div class="tool-icon" style="background:linear-gradient(135deg,#ff4757,#2ed573);">P</div>
+                        <div class="tool-name">Pika</div>
+                        <div class="tool-desc">动漫风格视频生成，角色一致性好</div>
+                    </a>
+                    <a href="https://www.liblib.art/" target="_blank" class="tool-card">
+                        <div class="tool-icon" style="background:linear-gradient(135deg,#ffa502,#ff6b6b);">哩</div>
+                        <div class="tool-name">哩布哩布</div>
+                        <div class="tool-desc">Stable Diffusion模型站，海量动漫模型</div>
+                    </a>
+                    <a href="https://www.comfy.org/" target="_blank" class="tool-card">
+                        <div class="tool-icon" style="background:linear-gradient(135deg,#2ed573,#00d4ff);">C</div>
+                        <div class="tool-name">ComfyUI</div>
+                        <div class="tool-desc">节点式AI绘画工作流，漫剧批量生产</div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">📝 漫剧提示词库</div>
+                <div class="prompt-toolbar">
+                    <div class="prompt-filter" id="promptFilter">
+                        <button class="prompt-filter-btn active" data-cat="all">全部</button>
+                        <button class="prompt-filter-btn" data-cat="剧本">剧本创作</button>
+                        <button class="prompt-filter-btn" data-cat="分镜">分镜脚本</button>
+                        <button class="prompt-filter-btn" data-cat="角色">角色生图</button>
+                        <button class="prompt-filter-btn" data-cat="场景">场景生图</button>
+                        <button class="prompt-filter-btn" data-cat="视频">视频生成</button>
+                        <button class="prompt-filter-btn" data-cat="关键词">通用关键词</button>
+                        <button class="prompt-filter-btn" data-cat="流程">流程技巧</button>
+                    </div>
+                    <div class="prompt-search-wrap">
+                        <input type="text" class="prompt-search" id="promptSearch" placeholder="🔍 搜索提示词...">
+                    </div>
+                </div>
+                <div class="prompt-list" id="promptList"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">剧本生成器</div>
+                <div class="generator-panel">
+                    <textarea class="input-area" id="scriptInput" placeholder="输入你的故事文案或剧本大纲...&#10;&#10;示例：少年林辰意外获得上古神剑，踏上修仙之路，在宗门大比中一鸣惊人，却发现背后隐藏着惊天秘密..."></textarea>
+                    <div class="param-grid">
+                        <div class="param-group"><label>画风风格</label><select id="artStyle"><option value="anime">日系动漫</option><option value="realistic">写实厚涂</option><option value="ink">国风水墨</option><option value="3d">3D渲染</option><option value="pixel">像素风</option></select></div>
+                        <div class="param-group"><label>镜头节奏</label><select id="camera"><option value="fast">快节奏（动作片）</option><option value="normal" selected>标准叙事</option><option value="slow">慢节奏（文艺片）</option></select></div>
+                        <div class="param-group"><label>分镜数量</label><select id="shotCount"><option value="4">4镜（短篇）</option><option value="6" selected>6镜（标准）</option><option value="8">8镜（详细）</option><option value="10">10镜（长篇）</option></select></div>
+                        <div class="param-group"><label>角色数量</label><select id="charCount"><option value="2">2人</option><option value="3" selected>3人</option><option value="4">4人</option><option value="5">5人</option></select></div>
+                        <div class="param-group"><label>画面比例</label><select id="ratio"><option value="16:9" selected>16:9 横屏</option><option value="9:16">9:16 竖屏</option><option value="1:1">1:1 方形</option></select></div>
+                        <div class="param-group"><label>色调氛围</label><select id="mood"><option value="warm">暖色（热血/温馨）</option><option value="cool" selected>冷色（悬疑/科幻）</option><option value="dark">暗色（暗黑/恐怖）</option><option value="bright">亮色（治愈/日常）</option></select></div>
+                    </div>
+                    <button class="generate-btn" id="genBtn" onclick="generateComic()">✨ 生成漫剧脚本</button>
+                </div>
+            </div>
+
+            <div class="result-panel" id="resultPanel">
+                <div class="result-toolbar">
+                    <div class="result-tabs">
+                        <div class="result-tab active" data-tab="storyboard" onclick="switchTab('storyboard')">分镜提示词</div>
+                        <div class="result-tab" data-tab="characters" onclick="switchTab('characters')">角色设定</div>
+                        <div class="result-tab" data-tab="script" onclick="switchTab('script')">漫剧脚本</div>
+                    </div>
+                    <div class="result-actions">
+                        <button class="result-action-btn" onclick="copyAllResult()" title="复制全部">📋 复制</button>
+                        <button class="result-action-btn" onclick="exportResult()" title="导出TXT">⬇️ 导出</button>
+                        <button class="result-action-btn" onclick="showHistory()" title="历史记录">🕐 历史</button>
+                    </div>
+                </div>
+                <div class="result-content" id="resultContent"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">样例作品</div>
+                <div class="sample-grid">
+                    <div class="sample-card" onclick="loadSample(0)"><div class="sample-thumb">⚔️</div><div class="sample-title">修仙少年逆袭记</div><div class="sample-desc">古风修仙 · 6镜 · 国风水墨</div></div>
+                    <div class="sample-card" onclick="loadSample(1)"><div class="sample-thumb">🚀</div><div class="sample-title">星际迷途</div><div class="sample-desc">科幻冒险 · 8镜 · 3D渲染</div></div>
+                    <div class="sample-card" onclick="loadSample(2)"><div class="sample-thumb">🌸</div><div class="sample-title">校园青春日记</div><div class="sample-desc">日常治愈 · 4镜 · 日系动漫</div></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 历史记录弹窗 -->
+    <div class="history-modal" id="historyModal">
+        <div class="history-modal-mask" onclick="hideHistory()"></div>
+        <div class="history-modal-box">
+            <div class="history-modal-header">
+                <span>🕐 生成历史记录</span>
+                <button class="history-close" onclick="hideHistory()">✕</button>
+            </div>
+            <div class="history-modal-body" id="historyList">
+                <div class="history-empty">暂无历史记录</div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer"><div class="footer-content"><p>© 2026 LengMeng · All Rights Reserved</p><p class="footer-link"><a href="https://lengmeng.online" target="_blank">lengmeng.online</a><span>·</span><span>Powered by Vercel</span></p></div></footer>
+
+    <script src="./js/theme.js"></script>
+    <script src="./js/animate.js"></script>
+    <script src="./js/weather.js"></script>
+    <script src="./js/darkmode.js"></script>
+    <script src="./js/main.js"></script>
+    <script>
+        let currentResult = null;
+
+        function generateComic() {
+            const input = document.getElementById('scriptInput').value.trim();
+            if (!input) { alert('请输入剧本内容'); return; }
+
+            const btn = document.getElementById('genBtn');
+            btn.disabled = true;
+            btn.textContent = '生成中...';
+
+            const panel = document.getElementById('resultPanel');
+            const content = document.getElementById('resultContent');
+            panel.classList.add('show');
+            content.innerHTML = '<div class="loading-text"><span class="loading-spinner"></span>AI正在分析剧本，生成分镜...</div>';
+
+            setTimeout(() => {
+                const style = document.getElementById('artStyle').value;
+                const shots = parseInt(document.getElementById('shotCount').value);
+                const chars = parseInt(document.getElementById('charCount').value);
+                const mood = document.getElementById('mood').value;
+                const ratio = document.getElementById('ratio').value;
+
+                currentResult = generateMockResult(input, style, shots, chars, mood, ratio);
+                // 保存到历史记录
+                saveToHistory(input, style, shots, chars, mood, ratio, currentResult);
+                switchTab('storyboard');
+                btn.disabled = false;
+                btn.textContent = '✨ 生成漫剧脚本';
+            }, 1500);
+        }
+
+        function generateMockResult(input, style, shotCount, charCount, mood, ratio) {
+            const styleNames = { anime: '日系动漫', realistic: '写实厚涂', ink: '国风水墨', '3d': '3D渲染', pixel: '像素风' };
+            const moodNames = { warm: '暖色调', cool: '冷色调', dark: '暗色调', bright: '亮色调' };
+            const charNames = ['主角', '导师', '对手', '伙伴', '神秘人'];
+            const scenes = ['开场铺垫', '冲突爆发', '关键转折', '高潮对决', '结局收束', '彩蛋伏笔', '回忆杀', '新征程', '内心挣扎', '真相大白'];
+            const prompts = [
+                'wide shot, dramatic lighting, cinematic composition, detailed background',
+                'close-up portrait, intense expression, emotional depth, soft focus background',
+                'dynamic action pose, motion blur, speed lines, impact frames',
+                'establishing shot, epic landscape, atmospheric perspective, volumetric light',
+                'medium shot, character interaction, dialogue scene, natural lighting',
+                'low angle shot, power stance, dramatic shadows, hero composition',
+                'aerial view, vast scenery, scale comparison, golden hour',
+                'over-the-shoulder, tense conversation, shallow depth of field',
+                'split screen, parallel narrative, contrasting colors, symbolic framing',
+                'silhouette shot, backlighting, mysterious atmosphere, rim light'
+            ];
+
+            const storyboard = [];
+            for (let i = 0; i < shotCount; i++) {
+                storyboard.push({
+                    num: i + 1,
+                    scene: scenes[i % scenes.length],
+                    desc: `镜头${i + 1}：${input.substring(0, 20)}... - ${scenes[i % scenes.length]}`,
+                    prompt: `${styleNames[style]} style, ${moodNames[mood]}, ${ratio}, ${prompts[i % prompts.length]}`
+                });
+            }
+
+            const characters = [];
+            for (let i = 0; i < charCount; i++) {
+                characters.push({
+                    name: charNames[i],
+                    desc: `${styleNames[style]}风格角色，${moodNames[mood]}氛围，独特服饰设计，鲜明性格特征`,
+                    prompt: `character design, ${styleNames[style]} style, full body, ${moodNames[mood]}, detailed costume, reference sheet`
+                });
+            }
+
+            const script = [];
+            for (let i = 0; i < shotCount; i++) {
+                script.push({ type: 'action', text: `【${scenes[i % scenes.length]}】画面渐入，镜头推进...` });
+                if (i % 2 === 0) script.push({ type: 'dialogue', speaker: charNames[i % charCount], text: '（角色台词，根据剧情填充）' });
+            }
+
+            return { storyboard, characters, script };
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.result-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.result-tab[data-tab="${tab}"]`).classList.add('active');
+            const content = document.getElementById('resultContent');
+            if (!currentResult) return;
+
+            if (tab === 'storyboard') {
+                content.innerHTML = currentResult.storyboard.map(s => `
+                    <div class="storyboard-item">
+                        <div class="storyboard-num">分镜 ${s.num}</div>
+                        <div class="storyboard-scene">${s.scene}</div>
+                        <div class="storyboard-prompt">${s.prompt}</div>
+                    </div>
+                `).join('');
+            } else if (tab === 'characters') {
+                content.innerHTML = currentResult.characters.map(c => `
+                    <div class="character-card">
+                        <div class="char-name">${c.name}</div>
+                        <div class="char-desc">${c.desc}</div>
+                        <div class="char-desc" style="margin-top:6px;font-style:italic;">提示词：${c.prompt}</div>
+                    </div>
+                `).join('');
+            } else if (tab === 'script') {
+                content.innerHTML = currentResult.script.map(s => {
+                    if (s.type === 'action') return `<div class="script-line"><span class="script-action">${s.text}</span></div>`;
+                    return `<div class="script-line"><span class="script-speaker">${s.speaker}：</span><span class="script-dialogue">${s.text}</span></div>`;
+                }).join('');
+            }
+        }
+
+        function loadSample(idx) {
+            const samples = [
+                '少年林辰意外获得上古神剑，踏上修仙之路，在宗门大比中一鸣惊人，却发现背后隐藏着惊天秘密',
+                '公元2387年，星际探险家在废弃空间站发现了人类起源的线索，却被神秘组织追杀',
+                '转学生苏小雨来到新学校，在樱花飘落的季节，遇见了改变她一生的人'
+            ];
+            document.getElementById('scriptInput').value = samples[idx];
+            generateComic();
+        }
+
+        // ========== 提示词库（7大分类，基于AI漫剧全流程资源库+论坛实战技巧） ==========
+        const PROMPT_LIBRARY = [
+            // ===== 一、剧本创作类 =====
+            {
+                title: '【剧本】60秒短剧第一集生成器',
+                tags: ['剧本', '豆包', '爆款'],
+                text: '你是专业短剧编剧，请根据以下故事设定，生成一集60秒竖屏短剧剧本。\n\n要求：\n1. 适用题材：都市/校园/玄幻/悬疑/喜剧/逆袭/职场/科幻/古装\n2. 节奏拆分：0-3s强钩子 → 4-15s人物处境 → 16-30s冲突升级 → 31-45s反转反击 → 46-57s矛盾爆发 → 58-60s悬念收尾\n3. 输出格式：\n【集标题】\n【一句话看点】\n【剧情大纲】（100字内）\n【完整剧本】（按时间段标注，含画面描述+台词+音效）\n【结尾钩子】\n【第二集承接方向】\n\n故事设定：[在此粘贴你的故事核心设定]'
+            },
+            {
+                title: '【剧本】小说转简化剧本指令',
+                tags: ['剧本', '小说改编', '分镜'],
+                text: '请将以下小说片段转化为漫剧简化剧本。\n\n规则：\n1. 字数控制：10000字≈140个分镜，1000字≈14个分镜，浮动≤5%\n2. 每个分镜输出5个字段：\n   【时间】xx秒-xx秒\n   【地点】场景名称\n   【人物】出场角色\n   【动作】角色具体动作和表情\n   【对话】角色台词（必须用"说："或"问："开头，禁止用冒号代替）\n3. 旁白用【解说】字段标注\n4. 关键情节不可删减，次要描写可合并\n\n小说片段：[粘贴小说内容]'
+            },
+            {
+                title: '【剧本】爆款短剧结构公式',
+                tags: ['剧本', '方法论', '运营'],
+                text: 'AI漫剧爆款结构公式（基于平台流量密码总结）：\n\n【黄金3秒】开场必须有：冲突画面/悬念问句/反差场景/极限处境\n  → 例："被退婚当天，她激活了上古神体"\n\n【15秒人设】快速建立：主角身份+核心困境+金手指/特殊能力\n  → 例：废柴少爷+被家族驱逐+获得万界商城系统\n\n【30秒冲突】第一个小高潮：反派施压/主角隐忍/意外爆发\n  → 必须有明确的对手和矛盾点\n\n【45秒反转】打脸/逆袭/身份揭露，给观众爽感\n  → 节奏要快，不拖泥带水\n\n【60秒钩子】结尾留悬念：更大的危机/新人物出场/未解之谜\n  → 让观众想看下一集\n\n【每集结尾】必须有"未完待续"式钩子，引导追更'
+            },
+
+            // ===== 二、分镜脚本类 =====
+            {
+                title: '【分镜】剧本转即梦Seedance分镜',
+                tags: ['分镜', '即梦', 'Seedance'],
+                text: '你是AI漫剧导演，请将以下剧本改编为即梦Seedance 2.0可直接生成的分镜脚本。\n\n格式要求：\n【画面风格/氛围】整体风格定语（如：唯美国风/赛博朋克/韩漫黑白）\n\n每15秒为一段，每段3-6个分镜，每个分镜输出：\n【镜号】第X镜\n【时段】0s-5s\n【景别】特写/近景/中景/全景/远景\n【运镜】固定/推近/拉远/平移/摇镜/跟拍（必须带物理参数，如"推进1.2米"）\n【画面】主体+动作+表情+场景+光影+色调\n【台词】角色说："..."\n【音效】环境音/动作音/背景音乐\n\n注意：\n1. 运镜必须用英文物理参数：dolly in(推近)/dolly out(拉远)/pan left(左摇)/track right(右移)/tilt up(上摇)\n2. 提示词必须前置风格锚点，如"国风手绘，快递员递出保温桶"\n3. 台词用"说："格式，不用冒号\n\n剧本内容：[粘贴剧本]'
+            },
+            {
+                title: '【分镜】标准分镜脚本模板',
+                tags: ['分镜', '模板', '通用'],
+                text: '标准AI漫剧分镜脚本模板（每镜8字段）：\n\n【镜号】第X镜 / 总X镜\n【时段】00:00-00:05\n【景别】\n  特写(ECU)：面部/眼部/手部细节\n  近景(CU)：胸部以上，表情为主\n  中景(MS)：腰部以上，动作+表情\n  全景(FS)：全身，人物+环境\n  远景(LS)：大场景，人物占比小\n【运镜】固定/推(dolly in)/拉(dolly out)/摇(pan)/移(track)/跟(follow)/升降(crane)\n【画面内容】主体外观+具体动作+微表情+场景环境+光源方向+色调\n【台词/旁白】角色名说："对话内容" / 解说："旁白内容"\n【音效】环境音+动作音+BGM氛围\n【时长】X秒\n\n示例：\n第3镜 / 00:10-00:15 / 近景 / dolly in推进0.8米 / 男主眉头紧锁，右手握紧剑柄，指节发白，背景竹林虚化，侧逆光勾勒轮廓，冷绿色调 / 男主说："这场比试，我不会输" / 剑鸣音+风声+紧张鼓点 / 5秒'
+            },
+            {
+                title: '【分镜】即梦AI全场景运镜指令',
+                tags: ['分镜', '运镜', '即梦'],
+                text: '即梦Seedance运镜指令大全（必须带物理参数，误差<0.3秒）：\n\n【推镜】dolly in 推进X米 / slow push in 缓慢推近\n  → 用于：强调情绪、聚焦细节、制造紧张感\n  → 例：dolly in 1.5米，焦点从背景牌匾移至主角瞳孔\n\n【拉镜】dolly out 拉远X米 / pull back 后撤\n  → 用于：揭示环境、展现规模、情绪释放\n\n【摇镜】pan left/right 左/右摇X度 / tilt up/down 上/下摇\n  → 用于：跟随动作、展示空间、引导视线\n  → 例：pan right 30度，从主角摇至门口反派\n\n【移镜】track left/right 左/右移X米 / crane up/down 升降\n  → 用于：平行跟随、垂直展现、动态空间\n\n【跟镜】follow subject 跟随主体 / over-the-shoulder 过肩跟拍\n  → 用于：代入感、动作追逐、第一视角\n\n【固定】locked off 固定机位 / static shot 静态\n  → 用于：对话场景、稳定构图、留白\n\n【关键技巧】\n1. 写"推镜"不如写"dolly in 1.2米"，参数化误差<0.1米\n2. "慢慢靠近"波动±1.7秒，"dolly in"稳定在0.8±0.05秒\n3. 每段视频只放1-2种运镜，不要堆砌'
+            },
+
+            // ===== 三、角色生图类 =====
+            {
+                title: '【角色】立绘生成模板（A-Pose全身）',
+                tags: ['角色', '立绘', '生图'],
+                text: '3D精品漫剧角色立绘提示词模板（按字段填写）：\n\n【人物基础特征】\n性别：男/女 | 年龄：XX岁 | 体型：修长/健壮/娇小\n风格：现代动画电影风格/吉卜力质感/国漫3D/韩漫写实\n色彩基调：暖色/冷色/暗色/亮色\n\n【头部细节】\n头发：颜色+长度+发型（如：黑色长发束高马尾，碎刘海）\n脸部：脸型+肤色（如：鹅蛋脸，白皙肤色）\n眉毛：形状+颜色（如：剑眉，浓黑）\n眼睛：颜色+神态（如：桃花眼，眼神坚定）\n\n【身体与穿搭】\n上衣：款式+颜色+材质（如：青白色道袍，丝绸质感）\n下装：款式+颜色（如：白色长裤，束脚）\n鞋子：款式+颜色（如：黑色布靴）\n配饰：武器/饰品（如：腰间挂古朴长剑，左手戴玉镯）\n\n【技术与环境限制】\n纯白背景，A-Pose站姿，正交视角，无透视畸变，8K画质，超高细节，角色居中，全身完整\n\n【负面词】\nlowres, bad anatomy, bad hands, missing fingers, extra fingers, deformed, blurry, watermark, text, cropped, mutated'
+            },
+            {
+                title: '【角色】三视图+面部特写设定表',
+                tags: ['角色', '三视图', '一致性'],
+                text: '角色标准三视图提示词（正面+侧面+背面+面部特写）：\n\n【排版规范】\n左侧1/3：超大头部正视特写（含发型、五官、表情）\n右侧2/3：正视图、正侧视图、后视图三视图横向并排\n1:9超高修长头身比，哥特式比例\n绝对标准A-Pose，双臂自然下垂，零透视畸变\n纯白影棚背景，无分割线，均匀布光\n\n【角色描述】\n[角色名称]，[年龄]岁，[性别]，[体型]\n发型：[颜色+长度+样式]\n五官：[脸型+眉形+眼型+鼻型+唇形]\n服装：[上衣+下装+鞋子+配饰，详细描述颜色材质]\n整体风格：[国风/赛博朋克/校园/奇幻，具体画风]\n\n【画质词】\nmasterpiece, best quality, ultra detailed, 8k, character sheet, reference sheet, turnaround, front view, side view, back view, full body, white background, studio lighting\n\n【负面词】\nlowres, bad anatomy, bad hands, extra fingers, missing fingers, deformed, blurry, watermark, text, multiple views, inconsistent, perspective distortion\n\n【使用技巧】\n1. 三视图是保持角色一致性的核心参考图\n2. 后续生图用"参考图"功能锁定人物特征\n3. 第一次生成后记录种子值(seed)，同人物复用种子一致性提升80%'
+            },
+            {
+                title: '【角色】多参图生成指令（保持画风）',
+                tags: ['角色', '多参图', '参考图'],
+                text: '保持原画风的多参图生成指令（用于角色多角度参考）：\n\n【任务】基于参考图角色，生成多角度多表情参考图集\n\n【输出要求】\n1. 16:9横版构图\n2. 包含：全身正面、四分之三侧面、全身背面、胸部以上特写、表情差分（微笑/愤怒/悲伤/惊讶）\n3. 角色外观100%参考输入图：发型、五官、服装、配饰、颜色完全一致\n4. 纯白或浅灰背景，均匀布光\n5. 各视图之间用细微留白分隔，无分割线\n\n【提示词结构】\n[风格锚点]，[角色完整外观描述，与参考图一致]，multiple views, expression sheet, character reference, turnaround, front view, 3/4 view, back view, close-up face, various expressions, white background, studio lighting, masterpiece, best quality, 8k, ultra detailed\n\n【负面词】\ninconsistent character, different hair, different clothes, bad anatomy, bad hands, extra fingers, deformed, blurry, watermark, text, perspective distortion\n\n【关键技巧】\n1. 必须用参考图功能(img2img)，不要纯文生图\n2. 重绘幅度设0.3-0.4，太低没变化，太高角色漂移\n3. 种子值与原角色图保持一致\n4. 在线拼图工具：https://www.designkit.cn/puzzle/'
+            },
+            {
+                title: '【角色】人物一致性3大方法',
+                tags: ['角色', '技巧', '防崩坏'],
+                text: 'AI漫剧人物不漂移的3大核心方法（亲测有效）：\n\n【方法一：固定种子参数】\n1. 第一次生成人物满意后，记录种子值(seed)和所有生成参数\n2. 后续生成同一人物时，复用相同种子+相同风格词\n3. 一致性提升约80%\n4. 工具：即梦/ Midjourney都可查看和设置seed\n\n【方法二：三视图做参考】\n1. 先生成角色正面、侧面、背面三视图\n2. 后续生图时用"参考图"功能上传三视图\n3. 参考权重设0.6-0.8，锁定人物核心特征\n4. 这是目前最稳定的一致性方案\n\n【方法三：局部重绘修崩坏】\n1. 遇到手部崩坏、脸部变形，不要整图重生成\n2. 用局部重绘(inpainting)功能，只涂抹崩坏区域\n3. 手部修复提示词："五根手指，指节分明，手掌自然微弯，肤色与手臂一致"\n4. 重绘强度设0.5左右，太高会改变整体风格\n\n【额外技巧：藏手大法】\n商业级出图常用"藏手"过关：双手插兜、手背在身后、一只手托着杯子/物品，减少手部暴露面积，从源头避免崩坏'
+            },
+
+            // ===== 四、场景生图类 =====
+            {
+                title: '【场景】概念图生成模板',
+                tags: ['场景', '概念图', '生图'],
+                text: '3D漫剧场景概念图提示词模板（按字段填写）：\n\n【核心设定】\n风格：现代动画电影风格/吉卜力质感/国风水墨/赛博朋克\n时间天气：清晨/正午/黄昏/深夜，晴天/雨天/雪天/雾天\n色彩基调：暖色/冷色/暗色/亮色/高对比\n\n【空间与结构】\n空间描述：[室内/室外，具体场景，如：宗门大殿/废弃空间站/樱花校园]\n建筑结构：[建筑风格，材质，如：飞檐翘角，木质结构，青瓦]\n材质细节：[地面/墙面/家具的材质，如：玉石地面，石柱，丝绸帷幔]\n远景边界：[远景元素，如：连绵仙山/城市天际线/海洋]\n\n【光影与镜头】\n光源：[主光源方向，如：天窗洒下的光柱/霓虹灯/夕阳逆光]\n光影技术：[体积光/全局光照/光线追踪/柔光]\n视角：[平视/俯视/仰视/鱼眼]\n构图：[居中/三分法/对称/引导线]\n\n【技术约束】\nUE5渲染，Octane渲染，8K画质，超高细节，无角色，纯场景，电影级光影，氛围浓厚\n\n【负面词】\nlowres, blurry, deformed, watermark, text, people, character, human, cropped, bad quality\n\n【示例】\n国风水墨风格，清晨，雾天，冷色调，仙侠宗门大殿，飞檐翘角，金色琉璃瓦，殿内巨大炼丹炉，香烟缭绕，玉石地面，远处连绵仙山，天窗洒下光柱，体积光，仰视，对称构图，UE5，8K，无角色'
+            },
+            {
+                title: '【场景】修仙宗门大殿',
+                tags: ['场景', '修仙', '国风'],
+                text: '中国风仙侠宗门大殿场景：\n宏伟的古代道教宫殿，飞檐翘角向上扬起，金色琉璃瓦在晨光中闪耀，殿内空间开阔高耸，巨大的青铜炼丹炉居中，丹炉中飘出袅袅青烟，两侧立着雕龙石柱，墙上挂着古老的符文卷轴和桃木剑，地面是温润的白玉石铺成，阳光从顶部天窗洒下形成数道金色光柱，光柱中尘埃飞舞，殿外可见云雾缭绕的连绵仙山和飞流直下的瀑布，仙气飘飘，国风水墨画风格融合3D渲染，细腻笔触，宏伟壮观，电影级光影，8K高清细节，UE5渲染，体积光，全局光照，无人物，纯场景\n\n【运镜建议】\ncrane up 升降3米，从炼丹炉缓缓上升至天窗，展现大殿空间感\n或 dolly in 推进2米，从殿门推近至炼丹炉特写'
+            },
+            {
+                title: '【场景】赛博朋克雨夜街道',
+                tags: ['场景', '科幻', '赛博朋克'],
+                text: '赛博朋克风格雨夜城市街道：\n狭窄的街道两侧是高耸的摩天大楼，楼体布满全息广告屏和霓虹灯招牌，紫红蓝三色霓虹灯光在湿漉漉的柏油路面上形成彩色反光，雨水从空中落下形成雨丝，空中飞行的无人机掠过，蒸汽从地下管道口喷出，街边有自动售货机和发光的日文招牌，远处可见巨大的全息投影人像，空中有飞行汽车的光轨，整体紫蓝色调，高对比度，电影级光影，blade runner风格，超写实，8K画质，光线追踪，全局光照，雨水反射，氛围浓厚，无人物，纯场景\n\n【运镜建议】\ntrack right 右移2米，镜头沿街道平行移动，展现两侧霓虹\n或 low angle仰拍，crane up升降，从地面升至高楼顶部'
+            },
+
+            // ===== 五、视频生成类 =====
+            {
+                title: '【视频】即梦Seedance提示词模板',
+                tags: ['视频', '即梦', 'Seedance'],
+                text: '即梦Seedance 2.0视频生成提示词模板（按时间段分行）：\n\n【整体风格】开头第一句必须前置风格锚点\n如：唯美国风手绘 / 赛博朋克线稿 / 韩漫黑白高对比\n\n【分段格式】每一行对应一个时间段：\n[起始秒-结束秒]，[景别]，[运镜方式+物理参数]，[主体]+[具体动作+表情]，[场景环境]，[光影色调]，音效：[声音描述]\n\n【完整示例】\n唯美国风手绘\n0-5s，特写，dolly in 0.5米，侠女眼神警惕看向侧方，竹叶从画面上方飘落，竹林背景虚化，侧逆光，冷绿色调，音效：竹叶沙沙声+远处鸟鸣\n5-12s，近景，tilt down下摇30度，手部特写缓缓拔出腰间银色长剑，寒光闪烁，剑刃反射冷光，音效：剑鞘摩擦声+剑鸣\n12-20s，远景，locked off固定，月光穿透竹林，迷雾四起，侠女持剑而立的剪影，雾气流动，音效：风声+低沉鼓点\n\n【关键规则】\n1. 提示词必须前置风格锚点（第一句）\n2. 运镜用英文物理参数：dolly in/pan/track/crane\n3. 每段只描述1个核心动作，不要堆砌\n4. 音效单独标注，AI会生成环境音\n5. 总时长5-30秒，每段3-8秒最佳'
+            },
+            {
+                title: '【视频】物理运镜参数速查表',
+                tags: ['视频', '运镜', '参数'],
+                text: '即梦AI视频物理运镜参数速查表（参数化比口语化稳定10倍）：\n\n【推镜系列】\ndolly in X米 → 镜头向前推进X米\n  例：dolly in 1.2米，焦点从背景移至主角瞳孔\nslow push in → 缓慢推近（情绪镜头）\nzoom in X% → 变焦放大X%（区别于dolly，有透视变化）\n\n【拉镜系列】\ndolly out X米 → 镜头向后拉远X米\npull back → 后撤拉远（揭示环境）\nzoom out X% → 变焦缩小\n\n【摇镜系列】\npan left/right X度 → 水平左/右摇X度\n  例：pan right 30度，从主角摇至门口\ntilt up/down X度 → 垂直上/下摇X度\n  例：tilt up 45度，从脚部摇至面部\n\n【移镜系列】\ntrack left/right X米 → 水平左/右移动X米（平行跟随）\ncrane up/down X米 → 升降X米（垂直展现）\n\n【跟镜系列】\nfollow subject → 跟随主体移动\nover-the-shoulder → 过肩跟拍（代入感）\nfirst person → 第一人称视角\n\n【固定】\nlocked off / static shot → 固定机位（对话场景）\n\n【使用原则】\n1. 每段视频只用1-2种运镜\n2. 参数化指令误差<0.1米，口语化波动±1.7秒\n3. 动作幅度大的场景用固定机位，避免AI混乱\n4. 即梦后台已将英文术语映射到物理摄像机参数'
+            },
+            {
+                title: '【视频】打斗动态视频提示词',
+                tags: ['视频', '动作', '打斗'],
+                text: 'AI漫剧打斗场景视频生成提示词（高动态场景专用）：\n\n【风格锚点】国风手绘动作漫 / 赛博朋克战斗 / 日系热血打斗\n\n【分镜示例 - 拔剑对决】\n0-3s，特写，locked off固定，男主眼神锐利，瞳孔微缩，眉头紧锁，风吹动发丝，背景虚化，高对比度，音效：心跳声+风声\n3-8s，近景，dolly in 0.8米快速推近，右手握剑猛地拔出，剑刃寒光闪烁，剑鞘飞落，动作模糊，音效：剑鸣+金属摩擦声\n8-15s，中景，track left左移1.5米，男主挥剑横斩，剑气划出弧形光刃，衣袂翻飞，身体旋转，背景速度线，音效：剑气呼啸+破空声\n15-22s，全景，locked off固定，两道身影交错而过，剑气碰撞产生爆炸光效，烟尘四起，地面碎裂，慢动作0.5倍速，音效：爆炸声+碎石落地声\n22-28s，特写，dolly out拉远1米，男主收剑入鞘，背对镜头，发丝飘落，远处反派倒地，夕阳逆光，剪影效果，音效：剑入鞘声+低沉BGM收尾\n\n【高动态场景技巧】\n1. 动作镜头用"motion blur运动模糊"增加速度感\n2. 碰撞瞬间用"slow motion 0.5x慢动作"强化冲击\n3. 背景加"speed lines速度线"是动漫打斗标配\n4. 每镜只放1个核心动作，不要同时多个\n5. 运镜幅度不要太大，高动态+大运镜容易崩坏'
+            },
+
+            // ===== 六、通用关键词类 =====
+            {
+                title: '【关键词】通用正面画质词',
+                tags: ['关键词', '正面词', '画质'],
+                text: 'AI生图通用正面画质词（直接复制粘贴到提示词开头）：\n\n【基础版】\nmasterpiece, best quality, ultra detailed, 8k, high resolution\n\n【进阶版 - 动漫风格】\nmasterpiece, best quality, ultra detailed, 8k, high resolution, anime style, cel shading, clean lineart, vibrant colors, cinematic lighting, depth of field, bokeh, dynamic angle, composition\n\n【进阶版 - 写实风格】\nmasterpiece, best quality, ultra detailed, 8k, photorealistic, hyperrealistic, cinematic lighting, dramatic shadows, global illumination, ray tracing, depth of field, professional photography, sharp focus\n\n【进阶版 - 国风3D】\nmasterpiece, best quality, ultra detailed, 8k, 3D render, Chinese style, UE5, Octane render, cinematic lighting, volumetric light, atmospheric perspective, highly detailed\n\n【即梦/Seedream专用前缀】\n(((masterpiece))), ((best quality)), ultra detailed, 8k, highres\n\n【使用技巧】\n1. 画质词放最前面，权重最高\n2. 括号()增加权重，((()))三重括号权重最高\n3. 不要堆砌太多画质词，5-8个最佳\n4. 风格词紧跟画质词之后'
+            },
+            {
+                title: '【关键词】通用负面防崩词',
+                tags: ['关键词', '负面词', '防崩坏'],
+                text: 'AI生图通用负面提示词（直接复制粘贴到负面提示词框，过滤90%畸形问题）：\n\n【基础版】\nlowres, bad anatomy, bad hands, missing fingers, extra fingers, deformed, blurry, watermark, text, cropped, worst quality, low quality, jpeg artifacts, signature, username\n\n【进阶版 - 全面防崩】\nlowres, bad anatomy, bad hands, missing fingers, extra fingers, fused fingers, deformed hands, mutated hands, poorly drawn hands, bad face, deformed face, asymmetric face, different eye sizes, cross-eyed, bad proportions, extra limbs, missing limbs, disconnected limbs, floating limbs, malformed limbs, mutated, disfigured, ugly, blurry, watermark, text, logo, cropped, worst quality, low quality, jpeg artifacts, signature, username, sketch, duplicate, error\n\n【视频专用负面词】\nflickering, jittery, shaky, unstable, morphing, face changing, outfit changing, color shifting, frame inconsistency, motion artifacts, ghosting, double exposure, distorted motion\n\n【手部专项负面词】\nextra fingers, missing fingers, fused fingers, deformed hands, mutated hands, poorly drawn hands, bad hands, six fingers, three fingers, twisted fingers, missing hand, extra hand, disconnected hand, blurry fingers, missing phalanges, malformed fingers\n\n【使用技巧】\n1. 负面词越具体越有效，"bad hands"不如"extra fingers, missing fingers, fused fingers"\n2. 针对性负向词组合，手部正确率可从8%提升至92%\n3. 通义万象/即梦对英文负向词响应更稳定\n4. 视频生成必须加flickering/jittery防止闪烁'
+            },
+            {
+                title: '【关键词】手部修复专项方案',
+                tags: ['关键词', '手部', '修复'],
+                text: 'AI手部崩坏修复完整方案（从预防到修复全流程）：\n\n【一、源头预防 - 提示词规避】\n正面词加：natural hands, five fingers, properly drawn hands, detailed fingers\n负面词加（必须具体）：\nextra fingers, missing fingers, fused fingers, deformed hands, mutated hands, poorly drawn hands, bad hands, six fingers, three fingers, twisted fingers, missing phalanges, malformed fingers, disconnected hand\n\n【二、构图藏手 - 最快方案】\n商业级出图常用"藏手"过关，在提示词里让手减少暴露：\n- 双手插兜 hands in pockets\n- 手背在身后 hands behind back\n- 一只手托着杯子/物品 holding cup/object\n- 交叉双臂 crossed arms\n- 手放在桌上 hands on table\n\n【三、局部重绘 - 最稳方案】\n1. 生成图后，用局部重绘(inpainting)功能\n2. 用硬度100%画笔圈住整只手（含手腕2cm范围）\n3. 提示词输入："五根手指，指节分明，手掌自然微弯，肤色与手臂一致，natural hands, five fingers, properly drawn"\n4. 重绘强度设0.5-0.55\n5. 第一次手指仍粘连，不要扩大区域，把强度降到0.45重试\n\n【四、骨骼锚定 - 专业方案】\n使用ControlNet OpenPose精确控制手部骨骼姿态，从根本上解决手部结构问题，适合批量生产\n\n【五、后期修复 - 终极方案】\nPS手动修图，或用专门的Inpainting模型针对手部微调训练\n\n【关键数据】\n- 只写"bad hands"：手部正确率<8%\n- 写具体负向词组：手部正确率>92%\n- 加局部重绘：手部正确率>98%'
+            },
+
+            // ===== 七、制作流程与技巧类 =====
+            {
+                title: '【流程】AI漫剧全流程制作流水线',
+                tags: ['流程', '全流程', '方法论'],
+                text: 'AI漫剧标准制作流水线（7步从0到上架）：\n\n【第1步：剧本创作】\n工具：豆包/DeepSeek/Claude\n输入：故事设定/小说片段\n输出：60秒短剧剧本（含分镜建议）\n推荐提示词："60秒短剧第一集生成器"\n关键：黄金3秒钩子+15秒人设+30秒冲突+45秒反转+60秒悬念\n\n【第2步：角色场景提取】\n工具：豆包/DeepSeek\n输入：剧本全文\n输出：角色卡（名称/外观/服装）+场景卡（地点/氛围/光影）\n关键：统计每个角色出现次数，主角需要三视图\n\n【第3步：生图出图】\n工具：即梦Seedream/Midjourney/Stable Diffusion\n输入：角色立绘提示词+场景提示词+三视图指令\n输出：角色立绘、三视图、多参图、场景概念图\n关键：固定种子值+参考图保持一致性，负面词防崩坏\n\n【第4步：分镜脚本】\n工具：豆包/DeepSeek\n输入：剧本+角色卡+场景卡\n输出：即梦Seedance格式分镜（每15秒一段，每段3-6镜）\n关键：运镜用英文物理参数，风格锚点前置，台词用"说："格式\n\n【第5步：视频生成】\n工具：即梦Seedance 2.0/可灵AI/Runway\n输入：分镜脚本+参考图（角色/场景）\n输出：每段5-15秒动态视频\n关键：图生视频比文生视频一致性好，运镜参数化\n\n【第6步：配音剪辑】\n工具：剪映/PR + AI配音（豆包/讯飞）\n输入：视频片段+台词+音效\n输出：完整一集视频（含字幕、BGM、音效）\n关键：配音情绪匹配画面，音效增强沉浸感\n\n【第7步：平台上架】\n平台：抖音/番茄/视频号/快手\n规格：1080P，9:16竖屏，MP4格式\n关键：封面吸睛+标题带悬念+前3秒留人+定期更新\n\n【各阶段耗时参考】\n剧本30分钟 → 角色场景20分钟 → 生图1-2小时 → 分镜30分钟 → 视频生成1-2小时 → 剪辑1小时 → 总计4-6小时/集'
+            },
+            {
+                title: '【技巧】AI漫剧防崩坏全套指南',
+                tags: ['技巧', '防崩坏', '实战'],
+                text: 'AI漫剧防崩坏全套指南（人物不漂移+镜头不穿帮）：\n\n【一、人物防漂移】\n1. 种子锁定：满意的人物图记录seed，同人物复用，一致性+80%\n2. 三视图参考：生成正面/侧面/背面，后续用参考图功能锁定\n3. 参考权重0.6-0.8：太低锁不住，太高没变化\n4. 重绘幅度0.3-0.4：多参图生成用这个区间\n5. 同集人物用同一批模型同一批参数，不要中途换模型\n\n【二、手部防崩坏】\n1. 负面词必须具体：extra fingers, missing fingers, fused fingers, deformed hands\n2. 构图藏手：插兜/背手/拿物品，减少手部暴露\n3. 局部重绘：只修手部区域，强度0.5，不要整图重生成\n4. ControlNet OpenPose：骨骼锚定，批量生产首选\n\n【三、面部防变形】\n1. 特写镜头用面部参考图\n2. 避免大角度侧脸（AI容易画歪）\n3. 正脸/微侧最稳，纯侧脸翻车率高\n4. 加"symmetrical face, detailed face"正面词\n\n【四、服装防变化】\n1. 服装描述要极其具体：颜色+款式+材质+配饰\n2. 同人物同场景用参考图锁定服装\n3. 避免"casual clothes"这种模糊描述\n4. 多参图确保各角度服装一致\n\n【五、视频防闪烁】\n1. 负面词加：flickering, jittery, morphing, face changing\n2. 图生视频比文生视频稳定\n3. 运镜幅度小，固定机位最稳\n4. 每段视频5-8秒，太长容易漂移\n5. 人物动作幅度不要太大\n\n【六、场景防穿帮】\n1. 先生成场景概念图，后续用参考图\n2. 同场景光线方向保持一致\n3. 避免镜头快速切换场景（AI容易混）\n4. 场景描述包含：空间结构+材质+光影+远景\n\n【新手最容易忽略的4个细节】\n1. 运镜必须带物理参数，不要写"慢慢推近"\n2. 提示词必须前置风格锚点\n3. 台词用"说："格式，不用冒号\n4. 每段视频只描述1个核心动作'
+            },
+            {
+                title: '【运营】平台上架规格与审核红线',
+                tags: ['运营', '上架', '平台'],
+                text: 'AI漫剧平台上架规格要求与审核红线（抖音/番茄/视频号/快手）：\n\n【视频规格】\n- 分辨率：1080P（1080×1920）\n- 比例：9:16竖屏\n- 格式：MP4（H.264编码）\n- 帧率：30fps\n- 单集时长：1-3分钟（短剧）/ 15-60秒（漫剧切片）\n- 文件大小：抖音≤4GB，其他平台≤2GB\n\n【封面要求】\n- 尺寸：1080×1440（3:4）或 1080×1920（9:16）\n- 格式：JPG/PNG\n- 必须有：剧名+核心冲突画面+人物特写\n- 文字清晰，不超过画面20%\n- 避免：低俗/血腥/违规文字\n\n【标题规则】\n- 字数：15-30字最佳\n- 结构：悬念/冲突+关键词，如"被退婚当天，她激活了上古神体"\n- 避免：标题党/虚假宣传/敏感词\n- 带话题标签：#AI漫剧 #短剧 #修仙 等\n\n【审核红线（绝对不能碰）】\n1. 政治敏感：涉及国家领导人、政治事件、敏感历史\n2. 色情低俗：暴露服装、性暗示、低俗台词\n3. 暴力血腥：过度血腥、残忍暴力、自残自杀\n4. 侵权盗版：未授权改编小说/影视/游戏\n5. 虚假宣传：AI生成标注为真人/虚假疗效\n6. 封建迷信：宣扬迷信、邪教、伪科学\n7. 未成年人不良内容：涉及未成年人的不当内容\n\n【版权合规】\n1. 改编小说必须获得授权（漫剧授权协议）\n2. 音乐使用平台正版库或无版权音乐\n3. 字体使用免费商用字体（思源黑体/阿里巴巴普惠体）\n4. AI生成内容需标注"AI生成"\n\n【上架流程】\n1. 平台入驻签约（抖音创作者中心/番茄作家后台）\n2. 作品备案（部分平台需要）\n3. 上传视频+封面+标题+简介\n4. 提交审核（通常1-24小时）\n5. 审核通过后发布，定期更新（日更/周更）\n\n【流量密码】\n- 前3秒必须有强钩子\n- 每集结尾留悬念\n- 固定时间更新，培养追更习惯\n- 评论区互动，回复观众\n- 多平台分发，扩大曝光'
+            }
+        ];
+
+        let currentPromptCat = 'all';
+        let currentPromptSearch = '';
+
+        function renderPromptLibrary() {
+            const list = document.getElementById('promptList');
+            let filtered = currentPromptCat === 'all'
+                ? PROMPT_LIBRARY
+                : PROMPT_LIBRARY.filter(p => p.tags.some(t => t.includes(currentPromptCat)));
+            if (currentPromptSearch) {
+                const kw = currentPromptSearch.toLowerCase();
+                filtered = filtered.filter(p =>
+                    p.title.toLowerCase().includes(kw) ||
+                    p.text.toLowerCase().includes(kw) ||
+                    p.tags.some(t => t.toLowerCase().includes(kw))
+                );
+            }
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="history-empty">没有找到匹配的提示词</div>';
+                return;
+            }
+            list.innerHTML = filtered.map((p) => {
+                const idx = PROMPT_LIBRARY.indexOf(p);
+                return `
+                <div class="prompt-item" data-idx="${idx}">
+                    <div class="prompt-header" onclick="togglePrompt(${idx})">
+                        <span class="prompt-title">${p.title}</span>
+                        <div class="prompt-tags">${p.tags.map(t => `<span class="prompt-tag">${t}</span>`).join('')}</div>
+                        <span class="prompt-arrow">▼</span>
+                    </div>
+                    <div class="prompt-body">
+                        <div class="prompt-text">${p.text}</div>
+                        <div class="prompt-actions">
+                            <button class="copy-btn" onclick="copyPrompt(${idx}, this)">📋 一键复制</button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // 分类筛选事件
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.prompt-filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.prompt-filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentPromptCat = btn.dataset.cat;
+                    renderPromptLibrary();
+                });
+            });
+            // 搜索框事件
+            const searchInput = document.getElementById('promptSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    currentPromptSearch = this.value.trim();
+                    renderPromptLibrary();
+                });
+            }
+        });
+
+        function togglePrompt(idx) {
+            const item = document.querySelector(`.prompt-item[data-idx="${idx}"]`);
+            item.classList.toggle('open');
+        }
+
+        function copyPrompt(idx, btn) {
+            const text = PROMPT_LIBRARY[idx].text;
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = '✓ 已复制';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '📋 一键复制';
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                // fallback
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                btn.textContent = '✓ 已复制';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '📋 一键复制';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // 初始化提示词库
+        renderPromptLibrary();
+
+        // ========== 历史记录功能 ==========
+        const HISTORY_KEY = 'ai_comic_history';
+        const MAX_HISTORY = 10;
+
+        function saveToHistory(input, style, shots, chars, mood, ratio, result) {
+            try {
+                const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+                const styleNames = { anime: '日系动漫', realistic: '写实厚涂', ink: '国风水墨', '3d': '3D渲染', pixel: '像素风' };
+                const record = {
+                    id: Date.now(),
+                    time: new Date().toLocaleString('zh-CN'),
+                    input: input.substring(0, 50) + (input.length > 50 ? '...' : ''),
+                    fullInput: input,
+                    style: styleNames[style] || style,
+                    shots: shots,
+                    chars: chars,
+                    mood: mood,
+                    ratio: ratio,
+                    result: result
+                };
+                history.unshift(record);
+                if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
+                localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+            } catch (e) { console.error('保存历史失败', e); }
+        }
+
+        function showHistory() {
+            const modal = document.getElementById('historyModal');
+            const list = document.getElementById('historyList');
+            try {
+                const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+                if (history.length === 0) {
+                    list.innerHTML = '<div class="history-empty">暂无历史记录</div>';
+                } else {
+                    list.innerHTML = history.map(r => `
+                        <div class="history-item" onclick="loadHistoryItem(${r.id})">
+                            <span class="history-item-del" onclick="event.stopPropagation();deleteHistoryItem(${r.id})">删除</span>
+                            <div class="history-item-title">${r.input}</div>
+                            <div class="history-item-meta">
+                                <span>🕐 ${r.time}</span>
+                                <span>🎨 ${r.style}</span>
+                                <span>🎬 ${r.shots}镜</span>
+                                <span>👤 ${r.chars}人</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                list.innerHTML = '<div class="history-empty">历史记录加载失败</div>';
+            }
+            modal.classList.add('show');
+        }
+
+        function hideHistory() {
+            document.getElementById('historyModal').classList.remove('show');
+        }
+
+        function loadHistoryItem(id) {
+            try {
+                const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+                const record = history.find(r => r.id === id);
+                if (record) {
+                    document.getElementById('scriptInput').value = record.fullInput;
+                    currentResult = record.result;
+                    document.getElementById('resultPanel').classList.add('show');
+                    switchTab('storyboard');
+                    hideHistory();
+                }
+            } catch (e) { console.error('加载历史失败', e); }
+        }
+
+        function deleteHistoryItem(id) {
+            try {
+                let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+                history = history.filter(r => r.id !== id);
+                localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+                showHistory();
+            } catch (e) { console.error('删除历史失败', e); }
+        }
+
+        // ========== 导出功能 ==========
+        function copyAllResult() {
+            if (!currentResult) { alert('请先生成漫剧脚本'); return; }
+            const styleNames = { anime: '日系动漫', realistic: '写实厚涂', ink: '国风水墨', '3d': '3D渲染', pixel: '像素风' };
+            let text = '===== AI漫剧脚本 =====\n\n';
+            text += '【分镜提示词】\n';
+            currentResult.storyboard.forEach(s => {
+                text += `第${s.num}镜 - ${s.scene}\n${s.prompt}\n\n`;
+            });
+            text += '【角色设定】\n';
+            currentResult.characters.forEach(c => {
+                text += `${c.name}：${c.desc}\n提示词：${c.prompt}\n\n`;
+            });
+            text += '【漫剧脚本】\n';
+            currentResult.script.forEach(s => {
+                if (s.type === 'action') text += `${s.text}\n`;
+                else text += `${s.speaker}：${s.text}\n`;
+            });
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✓ 已复制全部内容到剪贴板');
+            }).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                alert('✓ 已复制全部内容到剪贴板');
+            });
+        }
+
+        function exportResult() {
+            if (!currentResult) { alert('请先生成漫剧脚本'); return; }
+            let text = '===== AI漫剧脚本 =====\n生成时间：' + new Date().toLocaleString('zh-CN') + '\n\n';
+            text += '【分镜提示词】\n';
+            currentResult.storyboard.forEach(s => {
+                text += `第${s.num}镜 - ${s.scene}\n${s.prompt}\n\n`;
+            });
+            text += '【角色设定】\n';
+            currentResult.characters.forEach(c => {
+                text += `${c.name}：${c.desc}\n提示词：${c.prompt}\n\n`;
+            });
+            text += '【漫剧脚本】\n';
+            currentResult.script.forEach(s => {
+                if (s.type === 'action') text += `${s.text}\n`;
+                else text += `${s.speaker}：${s.text}\n`;
+            });
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'AI漫剧脚本_' + new Date().toISOString().slice(0,10) + '.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,803 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night" data-dark="false">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI+RPA 电商自动化 | LengMeng</title>
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/animate.css">
+    <link rel="stylesheet" href="./css/theme.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg-primary, #0a0e27); color: var(--text-primary, #fff); font-family: 'Microsoft YaHei', sans-serif; min-height: 100vh; }
+        .shop-container { padding: 20px; max-width: 1400px; margin: 0 auto; }
+        .page-header { margin-bottom: 20px; }
+        .page-title { font-size: 1.8rem; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #00ff88); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+        .page-subtitle { color: var(--text-secondary, #8892b0); font-size: 0.95rem; line-height: 1.6; }
+        .tech-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+        .tech-tag { padding: 4px 12px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); border-radius: 12px; font-size: 0.75rem; color: #00d4ff; }
+        .notice { background: rgba(255,165,2,0.1); border-left: 3px solid #ffa502; padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 20px; font-size: 0.85rem; color: #ffa502; line-height: 1.6; }
+        .section { margin-bottom: 28px; }
+        .section-title { font-size: 1.15rem; color: #00d4ff; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+        .section-title::before { content: ''; width: 4px; height: 20px; background: linear-gradient(180deg, #00d4ff, #00ff88); border-radius: 2px; }
+
+        /* 工具直达 */
+        .tool-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+        .tool-card { background: var(--card-bg, rgba(10,25,47,0.5)); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 10px; padding: 14px; text-decoration: none; color: inherit; transition: all 0.3s; display: block; }
+        .tool-card:hover { transform: translateY(-2px); border-color: rgba(0,212,255,0.4); box-shadow: 0 6px 20px rgba(0,212,255,0.15); }
+        .tool-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1rem; font-weight: bold; margin-bottom: 8px; }
+        .tool-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 3px; }
+        .tool-desc { font-size: 0.72rem; color: var(--text-secondary, #8892b0); line-height: 1.4; }
+
+        /* 核心功能卡片 */
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+        .feature-card { background: var(--card-bg, rgba(10,25,47,0.5)); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 12px; padding: 18px; transition: all 0.3s; cursor: pointer; }
+        .feature-card:hover { border-color: rgba(0,212,255,0.4); }
+        .feature-card.expanded { border-color: rgba(0,255,136,0.4); }
+        .feature-head { display: flex; align-items: center; gap: 12px; }
+        .feature-icon { font-size: 1.8rem; flex-shrink: 0; }
+        .feature-name { font-size: 1rem; font-weight: 600; }
+        .feature-desc { font-size: 0.82rem; color: var(--text-secondary, #8892b0); line-height: 1.5; margin-top: 8px; }
+        .feature-detail { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-color, rgba(0,212,255,0.1)); }
+        .feature-card.expanded .feature-detail { display: block; }
+        .feature-detail-item { font-size: 0.8rem; color: var(--text-secondary, #c0c8d8); padding: 4px 0; line-height: 1.6; }
+        .feature-detail-item strong { color: #00ff88; }
+        .feature-expand-hint { font-size: 0.72rem; color: #666; margin-top: 8px; }
+
+        /* 流程图 */
+        .flow-diagram { background: var(--card-bg, rgba(10,25,47,0.5)); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 12px; padding: 20px; overflow-x: auto; }
+        .flow-steps { display: flex; align-items: stretch; gap: 6px; min-width: 700px; justify-content: center; }
+        .flow-step { background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.25); border-radius: 8px; padding: 12px 10px; text-align: center; min-width: 100px; cursor: pointer; transition: all 0.3s; flex: 1; }
+        .flow-step:hover { background: rgba(0,212,255,0.15); border-color: rgba(0,212,255,0.5); }
+        .flow-step.active { background: rgba(0,255,136,0.1); border-color: rgba(0,255,136,0.5); }
+        .flow-step-num { font-size: 0.68rem; color: #00d4ff; margin-bottom: 4px; font-weight: bold; }
+        .flow-step-text { font-size: 0.8rem; font-weight: 600; }
+        .flow-step-time { font-size: 0.68rem; color: #8892b0; margin-top: 4px; }
+        .flow-arrow { color: #00d4ff; font-size: 1rem; display: flex; align-items: center; flex-shrink: 0; }
+        .flow-detail { margin-top: 14px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; font-size: 0.82rem; line-height: 1.7; color: var(--text-secondary, #c0c8d8); display: none; }
+        .flow-detail.show { display: block; }
+        .flow-detail strong { color: #00ff88; }
+
+        /* 参数配置 */
+        .config-panel { background: var(--card-bg, rgba(10,25,47,0.5)); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 12px; padding: 20px; }
+        .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+        .config-group { display: flex; flex-direction: column; gap: 6px; }
+        .config-group label { font-size: 0.8rem; color: var(--text-secondary, #8892b0); }
+        .config-group input, .config-group select { padding: 8px 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 6px; color: var(--text-primary, #fff); font-size: 0.85rem; }
+        .config-group input:focus { outline: none; border-color: #00d4ff; }
+        .sim-btn { margin-top: 16px; padding: 10px 28px; background: linear-gradient(135deg, #00d4ff, #00ff88); color: #0a0e27; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s; }
+        .sim-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,212,255,0.3); }
+        .sim-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .sim-progress { margin-top: 14px; display: none; }
+        .sim-progress.show { display: block; }
+        .progress-bar-wrap { background: rgba(0,0,0,0.3); border-radius: 6px; height: 8px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #00d4ff, #00ff88); border-radius: 6px; transition: width 0.3s; width: 0%; }
+        .progress-text { font-size: 0.78rem; color: #8892b0; margin-top: 6px; }
+        .sim-result { margin-top: 16px; display: none; }
+        .sim-result.show { display: block; }
+        .sim-result-title { font-size: 0.9rem; color: #00ff88; margin-bottom: 10px; font-weight: 600; }
+        .sim-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+        .sim-table th { background: rgba(0,212,255,0.1); color: #00d4ff; padding: 8px 10px; text-align: left; border-bottom: 1px solid rgba(0,212,255,0.2); }
+        .sim-table td { padding: 7px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary, #c0c8d8); }
+        .sim-table tr:hover td { background: rgba(0,212,255,0.05); }
+        .sim-score { display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+        .score-high { background: rgba(0,255,136,0.15); color: #00ff88; }
+        .score-mid { background: rgba(255,165,2,0.15); color: #ffa502; }
+        .score-low { background: rgba(255,107,107,0.15); color: #ff6b6b; }
+
+        /* 实战案例 */
+        .case-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+        .case-card { background: var(--card-bg, rgba(10,25,47,0.5)); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 12px; padding: 18px; transition: all 0.3s; }
+        .case-card:hover { border-color: rgba(0,255,136,0.4); }
+        .case-tag { display: inline-block; padding: 3px 10px; background: rgba(0,255,136,0.1); color: #00ff88; border-radius: 8px; font-size: 0.72rem; margin-bottom: 10px; }
+        .case-title { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+        .case-desc { font-size: 0.82rem; color: var(--text-secondary, #8892b0); line-height: 1.6; margin-bottom: 12px; }
+        .case-stats { display: flex; gap: 16px; flex-wrap: wrap; }
+        .case-stat { text-align: center; }
+        .case-stat-num { font-size: 1.3rem; font-weight: bold; color: #00ff88; }
+        .case-stat-label { font-size: 0.7rem; color: #8892b0; }
+
+        /* 对比表 */
+        .compare-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; background: var(--card-bg, rgba(10,25,47,0.5)); border-radius: 10px; overflow: hidden; }
+        .compare-table th { background: rgba(0,212,255,0.15); color: #00d4ff; padding: 10px 12px; text-align: left; font-weight: 600; }
+        .compare-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary, #c0c8d8); }
+        .compare-table tr:last-child td { border-bottom: none; }
+        .compare-table tr:hover td { background: rgba(0,212,255,0.05); }
+        .compare-good { color: #00ff88; }
+        .compare-bad { color: #ff6b6b; }
+        .compare-mid { color: #ffa502; }
+
+        /* 代码块 */
+        .code-tabs { display: flex; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
+        .code-tab { padding: 6px 14px; border-radius: 6px 6px 0 0; cursor: pointer; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-bottom: none; color: #8892b0; font-size: 0.78rem; transition: all 0.2s; }
+        .code-tab.active { background: rgba(0,212,255,0.1); color: #00d4ff; border-color: rgba(0,212,255,0.3); }
+        .code-block-wrap { position: relative; }
+        .code-block { background: #0d1117; border: 1px solid #30363d; border-radius: 0 8px 8px 8px; padding: 16px; overflow-x: auto; min-height: 200px; }
+        .code-block pre { margin: 0; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.78rem; line-height: 1.7; color: #c9d1d9; white-space: pre; }
+        .code-block .kw { color: #ff7b72; }
+        .code-block .str { color: #a5d6ff; }
+        .code-block .cmt { color: #8b949e; }
+        .code-block .fn { color: #d2a8ff; }
+        .code-copy-btn { position: absolute; top: 10px; right: 10px; padding: 5px 12px; background: rgba(0,212,255,0.15); border: 1px solid rgba(0,212,255,0.3); border-radius: 5px; color: #00d4ff; font-size: 0.72rem; cursor: pointer; transition: all 0.2s; z-index: 1; }
+        .code-copy-btn:hover { background: rgba(0,212,255,0.25); }
+        .code-copy-btn.copied { background: rgba(0,255,136,0.15); border-color: rgba(0,255,136,0.3); color: #00ff88; }
+
+        /* 运行指南 */
+        .guide-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+        .guide-card { background: var(--card-bg, rgba(10,25,47,0.5)); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 10px; padding: 16px; }
+        .guide-card-title { font-size: 0.95rem; font-weight: 600; color: #00d4ff; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .guide-step { font-size: 0.8rem; color: var(--text-secondary, #c0c8d8); padding: 5px 0; line-height: 1.6; padding-left: 20px; position: relative; }
+        .guide-step::before { content: '▸'; position: absolute; left: 0; color: #00ff88; }
+        .guide-code { background: rgba(0,0,0,0.3); padding: 6px 10px; border-radius: 4px; font-family: Consolas, monospace; font-size: 0.75rem; color: #00ff88; margin: 4px 0; display: inline-block; }
+
+        @media (max-width: 768px) {
+            .shop-container { padding: 14px; }
+            .page-title { font-size: 1.4rem; }
+            .flow-steps { min-width: auto; flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); justify-content: center; }
+            .config-grid { grid-template-columns: 1fr; }
+            .compare-table { font-size: 0.7rem; }
+            .compare-table th, .compare-table td { padding: 6px 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-box" id="loadingBox"><div class="loading-core"><div class="loading-ring"></div><div class="loading-ring ring2"></div><div class="loading-text">LOADING</div><div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div></div></div>
+    <div class="bg-layer" id="bgLayer"><div class="bg-wallpaper"></div><canvas id="particleCanvas"></canvas><div class="grid-overlay" id="gridOverlay"></div><div class="glow-orb orb1"></div><div class="glow-orb orb2"></div></div>
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="sidebar-mask" id="sidebarMask"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo"><span class="logo-icon">◆</span><span class="logo-text">LengMeng</span><button class="icon-btn dark-btn logo-dark-btn" id="darkBtn"><span class="icon-sun">☀</span><span class="icon-moon">☾</span></button></div>
+        <div class="sidebar-tool"><span class="weather-info" id="weatherInfo"><span class="weather-icon">◌</span><span class="weather-text">加载中...</span></span></div>
+        <nav class="sidebar-nav"><ul>
+            <li><a href="index.html"><span class="nav-icon">⌂</span>首页</a></li>
+            <li><a href="about.html"><span class="nav-icon">◉</span>关于我</a></li>
+            <li><a href="works.html"><span class="nav-icon">◆</span>项目作品</a></li>
+            <li class="has-submenu"><a href="javascript:void(0)" class="submenu-toggle"><span class="nav-icon">▤</span>工作<span class="submenu-arrow">▶</span></a><ul class="submenu"><li><a href="blog.html">实用工具</a></li><li><a href="finance-news.html">新闻大事</a></li><li><a href="dashboard.html">店铺管理</a></li></ul></li>
+            <li class="has-submenu"><a href="javascript:void(0)" class="submenu-toggle"><span class="nav-icon">◈</span>生活<span class="submenu-arrow">▶</span></a><ul class="submenu"><li><a href="cook.html">菜谱</a></li><li><a href="stock.html">股票走势</a></li><li><a href="anime.html">动漫</a></li></ul></li>
+            <li class="has-submenu open"><a href="javascript:void(0)" class="submenu-toggle"><span class="nav-icon">⚡</span>AI工具<span class="submenu-arrow">▶</span></a><ul class="submenu"><li class="active"><a href="ecommerce-rpa.html">电商RPA自动化</a></li><li><a href="ai-comic.html">AI漫剧工坊</a></li></ul></li>
+            <li><a href="works.html"><span class="nav-icon">◆</span>项目作品</a></li>
+            <li><a href="album.html"><span class="nav-icon">▣</span>相册</a></li>
+            <li><a href="contact.html"><span class="nav-icon">✉</span>联系我</a></li>
+        </ul></nav>
+    </aside>
+
+    <main class="main-container">
+        <div class="shop-container">
+            <div class="page-header">
+                <h1 class="page-title">🤖 AI+RPA 电商自动化</h1>
+                <p class="page-subtitle">基于 Python + 影刀RPA 的跨境电商运营自动化方案，覆盖竞品采集、数据整理、选品分析、广告监控全流程，本地运行无需服务器</p>
+                <div class="tech-tags">
+                    <span class="tech-tag">Python</span><span class="tech-tag">影刀RPA</span><span class="tech-tag">Pandas</span><span class="tech-tag">Selenium</span><span class="tech-tag">亚马逊SP-API</span><span class="tech-tag">数据分析</span>
+                </div>
+            </div>
+
+            <div class="notice">⚠️ 本页面为方案演示与参数模拟，浏览器无法直接执行本地RPA任务。实际自动化脚本在本地运行，此处展示流程、配置、代码参考与实战案例。</div>
+
+            <!-- 工具直达 -->
+            <div class="section">
+                <div class="section-title">🔧 工具直达</div>
+                <div class="tool-grid">
+                    <a href="https://www.winrobot360.com/" target="_blank" class="tool-card"><div class="tool-icon" style="background:linear-gradient(135deg,#00d4ff,#0066ff);">影</div><div class="tool-name">影刀RPA</div><div class="tool-desc">国产RPA首选，可视化流程搭建，电商场景模板丰富</div></a>
+                    <a href="https://www.python.org/" target="_blank" class="tool-card"><div class="tool-icon" style="background:linear-gradient(135deg,#ffd43b,#82c91e);">Py</div><div class="tool-name">Python</div><div class="tool-desc">数据处理与自动化核心语言，Pandas/Requests/Selenium生态</div></a>
+                    <a href="https://www.selenium.dev/" target="_blank" class="tool-card"><div class="tool-icon" style="background:linear-gradient(135deg,#43b02a,#2d7a1e);">Se</div><div class="tool-name">Selenium</div><div class="tool-desc">浏览器自动化框架，网页数据采集与操作模拟</div></a>
+                    <a href="https://developer-docs.amazon.com/sp-api/" target="_blank" class="tool-card"><div class="tool-icon" style="background:linear-gradient(135deg,#ff9900,#232f3e);">SP</div><div class="tool-name">亚马逊SP-API</div><div class="tool-desc">亚马逊官方API，订单/库存/广告数据稳定获取</div></a>
+                    <a href="https://www.lingxing.com/" target="_blank" class="tool-card"><div class="tool-icon" style="background:linear-gradient(135deg,#a55eea,#7c3aed);">领</div><div class="tool-name">领星ERP</div><div class="tool-desc">跨境电商ERP，多店铺数据聚合，利润核算</div></a>
+                    <a href="https://www.ziniao.com/" target="_blank" class="tool-card"><div class="tool-icon" style="background:linear-gradient(135deg,#ff6b6b,#c92a2a);">紫</div><div class="tool-name">紫鸟浏览器</div><div class="tool-desc">多店铺防关联浏览器，RPA自动化多账号管理</div></a>
+                    <a href="https://www.maijia.com/" target="_blank" class="tool-card"><div class="tool-icon" style="background:linear-gradient(135deg,#00ff88,#0ca678);">卖</div><div class="tool-name">卖家精灵</div><div class="tool-desc">亚马逊选品工具，关键词反查，竞品数据分析</div></a>
+                    <a href="https://www.uipath.com/" target="_blank" class="tool-card"><div class="tool-icon" style="background:linear-gradient(135deg,#fa4616,#c92a0a);">Ui</div><div class="tool-name">UiPath</div><div class="tool-desc">国际主流RPA平台，企业级自动化，功能强大</div></a>
+                </div>
+            </div>
+
+            <!-- 核心功能 -->
+            <div class="section">
+                <div class="section-title">🎯 核心功能（点击展开详情）</div>
+                <div class="feature-grid">
+                    <div class="feature-card" onclick="toggleFeature(this)">
+                        <div class="feature-head"><div class="feature-icon">🔍</div><div><div class="feature-name">竞品数据采集</div></div></div>
+                        <div class="feature-desc">自动抓取竞品价格、销量、Review、BSR排名，多维度对比分析</div>
+                        <div class="feature-expand-hint">点击展开详情 ▼</div>
+                        <div class="feature-detail">
+                            <div class="feature-detail-item"><strong>输入：</strong>关键词/类目/竞品ASIN列表</div>
+                            <div class="feature-detail-item"><strong>采集字段：</strong>标题、价格、评分、Review数、BSR排名、卖家类型、上架时间、变体数</div>
+                            <div class="feature-detail-item"><strong>输出：</strong>Excel对比表 + 趋势变化标记 + 异常波动预警</div>
+                            <div class="feature-detail-item"><strong>技术方案：</strong>Selenium模拟浏览器 / 亚马逊SP-API官方接口 / 第三方数据API</div>
+                            <div class="feature-detail-item"><strong>适用场景：</strong>新品竞品调研、日常竞品监控、价格战预警</div>
+                            <div class="feature-detail-item"><strong>预估耗时：</strong>50条竞品约2-3分钟</div>
+                        </div>
+                    </div>
+                    <div class="feature-card" onclick="toggleFeature(this)">
+                        <div class="feature-head"><div class="feature-icon">📊</div><div><div class="feature-name">商品数据整理</div></div></div>
+                        <div class="feature-desc">批量处理商品信息，自动清洗、去重、格式化，一键导出Excel/CSV</div>
+                        <div class="feature-expand-hint">点击展开详情 ▼</div>
+                        <div class="feature-detail">
+                            <div class="feature-detail-item"><strong>输入：</strong>多平台导出的原始数据（亚马逊/速卖通/Shein/PDD）</div>
+                            <div class="feature-detail-item"><strong>处理逻辑：</strong>字段统一映射 → 重复数据去重 → 缺失值填充 → 异常值标记 → 单位统一转换</div>
+                            <div class="feature-detail-item"><strong>输出：</strong>标准化Excel（多Sheet：原始/清洗/统计） + 数据质量报告</div>
+                            <div class="feature-detail-item"><strong>技术方案：</strong>Pandas数据处理 + openpyxl Excel生成 + 正则表达式清洗</div>
+                            <div class="feature-detail-item"><strong>适用场景：</strong>多平台数据合并、月度数据汇总、数据上报前整理</div>
+                            <div class="feature-detail-item"><strong>预估耗时：</strong>1000条数据约10秒</div>
+                        </div>
+                    </div>
+                    <div class="feature-card" onclick="toggleFeature(this)">
+                        <div class="feature-head"><div class="feature-icon">🎯</div><div><div class="feature-name">智能选品指标</div></div></div>
+                        <div class="feature-desc">基于市场容量、竞争度、利润率、季节性多维度评分，辅助选品决策</div>
+                        <div class="feature-expand-hint">点击展开详情 ▼</div>
+                        <div class="feature-detail">
+                            <div class="feature-detail-item"><strong>评分维度（5维）：</strong></div>
+                            <div class="feature-detail-item">　① 市场容量：月搜索量、市场规模、增长趋势</div>
+                            <div class="feature-detail-item">　② 竞争度：卖家数量、头部集中度、新进入者比例</div>
+                            <div class="feature-detail-item">　③ 利润率：客单价、采购成本、FBA费用、广告占比</div>
+                            <div class="feature-detail-item">　④ 季节性：销量波动系数、旺季月份、库存风险</div>
+                            <div class="feature-detail-item">　⑤ 合规风险：专利风险、侵权概率、类目审核要求</div>
+                            <div class="feature-detail-item"><strong>输出：</strong>选品评分表（0-100分） + 各维度雷达图 + 推荐/谨慎/回避建议</div>
+                            <div class="feature-detail-item"><strong>适用场景：</strong>新品开发选品、类目机会挖掘、供应链选品验证</div>
+                        </div>
+                    </div>
+                    <div class="feature-card" onclick="toggleFeature(this)">
+                        <div class="feature-head"><div class="feature-icon">📈</div><div><div class="feature-name">广告模拟分析</div></div></div>
+                        <div class="feature-desc">模拟SP广告投放效果，ACOS/ROAS预估，关键词竞价建议，预算分配优化</div>
+                        <div class="feature-expand-hint">点击展开详情 ▼</div>
+                        <div class="feature-detail">
+                            <div class="feature-detail-item"><strong>输入：</strong>商品客单价、毛利率、目标ACOS、关键词列表及搜索量</div>
+                            <div class="feature-detail-item"><strong>模拟指标：</strong>预估曝光量、点击率(CTR)、转化率(CVR)、单次点击成本(CPC)、ACOS、ROAS、广告订单占比</div>
+                            <div class="feature-detail-item"><strong>关键词策略：</strong>大词/长尾词/精准词分层建议，否定关键词推荐，竞价区间建议</div>
+                            <div class="feature-detail-item"><strong>预算分配：</strong>自动广告/手动广泛/手动词组/手动精准的预算比例建议</div>
+                            <div class="feature-detail-item"><strong>输出：</strong>广告投放方案表 + 效果预估 + 优化建议清单</div>
+                            <div class="feature-detail-item"><strong>适用场景：</strong>新品广告启动方案、广告优化复盘、预算调整决策</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 自动化流程 -->
+            <div class="section">
+                <div class="section-title">⚙️ 自动化流程（点击步骤查看详情）</div>
+                <div class="flow-diagram">
+                    <div class="flow-steps">
+                        <div class="flow-step" onclick="showFlowDetail(0)"><div class="flow-step-num">STEP 1</div><div class="flow-step-text">配置任务参数</div><div class="flow-step-time">~1分钟</div></div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-step" onclick="showFlowDetail(1)"><div class="flow-step-num">STEP 2</div><div class="flow-step-text">RPA启动浏览器</div><div class="flow-step-time">~30秒</div></div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-step" onclick="showFlowDetail(2)"><div class="flow-step-num">STEP 3</div><div class="flow-step-text">数据采集抓取</div><div class="flow-step-time">2-10分钟</div></div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-step" onclick="showFlowDetail(3)"><div class="flow-step-num">STEP 4</div><div class="flow-step-text">AI清洗分析</div><div class="flow-step-time">~30秒</div></div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-step" onclick="showFlowDetail(4)"><div class="flow-step-num">STEP 5</div><div class="flow-step-text">生成报告</div><div class="flow-step-time">~10秒</div></div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-step" onclick="showFlowDetail(5)"><div class="flow-step-num">STEP 6</div><div class="flow-step-text">邮件/企微通知</div><div class="flow-step-time">~5秒</div></div>
+                    </div>
+                    <div class="flow-detail" id="flowDetail">点击上方任意步骤，查看该步骤的详细说明、输入输出和技术实现。</div>
+                </div>
+            </div>
+
+            <!-- 参数配置模拟 -->
+            <div class="section">
+                <div class="section-title">▶️ 参数配置（模拟运行）</div>
+                <div class="config-panel">
+                    <div class="config-grid">
+                        <div class="config-group"><label>任务类型</label><select id="taskType"><option value="competitor">竞品采集</option><option value="product">商品整理</option><option value="selection">选品分析</option><option value="ads">广告分析</option></select></div>
+                        <div class="config-group"><label>目标平台</label><select id="platform"><option>亚马逊北美</option><option>亚马逊欧洲</option><option>速卖通</option><option>Shein</option><option>PDD</option></select></div>
+                        <div class="config-group"><label>关键词/类目</label><input type="text" id="keyword" placeholder="如：wireless earbuds"></div>
+                        <div class="config-group"><label>采集数量</label><input type="number" id="count" value="50" min="10" max="500"></div>
+                        <div class="config-group"><label>运行间隔（分钟）</label><input type="number" id="interval" value="60" min="5"></div>
+                        <div class="config-group"><label>通知方式</label><select id="notify"><option>邮件</option><option>企业微信</option><option>邮件+企微</option><option>不通知</option></select></div>
+                    </div>
+                    <button class="sim-btn" id="simBtn" onclick="runSimulation()">▶ 模拟运行</button>
+                    <div class="sim-progress" id="simProgress">
+                        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressFill"></div></div>
+                        <div class="progress-text" id="progressText">正在初始化...</div>
+                    </div>
+                    <div class="sim-result" id="simResult">
+                        <div class="sim-result-title" id="simResultTitle">✓ 模拟执行完成</div>
+                        <div id="simResultContent"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 实战案例 -->
+            <div class="section">
+                <div class="section-title">🏆 实战案例</div>
+                <div class="case-grid">
+                    <div class="case-card">
+                        <span class="case-tag">竞品监控</span>
+                        <div class="case-title">无线耳机品类竞品周报自动化</div>
+                        <div class="case-desc">针对亚马逊北美站无线耳机品类Top50竞品，实现每日自动采集价格、Review、BSR变化，自动生成周报并邮件推送，异常波动实时预警。</div>
+                        <div class="case-stats">
+                            <div class="case-stat"><div class="case-stat-num">50</div><div class="case-stat-label">监控竞品</div></div>
+                            <div class="case-stat"><div class="case-stat-num">95%</div><div class="case-stat-label">采集成功率</div></div>
+                            <div class="case-stat"><div class="case-stat-num">2h→5min</div><div class="case-stat-label">效率提升</div></div>
+                        </div>
+                    </div>
+                    <div class="case-card">
+                        <span class="case-tag">广告优化</span>
+                        <div class="case-title">SP广告ACOS从35%降至22%</div>
+                        <div class="case-desc">基于广告数据自动分析，识别低效关键词并建议否定，优化竞价策略和预算分配，配合影刀RPA自动执行调价，3个月内ACOS显著下降。</div>
+                        <div class="case-stats">
+                            <div class="case-stat"><div class="case-stat-num">35%→22%</div><div class="case-stat-label">ACOS下降</div></div>
+                            <div class="case-stat"><div class="case-stat-num">+18%</div><div class="case-stat-label">广告订单增长</div></div>
+                            <div class="case-stat"><div class="case-stat-num">3个月</div><div class="case-stat-label">优化周期</div></div>
+                        </div>
+                    </div>
+                    <div class="case-card">
+                        <span class="case-tag">选品决策</span>
+                        <div class="case-title">多维度选品评分系统</div>
+                        <div class="case-desc">搭建5维度选品评分模型（市场容量/竞争度/利润率/季节性/合规风险），自动采集类目数据并评分，辅助新品开发决策，降低选品试错成本。</div>
+                        <div class="case-stats">
+                            <div class="case-stat"><div class="case-stat-num">5维</div><div class="case-stat-label">评分模型</div></div>
+                            <div class="case-stat"><div class="case-stat-num">200+</div><div class="case-stat-label">已评品类</div></div>
+                            <div class="case-stat"><div class="case-stat-num">60%</div><div class="case-stat-label">试错成本降低</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 技术方案对比 -->
+            <div class="section">
+                <div class="section-title">⚖️ 技术方案对比</div>
+                <table class="compare-table">
+                    <thead><tr><th>对比维度</th><th>Python+Selenium</th><th>影刀RPA</th><th>亚马逊SP-API</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>开发难度</strong></td><td class="compare-mid">中等（需写代码）</td><td class="compare-good">低（可视化拖拽）</td><td class="compare-bad">高（需授权+签名）</td></tr>
+                        <tr><td><strong>数据稳定性</strong></td><td class="compare-mid">中等（受页面结构影响）</td><td class="compare-mid">中等（元素定位依赖）</td><td class="compare-good">高（官方接口）</td></tr>
+                        <tr><td><strong>采集速度</strong></td><td class="compare-good">快（并发支持）</td><td class="compare-mid">中等（单线程为主）</td><td class="compare-good">快（批量接口）</td></tr>
+                        <tr><td><strong>反爬风险</strong></td><td class="compare-bad">较高（需代理+验证码）</td><td class="compare-mid">中等（模拟真人操作）</td><td class="compare-good">无（官方授权）</td></tr>
+                        <tr><td><strong>维护成本</strong></td><td class="compare-mid">中等（页面变了要改）</td><td class="compare-mid">中等（流程要维护）</td><td class="compare-good">低（接口稳定）</td></tr>
+                        <tr><td><strong>数据范围</strong></td><td class="compare-good">广（页面可见即可爬）</td><td class="compare-good">广（可操作任何页面）</td><td class="compare-mid">有限（仅API开放字段）</td></tr>
+                        <tr><td><strong>适用场景</strong></td><td>大规模数据采集、复杂数据处理</td><td>日常运营自动化、多步骤操作流程</td><td>订单/库存/广告等核心业务数据</td></tr>
+                        <tr><td><strong>推荐组合</strong></td><td colspan="3" style="color:#00ff88;">SP-API获取核心业务数据 + Python处理分析 + 影刀RPA执行操作（如调价、发邮件）</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 代码片段 -->
+            <div class="section">
+                <div class="section-title">💻 代码片段参考</div>
+                <div class="code-tabs">
+                    <div class="code-tab active" onclick="switchCodeTab(0, this)">竞品采集</div>
+                    <div class="code-tab" onclick="switchCodeTab(1, this)">数据清洗</div>
+                    <div class="code-tab" onclick="switchCodeTab(2, this)">选品评分</div>
+                    <div class="code-tab" onclick="switchCodeTab(3, this)">广告模拟</div>
+                    <div class="code-tab" onclick="switchCodeTab(4, this)">RPA调用</div>
+                    <div class="code-tab" onclick="switchCodeTab(5, this)">邮件通知</div>
+                </div>
+                <div class="code-block-wrap">
+                    <button class="code-copy-btn" id="codeCopyBtn" onclick="copyCode()">📋 复制代码</button>
+                    <div class="code-block"><pre id="codeContent"></pre></div>
+                </div>
+            </div>
+
+            <!-- 本地运行指南 -->
+            <div class="section">
+                <div class="section-title">📖 本地运行指南</div>
+                <div class="guide-grid">
+                    <div class="guide-card">
+                        <div class="guide-card-title">🔧 环境配置</div>
+                        <div class="guide-step">安装Python 3.9+（推荐3.10）</div>
+                        <div class="guide-step">安装依赖包：</div>
+                        <div class="guide-code">pip install pandas selenium requests openpyxl</div>
+                        <div class="guide-step">下载ChromeDriver（匹配Chrome版本）</div>
+                        <div class="guide-step">安装影刀RPA客户端（如需可视化流程）</div>
+                        <div class="guide-step">配置亚马逊SP-API开发者凭证（如需官方API）</div>
+                    </div>
+                    <div class="guide-card">
+                        <div class="guide-card-title">▶️ 运行方式</div>
+                        <div class="guide-step"><strong>方式一：</strong>直接运行Python脚本</div>
+                        <div class="guide-code">python competitor_scraper.py --keyword "wireless earbuds"</div>
+                        <div class="guide-step"><strong>方式二：</strong>影刀RPA调用Python</div>
+                        <div class="guide-step">在影刀中添加"执行Python"节点，传入参数</div>
+                        <div class="guide-step"><strong>方式三：</strong>定时任务自动运行</div>
+                        <div class="guide-code">Windows任务计划程序 → 每日9:00触发</div>
+                    </div>
+                    <div class="guide-card">
+                        <div class="guide-card-title">⚠️ 常见问题</div>
+                        <div class="guide-step"><strong>被反爬拦截：</strong>添加代理IP池、设置随机延迟、使用无头浏览器模式</div>
+                        <div class="guide-step"><strong>元素定位失败：</strong>页面结构变化，更新CSS Selector/XPath，建议使用相对定位</div>
+                        <div class="guide-step"><strong>数据不准：</strong>多数据源交叉验证，设置数据校验规则，异常值人工复核</div>
+                        <div class="guide-step"><strong>被封号风险：</strong>控制采集频率（间隔≥3秒），使用紫鸟等防关联浏览器，遵守平台robots协议</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer"><div class="footer-content"><p>© 2026 LengMeng · All Rights Reserved</p><p class="footer-link"><a href="https://lengmeng.online" target="_blank">lengmeng.online</a><span>·</span><span>Powered by Vercel</span></p></div></footer>
+
+    <script src="./js/theme.js"></script>
+    <script src="./js/animate.js"></script>
+    <script src="./js/weather.js"></script>
+    <script src="./js/darkmode.js"></script>
+    <script src="./js/main.js"></script>
+    <script>
+        // ========== 核心功能展开 ==========
+        function toggleFeature(card) {
+            card.classList.toggle('expanded');
+            const hint = card.querySelector('.feature-expand-hint');
+            if (hint) hint.textContent = card.classList.contains('expanded') ? '点击收起 ▲' : '点击展开详情 ▼';
+        }
+
+        // ========== 流程详情 ==========
+        const FLOW_DETAILS = [
+            '<strong>STEP 1 - 配置任务参数</strong><br>输入任务类型、目标平台、关键词、采集数量、运行间隔、通知方式等参数。系统根据任务类型加载对应的配置模板，用户可自定义参数后保存为预设，下次直接调用。<br><strong>输入：</strong>任务参数表单 | <strong>输出：</strong>配置JSON | <strong>技术：</strong>本地配置文件/影刀变量',
+            '<strong>STEP 2 - RPA启动浏览器</strong><br>影刀RPA或Selenium自动启动Chrome浏览器，加载用户配置（Cookie、代理、UA），打开目标平台页面，处理登录验证（如有），等待页面完全加载后进入采集流程。<br><strong>输入：</strong>配置JSON | <strong>输出：</strong>浏览器实例 | <strong>技术：</strong>Selenium WebDriver/影刀浏览器自动化',
+            '<strong>STEP 3 - 数据采集抓取</strong><br>按配置的关键词或ASIN列表，逐页采集商品数据。每页等待加载完成后提取目标字段（标题/价格/评分/Review/BSR等），设置随机延迟避免被封，采集进度实时显示，失败自动重试3次。<br><strong>输入：</strong>关键词列表 | <strong>输出：</strong>原始数据CSV | <strong>技术：</strong>Selenium元素提取/SP-API批量调用',
+            '<strong>STEP 4 - AI清洗分析</strong><br>Pandas读取原始数据，执行：字段统一映射→重复数据去重→缺失值填充→异常值标记→单位转换→多维度计算（增长率/占比/排名变化）。选品任务还会执行5维度评分算法，广告任务执行ACOS/ROAS模拟。<br><strong>输入：</strong>原始数据CSV | <strong>输出：</strong>分析结果DataFrame | <strong>技术：</strong>Pandas+NumPy+自定义算法',
+            '<strong>STEP 5 - 生成报告</strong><br>openpyxl生成多Sheet Excel报告：数据总览Sheet（核心指标+趋势图）、明细数据Sheet（完整字段）、异常预警Sheet（标记异常波动项）、建议方案Sheet（AI生成的优化建议）。报告自动命名含日期时间。<br><strong>输入：</strong>分析结果 | <strong>输出：</strong>Excel报告文件 | <strong>技术：</strong>openpyxl+matplotlib图表',
+            '<strong>STEP 6 - 邮件/企微通知</strong><br>报告生成完成后，自动通过SMTP发送邮件（含Excel附件+核心数据摘要），或调用企业微信Webhook推送消息卡片（含关键指标+异常预警+报告下载链接）。通知内容根据任务类型自动适配模板。<br><strong>输入：</strong>Excel报告+分析结果 | <strong>输出：</strong>邮件/企微消息 | <strong>技术：</strong>smtplib/企业微信Webhook API'
+        ];
+        function showFlowDetail(idx) {
+            document.querySelectorAll('.flow-step').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.flow-step')[idx].classList.add('active');
+            const detail = document.getElementById('flowDetail');
+            detail.innerHTML = FLOW_DETAILS[idx];
+            detail.classList.add('show');
+        }
+
+        // ========== 模拟运行 ==========
+        function runSimulation() {
+            const taskType = document.getElementById('taskType').value;
+            const platform = document.getElementById('platform').value;
+            const keyword = document.getElementById('keyword').value || '默认关键词';
+            const count = parseInt(document.getElementById('count').value);
+            const interval = document.getElementById('interval').value;
+            const notify = document.getElementById('notify').value;
+            const btn = document.getElementById('simBtn');
+            const progress = document.getElementById('simProgress');
+            const fill = document.getElementById('progressFill');
+            const pText = document.getElementById('progressText');
+            const result = document.getElementById('simResult');
+            const content = document.getElementById('simResultContent');
+            const title = document.getElementById('simResultTitle');
+
+            btn.disabled = true;
+            btn.textContent = '运行中...';
+            result.classList.remove('show');
+            progress.classList.add('show');
+            fill.style.width = '0%';
+
+            const stages = [
+                { p: 15, t: '正在启动浏览器...' },
+                { p: 35, t: `正在采集数据（0/${count}）...` },
+                { p: 60, t: `正在采集数据（${Math.floor(count*0.6)}/${count}）...` },
+                { p: 80, t: '正在清洗分析数据...' },
+                { p: 95, t: '正在生成报告...' },
+                { p: 100, t: '完成！' }
+            ];
+            let i = 0;
+            const timer = setInterval(() => {
+                if (i >= stages.length) {
+                    clearInterval(timer);
+                    setTimeout(() => {
+                        progress.classList.remove('show');
+                        btn.disabled = false;
+                        btn.textContent = '▶ 模拟运行';
+                        title.textContent = `✓ ${taskType === 'competitor' ? '竞品采集' : taskType === 'product' ? '商品整理' : taskType === 'selection' ? '选品分析' : '广告分析'}任务完成`;
+                        content.innerHTML = generateSimResult(taskType, platform, keyword, count, interval, notify);
+                        result.classList.add('show');
+                    }, 300);
+                    return;
+                }
+                fill.style.width = stages[i].p + '%';
+                pText.textContent = stages[i].t + ` (${stages[i].p}%)`;
+                i++;
+            }, 400);
+        }
+
+        function generateSimResult(type, platform, keyword, count, interval, notify) {
+            if (type === 'competitor') {
+                let rows = '';
+                const names = ['竞品A 无线蓝牙耳机Pro', '竞品B 降噪耳机旗舰', '竞品C 运动耳机Lite', '竞品D 游戏耳机专业版', '竞品E 骨传导耳机'];
+                for (let i = 0; i < 5; i++) {
+                    const price = (29.99 + Math.random() * 80).toFixed(2);
+                    const rating = (3.5 + Math.random() * 1.5).toFixed(1);
+                    const reviews = Math.floor(100 + Math.random() * 5000);
+                    const bsr = Math.floor(50 + Math.random() * 5000);
+                    rows += `<tr><td>${names[i]}</td><td>$${price}</td><td>${rating}★</td><td>${reviews}</td><td>#${bsr}</td></tr>`;
+                }
+                return `<div style="margin-bottom:10px;font-size:0.82rem;color:#8892b0;">平台：${platform} | 关键词：${keyword} | 采集数量：${count}条 | 运行间隔：每${interval}分钟 | 通知：${notify}</div>
+                <table class="sim-table"><thead><tr><th>商品名称</th><th>价格</th><th>评分</th><th>Review数</th><th>BSR排名</th></tr></thead><tbody>${rows}</tbody></table>
+                <div style="margin-top:10px;font-size:0.78rem;color:#00ff88;">✓ 发现3个竞品价格异常波动，已标记预警</div>`;
+            } else if (type === 'selection') {
+                const dims = [
+                    { name: '市场容量', score: 85, level: 'high' },
+                    { name: '竞争度', score: 62, level: 'mid' },
+                    { name: '利润率', score: 78, level: 'high' },
+                    { name: '季节性', score: 55, level: 'mid' },
+                    { name: '合规风险', score: 90, level: 'high' }
+                ];
+                let rows = dims.map(d => `<tr><td>${d.name}</td><td><span class="sim-score score-${d.level}">${d.score}分</span></td><td>${d.score >= 80 ? '优秀' : d.score >= 60 ? '良好' : '需关注'}</td></tr>`).join('');
+                const total = Math.round(dims.reduce((s, d) => s + d.score, 0) / dims.length);
+                return `<div style="margin-bottom:10px;font-size:0.82rem;color:#8892b0;">选品关键词：${keyword} | 平台：${platform} | 综合评分：<span style="color:#00ff88;font-weight:bold;font-size:1.1rem;">${total}分</span></div>
+                <table class="sim-table"><thead><tr><th>评分维度</th><th>得分</th><th>评价</th></tr></thead><tbody>${rows}</tbody></table>
+                <div style="margin-top:10px;font-size:0.78rem;color:${total >= 75 ? '#00ff88' : '#ffa502'};">${total >= 75 ? '✓ 推荐进入：综合表现优秀，建议深入调研后开发' : '⚠ 谨慎评估：部分维度需关注，建议进一步验证'}</div>`;
+            } else if (type === 'ads') {
+                return `<div style="margin-bottom:10px;font-size:0.82rem;color:#8892b0;">广告模拟 | 平台：${platform} | 关键词：${keyword}</div>
+                <table class="sim-table"><thead><tr><th>指标</th><th>预估值</th><th>说明</th></tr></thead><tbody>
+                <tr><td>预估曝光量</td><td style="color:#00d4ff;">${(count * 150).toLocaleString()}</td><td>基于搜索量估算</td></tr>
+                <tr><td>预估点击率(CTR)</td><td style="color:#00d4ff;">0.35%</td><td>类目平均水平</td></tr>
+                <tr><td>预估转化率(CVR)</td><td style="color:#00d4ff;">12%</td><td>基于历史数据</td></tr>
+                <tr><td>单次点击成本(CPC)</td><td style="color:#00d4ff;">$0.85</td><td>关键词竞价建议</td></tr>
+                <tr><td>预估ACOS</td><td><span class="sim-score score-mid">28%</span></td><td>目标ACOS 30%以内</td></tr>
+                <tr><td>预估ROAS</td><td style="color:#00ff88;">3.57</td><td>投入产出比</td></tr>
+                </tbody></table>
+                <div style="margin-top:10px;font-size:0.78rem;color:#00ff88;">✓ 建议：大词预算40%，长尾词预算60%，添加5个否定关键词</div>`;
+            } else {
+                return `<div style="margin-bottom:10px;font-size:0.82rem;color:#8892b0;">商品数据整理 | 平台：${platform} | 处理数量：${count}条</div>
+                <table class="sim-table"><thead><tr><th>处理项</th><th>数量</th><th>占比</th></tr></thead><tbody>
+                <tr><td>原始数据</td><td>${count}</td><td>100%</td></tr>
+                <tr><td>重复数据去重</td><td>${Math.floor(count * 0.08)}</td><td>8%</td></tr>
+                <tr><td>缺失值填充</td><td>${Math.floor(count * 0.15)}</td><td>15%</td></tr>
+                <tr><td>异常值标记</td><td>${Math.floor(count * 0.03)}</td><td>3%</td></tr>
+                <tr><td>有效数据</td><td style="color:#00ff88;">${count - Math.floor(count * 0.08)}</td><td style="color:#00ff88;">92%</td></tr>
+                </tbody></table>
+                <div style="margin-top:10px;font-size:0.78rem;color:#00ff88;">✓ 数据已写入：output_product_${Date.now()}.xlsx（3个Sheet：原始/清洗/统计）</div>`;
+            }
+        }
+
+        // ========== 代码片段 ==========
+        const CODE_SNIPPETS = [
+            `<span class="cmt"># 竞品数据采集（Python + Selenium）</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> selenium <span class="kw">import</span> webdriver
+<span class="kw">from</span> selenium.webdriver.common.by <span class="kw">import</span> By
+<span class="kw">import</span> time, random
+
+<span class="kw">def</span> <span class="fn">scrape_competitors</span>(keyword, max_items=<span class="str">50</span>):
+    <span class="str">"""抓取亚马逊竞品数据"""</span>
+    options = webdriver.ChromeOptions()
+    options.add_argument(<span class="str">'--headless'</span>)
+    driver = webdriver.Chrome(options=options)
+    driver.get(<span class="str">f"https://www.amazon.com/s?k={keyword}"</span>)
+    time.sleep(random.uniform(<span class="str">2</span>, <span class="str">4</span>))
+
+    results = []
+    items = driver.find_elements(By.CSS_SELECTOR, <span class="str">"[data-component-type='s-search-result']"</span>)
+    <span class="kw">for</span> item <span class="kw">in</span> items[:max_items]:
+        <span class="kw">try</span>:
+            data = {
+                <span class="str">'title'</span>: item.find_element(By.TAG_NAME, <span class="str">"h2"</span>).text,
+                <span class="str">'price'</span>: item.find_element(By.CLASS_NAME, <span class="str">"a-price"</span>).text,
+                <span class="str">'rating'</span>: item.get_attribute(<span class="str">"aria-label"</span>),
+                <span class="str">'reviews'</span>: item.find_element(By.CLASS_NAME, <span class="str">"a-size-base"</span>).text,
+                <span class="str">'asin'</span>: item.get_attribute(<span class="str">"data-asin"</span>)
+            }
+            results.append(data)
+        <span class="kw">except</span>: <span class="kw">pass</span>
+        time.sleep(random.uniform(<span class="str">0.5</span>, <span class="str">1.5</span>))
+
+    driver.quit()
+    df = pd.DataFrame(results)
+    df.to_excel(<span class="str">f"competitor_{keyword}.xlsx"</span>, index=<span class="kw">False</span>)
+    <span class="kw">return</span> df`,
+
+            `<span class="cmt"># 数据清洗与去重（Pandas）</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">clean_product_data</span>(file_path):
+    <span class="str">"""多平台商品数据清洗标准化"""</span>
+    df = pd.read_excel(file_path)
+
+    <span class="cmt"># 1. 字段统一映射</span>
+    col_map = {<span class="str">'商品标题'</span>: <span class="str">'title'</span>, <span class="str">'售价'</span>: <span class="str">'price'</span>,
+               <span class="str">'库存'</span>: <span class="str">'stock'</span>, <span class="str">'销量'</span>: <span class="str">'sales'</span>}
+    df = df.rename(columns=col_map)
+
+    <span class="cmt"># 2. 去重（按ASIN/商品ID）</span>
+    df = df.drop_duplicates(subset=[<span class="str">'asin'</span>], keep=<span class="str">'first'</span>)
+
+    <span class="cmt"># 3. 缺失值处理</span>
+    df[<span class="str">'price'</span>] = df[<span class="str">'price'</span>].fillna(df[<span class="str">'price'</span>].median())
+    df[<span class="str">'stock'</span>] = df[<span class="str">'stock'</span>].fillna(<span class="str">0</span>)
+
+    <span class="cmt"># 4. 异常值标记（价格超3倍标准差）</span>
+    price_mean = df[<span class="str">'price'</span>].mean()
+    price_std = df[<span class="str">'price'</span>].std()
+    df[<span class="str">'price_abnormal'</span>] = np.abs(df[<span class="str">'price'</span>] - price_mean) > <span class="str">3</span> * price_std
+
+    <span class="cmt"># 5. 计算衍生指标</span>
+    df[<span class="str">'gmv'</span>] = df[<span class="str">'price'</span>] * df[<span class="str">'sales'</span>]
+    df[<span class="str">'stock_days'</span>] = (df[<span class="str">'stock'</span>] / df[<span class="str">'sales'</span>].replace(<span class="str">0</span>, np.nan)).round(<span class="str">1</span>)
+
+    <span class="cmt"># 6. 导出多Sheet报告</span>
+    <span class="kw">with</span> pd.ExcelWriter(<span class="str">'cleaned_report.xlsx'</span>) <span class="kw">as</span> writer:
+        df.to_excel(writer, sheet_name=<span class="str">'清洗后数据'</span>, index=<span class="kw">False</span>)
+        df[df[<span class="str">'price_abnormal'</span>]].to_excel(writer, sheet_name=<span class="str">'异常预警'</span>, index=<span class="kw">False</span>)
+        df.describe().to_excel(writer, sheet_name=<span class="str">'统计摘要'</span>)
+
+    <span class="kw">return</span> df`,
+
+            `<span class="cmt"># 5维度选品评分算法</span>
+<span class="kw">def</span> <span class="fn">product_scoring</span>(data):
+    <span class="str">"""5维度选品评分：市场容量/竞争度/利润率/季节性/合规风险"""</span>
+    scores = {}
+
+    <span class="cmt"># 1. 市场容量（月搜索量，满分100）</span>
+    search_vol = data.get(<span class="str">'monthly_search'</span>, <span class="str">0</span>)
+    scores[<span class="str">'market'</span>] = min(<span class="str">100</span>, search_vol / <span class="str">1000</span> * <span class="str">100</span>)
+
+    <span class="cmt"># 2. 竞争度（卖家数量，越少分越高）</span>
+    seller_count = data.get(<span class="str">'seller_count'</span>, <span class="str">100</span>)
+    scores[<span class="str">'competition'</span>] = max(<span class="str">0</span>, <span class="str">100</span> - seller_count)
+
+    <span class="cmt"># 3. 利润率（毛利率，越高分越高）</span>
+    margin = data.get(<span class="str">'gross_margin'</span>, <span class="str">0.2</span>)
+    scores[<span class="str">'profit'</span>] = min(<span class="str">100</span>, margin * <span class="str">200</span>)
+
+    <span class="cmt"># 4. 季节性（波动系数，越稳定分越高）</span>
+    cv = data.get(<span class="str">'coefficient_variation'</span>, <span class="str">0.5</span>)
+    scores[<span class="str">'seasonality'</span>] = max(<span class="str">0</span>, <span class="str">100</span> - cv * <span class="str">100</span>)
+
+    <span class="cmt"># 5. 合规风险（专利/侵权风险，越低分越高）</span>
+    risk_level = data.get(<span class="str">'compliance_risk'</span>, <span class="str">0.3</span>)
+    scores[<span class="str">'compliance'</span>] = max(<span class="str">0</span>, <span class="str">100</span> - risk_level * <span class="str">100</span>)
+
+    <span class="cmt"># 加权综合评分（权重可配置）</span>
+    weights = {<span class="str">'market'</span>: <span class="str">0.25</span>, <span class="str">'competition'</span>: <span class="str">0.2</span>,
+               <span class="str">'profit'</span>: <span class="str">0.25</span>, <span class="str">'seasonality'</span>: <span class="str">0.15</span>,
+               <span class="str">'compliance'</span>: <span class="str">0.15</span>}
+    total = sum(scores[k] * weights[k] <span class="kw">for</span> k <span class="kw">in</span> weights)
+
+    <span class="cmt"># 推荐建议</span>
+    <span class="kw">if</span> total >= <span class="str">75</span>: suggestion = <span class="str">"推荐进入"</span>
+    <span class="kw">elif</span> total >= <span class="str">60</span>: suggestion = <span class="str">"谨慎评估"</span>
+    <span class="kw">else</span>: suggestion = <span class="str">"建议回避"</span>
+
+    <span class="kw">return</span> {<span class="str">'scores'</span>: scores, <span class="str">'total'</span>: round(total, <span class="str">1</span>), <span class="str">'suggestion'</span>: suggestion}`,
+
+            `<span class="cmt"># SP广告效果模拟与竞价建议</span>
+<span class="kw">def</span> <span class="fn">ads_simulation</span>(price, cost, target_acos, keywords):
+    <span class="str">"""模拟SP广告投放效果，输出ACOS/ROAS预估和竞价建议"""</span>
+    gross_profit = price - cost  <span class="cmt"># 单品毛利</span>
+    max_cpc = gross_profit * target_acos  <span class="cmt"># 可承受最高CPC</span>
+
+    results = []
+    <span class="kw">for</span> kw <span class="kw">in</span> keywords:
+        search_vol = kw[<span class="str">'volume'</span>]
+        ctr = kw.get(<span class="str">'ctr'</span>, <span class="str">0.0035</span>)  <span class="cmt"># 预估点击率</span>
+        cvr = kw.get(<span class="str">'cvr'</span>, <span class="str">0.12</span>)    <span class="cmt"># 预估转化率</span>
+        suggested_cpc = min(max_cpc * <span class="str">0.8</span>, kw.get(<span class="str">'avg_cpc'</span>, max_cpc))
+
+        impressions = search_vol * <span class="str">0.3</span>  <span class="cmt"># 预估曝光（30%市场份额）</span>
+        clicks = impressions * ctr
+        orders = clicks * cvr
+        ad_cost = clicks * suggested_cpc
+        ad_revenue = orders * price
+        acos = ad_cost / ad_revenue * <span class="str">100</span> <span class="kw">if</span> ad_revenue > <span class="str">0</span> <span class="kw">else</span> <span class="str">0</span>
+        roas = ad_revenue / ad_cost <span class="kw">if</span> ad_cost > <span class="str">0</span> <span class="kw">else</span> <span class="str">0</span>
+
+        results.append({
+            <span class="str">'keyword'</span>: kw[<span class="str">'word'</span>],
+            <span class="str">'suggested_cpc'</span>: round(suggested_cpc, <span class="str">2</span>),
+            <span class="str">'est_acos'</span>: round(acos, <span class="str">1</span>),
+            <span class="str">'est_roas'</span>: round(roas, <span class="str">2</span>),
+            <span class="str">'est_orders'</span>: round(orders),
+            <span class="str">'recommend'</span>: <span class="str">"投放"</span> <span class="kw">if</span> acos <= target_acos * <span class="str">100</span> <span class="kw">else</span> <span class="str">"观察"</span>
+        })
+
+    <span class="cmt"># 预算分配建议</span>
+    total_value = sum(r[<span class="str">'est_orders'</span>] <span class="kw">for</span> r <span class="kw">in</span> results)
+    <span class="kw">for</span> r <span class="kw">in</span> results:
+        r[<span class="str">'budget_share'</span>] = f"{round(r['est_orders'] / total_value * 100)}%"
+
+    <span class="kw">return</span> results`,
+
+            `<span class="cmt"># 影刀RPA调用Python脚本</span>
+<span class="cmt"># 方式一：影刀中使用"执行Python"节点</span>
+<span class="cmt"># 1. 在影刀流程中添加"执行Python代码"节点</span>
+<span class="cmt"># 2. 传入参数：${keyword}, ${count}</span>
+<span class="cmt"># 3. Python代码中通过sys.argv接收</span>
+
+<span class="kw">import</span> sys
+<span class="kw">import</span> subprocess
+
+<span class="kw">def</span> <span class="fn">run_scraper</span>(keyword, count):
+    <span class="str">"""影刀调用Python采集脚本"""</span>
+    script_path = <span class="str">"C:/RPA/scripts/competitor_scraper.py"</span>
+    cmd = [<span class="str">"python"</span>, script_path, <span class="str">"--keyword"</span>, keyword,
+           <span class="str">"--count"</span>, str(count), <span class="str">"--output"</span>, <span class="str">f"output_{keyword}.xlsx"</span>]
+
+    result = subprocess.run(cmd, capture_output=<span class="kw">True</span>, text=<span class="kw">True</span>, encoding=<span class="str">"utf-8"</span>)
+
+    <span class="kw">if</span> result.returncode == <span class="str">0</span>:
+        print(<span class="str">f"采集完成，输出文件：output_{keyword}.xlsx"</span>)
+        <span class="kw">return</span> <span class="kw">True</span>
+    <span class="kw">else</span>:
+        print(<span class="str">f"采集失败：{result.stderr}"</span>)
+        <span class="kw">return</span> <span class="kw">False</span>
+
+<span class="cmt"># 方式二：Python触发影刀流程（通过影刀命令行）</span>
+<span class="kw">def</span> <span class="fn">trigger_yingdao</span>(flow_id, params):
+    <span class="str">"""Python触发影刀RPA流程"""</span>
+    yingdao_cli = <span class="str">"C:/Program Files/影刀RPA/yingdao-cli.exe"</span>
+    cmd = [yingdao_cli, <span class="str">"run"</span>, <span class="str">"--id"</span>, flow_id, <span class="str">"--params"</span>, str(params)]
+    subprocess.Popen(cmd)
+
+<span class="cmt"># 方式三：Windows任务计划定时触发</span>
+<span class="cmt"># schtasks /create /tn "竞品监控" /tr "python C:\RPA\run.py" /sc daily /st 09:00</span>`,
+
+            `<span class="cmt"># 邮件通知（SMTP）+ 企业微信Webhook</span>
+<span class="kw">import</span> smtplib
+<span class="kw">from</span> email.mime.text <span class="kw">import</span> MIMEText
+<span class="kw">from</span> email.mime.multipart <span class="kw">import</span> MIMEMultipart
+<span class="kw">from</span> email.mime.base <span class="kw">import</span> MIMEBase
+<span class="kw">from</span> email <span class="kw">import</span> encoders
+<span class="kw">import</span> requests, json
+
+<span class="cmt"># ========== 邮件通知 ==========</span>
+<span class="kw">def</span> <span class="fn">send_email</span>(to_email, subject, content, attach_path=<span class="kw">None</span>):
+    <span class="str">"""发送邮件通知（QQ邮箱SMTP）"""</span>
+    msg = MIMEMultipart()
+    msg[<span class="str">'From'</span>] = <span class="str">"your_email@qq.com"</span>
+    msg[<span class="str">'To'</span>] = to_email
+    msg[<span class="str">'Subject'</span>] = subject
+
+    msg.attach(MIMEText(content, <span class="str">'html'</span>, <span class="str">'utf-8'</span>))
+
+    <span class="kw">if</span> attach_path:
+        <span class="kw">with</span> open(attach_path, <span class="str">'rb'</span>) <span class="kw">as</span> f:
+            part = MIMEBase(<span class="str">'application'</span>, <span class="str">'octet-stream'</span>)
+            part.set_payload(f.read())
+            encoders.encode_base64(part)
+            part.add_header(<span class="str">'Content-Disposition'</span>, f<span class="str">'attachment; filename="{attach_path}"'</span>)
+            msg.attach(part)
+
+    server = smtplib.SMTP_SSL(<span class="str">'smtp.qq.com'</span>, <span class="str">465</span>)
+    server.login(<span class="str">"your_email@qq.com"</span>, <span class="str">"your_smtp_auth_code"</span>)
+    server.sendmail(<span class="str">"your_email@qq.com"</span>, to_email, msg.as_string())
+    server.quit()
+
+<span class="cmt"># ========== 企业微信Webhook ==========</span>
+<span class="kw">def</span> <span class="fn">send_wecom</span>(webhook_url, content, mentioned_list=<span class="kw">None</span>):
+    <span class="str">"""发送企业微信消息卡片"""</span>
+    data = {
+        <span class="str">"msgtype"</span>: <span class="str">"markdown"</span>,
+        <span class="str">"markdown"</span>: {<span class="str">"content"</span>: content}
+    }
+    <span class="kw">if</span> mentioned_list:
+        data[<span class="str">"markdown"</span>][<span class="str">"mentioned_list"</span>] = mentioned_list
+
+    resp = requests.post(webhook_url, data=json.dumps(data),
+                         headers={<span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>})
+    <span class="kw">return</span> resp.json()
+
+<span class="cmt"># 使用示例</span>
+<span class="cmt"># send_email("boss@example.com", "【竞品监控】异常预警", html_content, "report.xlsx")</span>
+<span class="cmt"># send_wecom("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxx", "### 竞品监控报告\\n> 发现3个异常波动")</span>`
+        ];
+
+        let currentCodeTab = 0;
+        function switchCodeTab(idx, el) {
+            document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            currentCodeTab = idx;
+            document.getElementById('codeContent').innerHTML = CODE_SNIPPETS[idx];
+        }
+
+        function copyCode() {
+            const codeEl = document.getElementById('codeContent');
+            const text = codeEl.innerText;
+            const btn = document.getElementById('codeCopyBtn');
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = '✓ 已复制';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = '📋 复制代码'; btn.classList.remove('copied'); }, 2000);
+            }).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                btn.textContent = '✓ 已复制';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = '📋 复制代码'; btn.classList.remove('copied'); }, 2000);
+            });
+        }
+
+        // 初始化代码显示
+        document.getElementById('codeContent').innerHTML = CODE_SNIPPETS[0];
+    </script>
+</body>
+</html>

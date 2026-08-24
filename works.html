@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN" data-theme="night" data-dark="false">
 <head>
     <meta charset="UTF-8">
@@ -65,11 +65,9 @@
             <ul>
                 <li><a href="index.html"><span class="nav-icon">⌂</span>首页</a></li>
                 <li><a href="about.html"><span class="nav-icon">◉</span>关于我</a></li>
-                <li class="active"><a href="works.html"><span class="nav-icon">◆</span>项目作品</a></li>
                 <li class="has-submenu">
                     <a href="javascript:void(0)" class="submenu-toggle">
-                        <span class="nav-icon">▤</span>工作
-                        <span class="submenu-arrow">▶</span>
+                        <span class="nav-icon">▤</span>工作<span class="submenu-arrow">▶</span>
                     </a>
                     <ul class="submenu">
                         <li><a href="blog.html">实用工具</a></li>
@@ -77,11 +75,9 @@
                         <li><a href="dashboard.html">店铺管理</a></li>
                     </ul>
                 </li>
-                <li><a href="album.html"><span class="nav-icon">▣</span>相册</a></li>
-                <li class="has-submenu open">
+                <li class="has-submenu">
                     <a href="javascript:void(0)" class="submenu-toggle">
-                        <span class="nav-icon">◈</span>生活
-                        <span class="submenu-arrow">▶</span>
+                        <span class="nav-icon">◈</span>生活<span class="submenu-arrow">▶</span>
                     </a>
                     <ul class="submenu">
                         <li><a href="cook.html">菜谱</a></li>
@@ -89,6 +85,17 @@
                         <li><a href="anime.html">动漫</a></li>
                     </ul>
                 </li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle">
+                        <span class="nav-icon">⚡</span>AI工具<span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="ecommerce-rpa.html">电商RPA自动化</a></li>
+                        <li><a href="ai-comic.html">AI漫剧工坊</a></li>
+                    </ul>
+                </li>
+                <li class="active"><a href="works.html"><span class="nav-icon">◆</span>项目作品</a></li>
+                <li><a href="album.html"><span class="nav-icon">▣</span>相册</a></li>
                 <li><a href="contact.html"><span class="nav-icon">✉</span>联系我</a></li>
             </ul>
         </nav>
@@ -106,6 +113,7 @@
             <button class="filter-btn" data-filter="shop">店铺管理</button>
             <button class="filter-btn" data-filter="web">Web应用</button>
             <button class="filter-btn" data-filter="ecom">跨境电商</button>
+            <button class="filter-btn" data-filter="ai">AI工具</button>
         </div>
 
         <div class="works-grid">
@@ -287,6 +295,43 @@
                     <p class="work-desc">企业级综合数据监控平台，整合销售、运营、财务、用户四大模块，核心指标实时刷新，支持大屏投屏展示与移动端适配，异常数据自动标红预警。</p>
                     <div class="work-tags">
                         <span>ECharts</span><span>综合看板</span><span>实时监控</span><span>大屏投屏</span>
+                    </div>
+                </div>
+            </article>
+            <article class="work-card animate-on-scroll" data-category="ai">
+                <div class="work-cover">
+                    <div class="cover-placeholder cover-3">
+                        <span class="cover-icon">🤖</span>
+                    </div>
+                    <div class="work-overlay">
+                        <a href="ecommerce-rpa.html" class="work-link">查看演示 →</a>
+                    </div>
+                </div>
+                <div class="work-info">
+                    <h3 class="work-title">AI+RPA 电商自动化</h3>
+                    <p class="work-meta">2026 · 独立开发 · 方案演示</p>
+                    <p class="work-desc">基于Python+影刀RPA的跨境电商运营自动化方案，覆盖竞品采集、商品数据整理、智能选品指标、广告模拟分析全流程，含参数配置面板与代码片段参考。浏览器端做方案演示，实际脚本本地运行。</p>
+                    <div class="work-tags">
+                        <span>Python</span><span>影刀RPA</span><span>Pandas</span><span>Selenium</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="work-card animate-on-scroll" data-category="ai">
+                <div class="work-cover">
+                    <div class="cover-placeholder cover-1">
+                        <span class="cover-icon">🎬</span>
+                    </div>
+                    <div class="work-overlay">
+                        <a href="ai-comic.html" class="work-link">查看演示 →</a>
+                    </div>
+                </div>
+                <div class="work-info">
+                    <h3 class="work-title">AI漫剧工坊</h3>
+                    <p class="work-meta">2026 · 独立开发 · 提示词编排</p>
+                    <p class="work-desc">输入文案剧本，AI自动生成分镜提示词、角色设定与漫剧脚本。支持画风、镜头节奏、分镜数量、角色数量、画面比例、色调氛围6项参数调整，前端做提示词编排，成品视频由后端/本地工具生成。</p>
+                    <div class="work-tags">
+                        <span>AI绘画</span><span>分镜生成</span><span>提示词工程</span><span>角色设定</span>
                     </div>
                 </div>
             </article>
