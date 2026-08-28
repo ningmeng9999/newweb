@@ -569,44 +569,52 @@
 
     // ===== K线API（优先Vercel代理，失败回退直接请求） =====
     async function fetchKline(code, days = 25) {
-        if (klineCache[code]) return klineCache[code];
+        if (klineCache[code]) {
+            console.log('[K线] 使用缓存', code, klineCache[code].length, '条');
+            return klineCache[code];
+        }
         const isLocal = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        console.log('[K线] 请求', code, 'days=' + days, 'isLocal=' + isLocal);
 
-        // 带超时的fetch
         const fetchWithTimeout = (url, opts = {}, timeout = 5000) => {
             const controller = new AbortController();
             const timer = setTimeout(() => controller.abort(), timeout);
             return fetch(url, { ...opts, signal: controller.signal }).finally(() => clearTimeout(timer));
         };
 
-        // 本地环境直接直连，不走代理
+        // 优先走代理
         if (!isLocal) {
             try {
-                const res = await fetchWithTimeout(`./api/kline?code=${code}&days=${days}`, { cache: 'no-store' }, 5000);
+                const res = await fetchWithTimeout(`./api/kline?code=${code}&days=${days}`, { cache: 'no-store' }, 8000);
+                console.log('[K线] 代理响应状态', res.status);
                 if (res.ok) {
                     const data = await res.json();
-                    const node = data.data && data.data[code];
+                    console.log('[K线] 代理返回keys', data ? Object.keys(data) : 'null', 'data.data keys', data && data.data ? Object.keys(data.data) : 'null');
+                    const node = data && data.data && data.data[code];
                     const kline = (node && (node.qfqday || node.day)) || [];
+                    console.log('[K线] 代理解析到', kline.length, '条');
                     if (kline.length) {
                         klineCache[code] = kline;
                         return kline;
                     }
                 }
             } catch (e) {
-                console.warn('代理K线失败，尝试直连:', e.message);
+                console.warn('[K线] 代理失败:', e.message);
             }
         }
 
         // 直连腾讯API
         try {
-            const res = await fetchWithTimeout(`https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=${code},day,,,${days},qfq`, {}, 8000);
+            const res = await fetchWithTimeout(`https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=${code},day,,,${days},qfq`, {}, 10000);
+            console.log('[K线] 直连响应状态', res.status);
             const data = await res.json();
-            const node = data.data && data.data[code];
+            const node = data && data.data && data.data[code];
             const kline = (node && (node.qfqday || node.day)) || [];
+            console.log('[K线] 直连解析到', kline.length, '条');
             klineCache[code] = kline;
             return kline;
         } catch (e) {
-            console.warn('K线直连也失败:', code, e.message);
+            console.warn('[K线] 直连也失败:', code, e.message);
             return [];
         }
     }
