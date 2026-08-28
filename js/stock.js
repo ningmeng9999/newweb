@@ -548,11 +548,11 @@
         });
     }
 
-    // ===== 腾讯K线API（fetch，支持CORS） =====
+    // ===== 腾讯K线API（通过Vercel代理，避免CORS） =====
     async function fetchKline(code, days = 25) {
         if (klineCache[code]) return klineCache[code];
         try {
-            const res = await fetch(`https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=${code},day,,,${days},qfq`);
+            const res = await fetch(`./api/kline?code=${code}&days=${days}`, { cache: 'no-store' });
             const data = await res.json();
             const node = data.data && data.data[code];
             const kline = (node && (node.qfqday || node.day)) || [];
