@@ -1,18 +1,19 @@
-// Vercel Serverless Function - 热门股票排行（东方财富多维度排序）
+// Vercel Serverless Function - 热门股票排行（新浪财经API）
 const https = require('https');
+const http = require('http');
 
 function sendJson(res, statusCode, data) {
     res.writeHead(statusCode, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify(data));
 }
 
-function fetchUrl(url, referer = 'https://quote.eastmoney.com/') {
+function fetchUrl(url, useHttps = true) {
     return new Promise((resolve, reject) => {
-        const req = https.get(url, {
+        const client = useHttps ? https : http;
+        const req = client.get(url, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Accept': 'application/json, text/plain, */*',
-                'Referer': referer
+                'Referer': 'https://finance.sina.com.cn/'
             },
             timeout: 8000
         }, (response) => {
@@ -21,7 +22,7 @@ function fetchUrl(url, referer = 'https://quote.eastmoney.com/') {
             response.on('end', () => {
                 const buf = Buffer.concat(chunks);
                 let text;
-                try { text = new TextDecoder('utf-8').decode(buf); } catch(e) { text = buf.toString(); }
+                try { text = new TextDecoder('gbk').decode(buf); } catch(e) { text = buf.toString('utf-8'); }
                 resolve(text);
             });
         });
@@ -30,49 +31,47 @@ function fetchUrl(url, referer = 'https://quote.eastmoney.com/') {
     });
 }
 
-// 东方财富clist通用接口，按不同字段排序
-async function fetchEastmoneyRank(fid, size = 30, label = '') {
-    // fid: f3=涨跌幅, f6=成交额, f8=换手率, f5=成交量
-    const fs = 'm:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23'; // 沪深A股
-    const url = `https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=${size}&po=1&np=1&fltt=2&invt=2&fid=${fid}&fs=${fs}&fields=f2,f3,f5,f6,f8,f12,f14,f15,f16,f17,f18`;
+// 新浪财经排行榜
+async function fetchSinaRank(sort, size = 30, label = '') {
+    // sort: changepercent(涨跌幅), amount(成交额), turnoverratio(换手率)
+    const url = `https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=${size}&sort=${sort}&asc=0&node=hs_a`;
     try {
-        const text = await fetchUrl(url);
-        const json = JSON.parse(text);
-        if (json.data && json.data.diff && Array.isArray(json.data.diff)) {
-            return json.data.diff.map(item => {
-                const code = item.f12 || '';
-                const prefix = code.startsWith('6') || code.startsWith('9') ? 'sh' : (code.startsWith('0') || code.startsWith('3') ? 'sz' : 'bj');
+        let text;
+        try {
+            text = await fetchUrl(url, true);
+        } catch (e) {
+            // HTTPS失败回退HTTP
+            text = await fetchUrl(url.replace('https://', 'http://'), false);
+        }
+        // 新浪返回的是JSON数组，可能有JSONP包裹
+        text = text.trim();
+        if (text.startsWith('var') || text.startsWith('(')) {
+            const match = text.match(/\[.*\]/s);
+            if (match) text = match[0];
+        }
+        const data = JSON.parse(text);
+        if (Array.isArray(data)) {
+            return data.map(item => {
+                const symbol = item.symbol || ''; // 如 sh600519
                 return {
-                    code: prefix + code,
-                    name: item.f14 || '',
-                    price: item.f2 || 0,
-                    changeRate: item.f3 || 0,
-                    volume: item.f5 || 0,
-                    amount: item.f6 || 0,
-                    turnover: item.f8 || 0,
-                    hotValue: item[fid] || 0,
+                    code: symbol.toLowerCase(),
+                    name: item.name || '',
+                    price: parseFloat(item.trade) || 0,
+                    changeRate: parseFloat(item.changepercent) || 0,
+                    volume: parseFloat(item.volume) || 0,
+                    amount: parseFloat(item.amount) || 0,
+                    turnover: parseFloat(item.turnoverratio) || 0,
+                    pe: parseFloat(item.per) || 0,
+                    pb: parseFloat(item.pb) || 0,
+                    hotValue: parseFloat(item[sort]) || 0,
                     source: label
                 };
             }).filter(s => s.code && s.name && s.price > 0);
         }
-        console.warn(`东方财富${label}榜: 无diff数据`, text.substring(0, 100));
     } catch (e) {
-        console.warn(`东方财富${label}榜失败:`, e.message);
+        console.warn(`新浪${label}榜失败:`, e.message);
     }
     return [];
-}
-
-// 东方财富人气榜（股吧热度，备用接口）
-async function fetchGubaHot(size = 30) {
-    try {
-        const url = `https://guba.eastmoney.com/rank/`;
-        // 股吧人气榜是动态渲染的，用API替代
-        // 用涨幅榜+成交量模拟人气
-        const result = await fetchEastmoneyRank('f5', size, '人气榜');
-        return result;
-    } catch (e) {
-        return [];
-    }
 }
 
 module.exports = async (req, res) => {
@@ -94,10 +93,9 @@ module.exports = async (req, res) => {
         let changeRank = [], amountRank = [], turnoverRank = [];
         const tasks = [];
 
-        // 三个维度：涨幅、成交额、换手率
-        if (source === 'all' || source === 'hot') tasks.push(fetchEastmoneyRank('f3', size, '涨幅榜').then(r => changeRank = r));
-        if (source === 'all' || source === 'amount') tasks.push(fetchEastmoneyRank('f6', size, '成交额').then(r => amountRank = r));
-        if (source === 'all' || source === 'turnover') tasks.push(fetchEastmoneyRank('f8', size, '换手率').then(r => turnoverRank = r));
+        if (source === 'all' || source === 'hot') tasks.push(fetchSinaRank('changepercent', size, '涨幅榜').then(r => changeRank = r));
+        if (source === 'all' || source === 'amount') tasks.push(fetchSinaRank('amount', size, '成交额').then(r => amountRank = r));
+        if (source === 'all' || source === 'turnover') tasks.push(fetchSinaRank('turnoverratio', size, '换手率').then(r => turnoverRank = r));
 
         await Promise.allSettled(tasks);
 
