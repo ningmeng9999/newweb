@@ -548,18 +548,46 @@
         });
     }
 
-    // ===== 腾讯K线API（通过Vercel代理，避免CORS） =====
+    // ===== K线API（优先Vercel代理，失败回退直接请求） =====
     async function fetchKline(code, days = 25) {
         if (klineCache[code]) return klineCache[code];
+        const isLocal = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+        // 带超时的fetch
+        const fetchWithTimeout = (url, opts = {}, timeout = 5000) => {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeout);
+            return fetch(url, { ...opts, signal: controller.signal }).finally(() => clearTimeout(timer));
+        };
+
+        // 本地环境直接直连，不走代理
+        if (!isLocal) {
+            try {
+                const res = await fetchWithTimeout(`./api/kline?code=${code}&days=${days}`, { cache: 'no-store' }, 5000);
+                if (res.ok) {
+                    const data = await res.json();
+                    const node = data.data && data.data[code];
+                    const kline = (node && (node.qfqday || node.day)) || [];
+                    if (kline.length) {
+                        klineCache[code] = kline;
+                        return kline;
+                    }
+                }
+            } catch (e) {
+                console.warn('代理K线失败，尝试直连:', e.message);
+            }
+        }
+
+        // 直连腾讯API
         try {
-            const res = await fetch(`./api/kline?code=${code}&days=${days}`, { cache: 'no-store' });
+            const res = await fetchWithTimeout(`https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=${code},day,,,${days},qfq`, {}, 8000);
             const data = await res.json();
             const node = data.data && data.data[code];
             const kline = (node && (node.qfqday || node.day)) || [];
             klineCache[code] = kline;
             return kline;
         } catch (e) {
-            console.warn('K线获取失败:', code, e.message);
+            console.warn('K线直连也失败:', code, e.message);
             return [];
         }
     }
@@ -568,25 +596,31 @@
     async function fetchHotStocks(source = 'all', size = 30) {
         if (hotLoading) return hotStocks;
         hotLoading = true;
+        const isLocal = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
         try {
-            const res = await fetch(`./api/hot-stocks?source=${source}&size=${size}`, { cache: 'no-store' });
-            const json = await res.json();
-            if (json.success && json.data && json.data.length) {
-                hotStocks = json.data.map(s => ({
-                    code: s.code,
-                    name: s.name,
-                    hotValue: s.hotValue || 0,
-                    source: s.source || (s.sources ? s.sources.join('/') : '综合')
-                }));
-                // 同时获取这些股票的实时行情
-                const codes = hotStocks.map(s => ({ code: s.code }));
-                try {
-                    const quotesData = await fetchQuotes(codes);
-                    quotes = { ...quotes, ...quotesData };
-                } catch (e) {
-                    console.warn('热门榜行情获取失败:', e.message);
+            if (!isLocal) {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 8000);
+                const res = await fetch(`./api/hot-stocks?source=${source}&size=${size}`, { cache: 'no-store', signal: controller.signal });
+                clearTimeout(timer);
+                const json = await res.json();
+                if (json.success && json.data && json.data.length) {
+                    hotStocks = json.data.map(s => ({
+                        code: s.code,
+                        name: s.name,
+                        hotValue: s.hotValue || 0,
+                        source: s.source || (s.sources ? s.sources.join('/') : '综合')
+                    }));
+                    // 同时获取这些股票的实时行情
+                    const codes = hotStocks.map(s => ({ code: s.code }));
+                    try {
+                        const quotesData = await fetchQuotes(codes);
+                        quotes = { ...quotes, ...quotesData };
+                    } catch (e) {
+                        console.warn('热门榜行情获取失败:', e.message);
+                    }
+                    return hotStocks;
                 }
-                return hotStocks;
             }
         } catch (e) {
             console.warn('热门榜API失败，使用内置数据:', e.message);
@@ -625,7 +659,8 @@
         document.getElementById('klineTitle').textContent = name + ' (' + code.toUpperCase() + ') 日K线';
         document.getElementById('klineInfo').textContent = '加载中...';
         klineModal.classList.add('show');
-        loadAndDrawKline(code);
+        // 延迟加载，确保弹窗完全显示后canvas有尺寸
+        setTimeout(() => loadAndDrawKline(code), 50);
     }
 
     function closeKlineModal() {
