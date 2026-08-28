@@ -503,11 +503,30 @@
         catch (e) { console.error('策略存储失败', e); }
     }
 
-    // ===== 腾讯实时行情API（JSONP） =====
-    function fetchQuotes(stockList) {
+    // ===== 实时行情API（优先Vercel代理，避免Mixed Content，失败回退JSONP） =====
+    async function fetchQuotes(stockList) {
+        if (!stockList || !stockList.length) return {};
+        const codes = stockList.map(s => s.code || s).join(',');
+        const isLocal = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+        // 方式1：Vercel代理（部署后用，避免HTTPS页面请求HTTP）
+        if (!isLocal) {
+            try {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 6000);
+                const res = await fetch(`./api/quote?codes=${encodeURIComponent(codes)}`, { signal: controller.signal });
+                clearTimeout(timer);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && typeof data === 'object' && !data.error) return data;
+                }
+            } catch (e) {
+                console.warn('代理行情失败，尝试JSONP:', e.message);
+            }
+        }
+
+        // 方式2：JSONP直连（本地可用）
         return new Promise((resolve, reject) => {
-            if (!stockList || !stockList.length) { resolve({}); return; }
-            const codes = stockList.map(s => s.code || s).join(',');
             const script = document.createElement('script');
             const url = `https://qt.gtimg.cn/q=${codes}`;
             const timeout = setTimeout(() => { cleanup(); reject(new Error('超时')); }, 8000);
