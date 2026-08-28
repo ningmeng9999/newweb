@@ -1213,6 +1213,77 @@
     }
 
     // 渲染搜索结果卡片到独立板块
+    // K线缩略图缓存
+    const klineThumbCache = {};
+
+    // 绘制K线缩略图（折线图，收盘价连线）
+    function drawKlineThumb(canvas, code) {
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        const W = canvas.width, H = canvas.height;
+        ctx.clearRect(0, 0, W, H);
+
+        const kline = klineThumbCache[code];
+        if (!kline || kline.length < 2) {
+            // 加载中提示
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.font = '10px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('加载中...', W/2, H/2);
+            return;
+        }
+
+        // 计算价格范围
+        const closes = kline.map(k => parseFloat(k[2])).filter(v => !isNaN(v));
+        if (closes.length < 2) return;
+        const minP = Math.min(...closes);
+        const maxP = Math.max(...closes);
+        const range = maxP - minP || 1;
+        const firstClose = closes[0];
+        const lastClose = closes[closes.length - 1];
+        const isUp = lastClose >= firstClose;
+        const color = isUp ? '#ef4444' : '#22c55e';
+
+        // 绘制折线
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        closes.forEach((price, i) => {
+            const x = (i / (closes.length - 1)) * (W - 4) + 2;
+            const y = H - 4 - ((price - minP) / range) * (H - 8);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        // 填充渐变
+        const gradient = ctx.createLinearGradient(0, 0, 0, H);
+        gradient.addColorStop(0, isUp ? 'rgba(239,68,68,0.3)' : 'rgba(34,197,94,0.3)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.lineTo(W - 2, H - 2);
+        ctx.lineTo(2, H - 2);
+        ctx.closePath();
+        ctx.fillStyle = gradient;
+        ctx.fill();
+    }
+
+    // 异步加载K线缩略图
+    async function loadKlineThumb(code, canvas) {
+        if (klineThumbCache[code]) {
+            drawKlineThumb(canvas, code);
+            return;
+        }
+        try {
+            const kline = await fetchKline(code, 20);
+            if (kline && kline.length >= 2) {
+                klineThumbCache[code] = kline;
+                drawKlineThumb(canvas, code);
+            }
+        } catch (e) {
+            console.warn('K线缩略图加载失败:', code, e.message);
+        }
+    }
+
     function renderSearchCards(list) {
         if (!searchResultGrid) return;
         searchResultGrid.innerHTML = '';
@@ -1225,23 +1296,31 @@
             const dir = q.changeRate >= 0 ? 'up' : 'down';
             const inFav = favorites.some(f => f.code === stock.code);
             const card = document.createElement('div');
-            card.className = 'hot-card';
+            card.className = 'hot-card search-card';
             card.innerHTML = `
-                <div class="hot-card-header">
-                    <span class="hot-name">${q.name}</span>
-                    <span class="hot-code">${stock.code.toUpperCase()}</span>
+                <div class="card-info">
+                    <div class="hot-card-header">
+                        <span class="hot-name">${q.name}</span>
+                        <span class="hot-code">${stock.code.toUpperCase()}</span>
+                    </div>
+                    <div class="hot-card-price">
+                        <span class="price-num">¥${q.price ? q.price.toFixed(2) : '--'}</span>
+                        <span class="price-change pnl-${dir}">${dir==='up'?'+':''}${q.changeRate ? q.changeRate.toFixed(2) : '0.00'}%</span>
+                    </div>
+                    <div class="hot-card-meta">
+                        <span>换手:${q.turnover ? q.turnover.toFixed(2) : '--'}%</span>
+                        <span>PE:${q.pe ? q.pe.toFixed(1) : '--'}</span>
+                    </div>
+                    <button class="hot-add-btn ${inFav?'added':''}" data-code="${stock.code}" data-name="${q.name}">${inFav?'✓ 已加':'+ 自选'}</button>
                 </div>
-                <div class="hot-card-price">
-                    <span class="price-num">¥${q.price ? q.price.toFixed(2) : '--'}</span>
-                    <span class="price-change pnl-${dir}">${dir==='up'?'+':''}${q.changeRate ? q.changeRate.toFixed(2) : '0.00'}%</span>
+                <div class="search-kline-thumb">
+                    <canvas width="130" height="60" data-code="${stock.code}"></canvas>
                 </div>
-                <div class="hot-card-meta">
-                    <span>换手:${q.turnover ? q.turnover.toFixed(2) : '--'}%</span>
-                    <span>PE:${q.pe ? q.pe.toFixed(1) : '--'}</span>
-                </div>
-                <button class="hot-add-btn ${inFav?'added':''}" data-code="${stock.code}" data-name="${q.name}">${inFav?'✓ 已加':'+ 自选'}</button>
             `;
             searchResultGrid.appendChild(card);
+            // 异步加载K线缩略图
+            const canvas = card.querySelector('canvas');
+            if (canvas) loadKlineThumb(stock.code, canvas);
         });
         searchResultGrid.querySelectorAll('.hot-add-btn:not(.added)').forEach(btn => {
             btn.addEventListener('click', async () => {
@@ -1370,18 +1449,47 @@
         if (favorites.some(f => f.code === code)) return;
         // 确保有实时行情
         let quote = quotes[code];
-        if (!quote) {
+        if (!quote || !quote.price || quote.price <= 0) {
             try {
                 const result = await fetchQuotes([{ code }]);
                 quote = result[code];
-                if (quote) quotes[code] = quote;
+                if (quote && quote.price > 0) quotes[code] = quote;
             } catch (e) {
-                console.warn('获取行情失败，使用0作为买入价', e);
+                console.warn('获取行情失败，尝试从全市场缓存获取', e);
             }
         }
-        const buyPrice = quote ? quote.price : 0;
+        // 回退：从全市场缓存获取价格
+        if ((!quote || !quote.price || quote.price <= 0) && allStocksCache && allStocksCache.length) {
+            const cached = allStocksCache.find(s => s.code === code || s.rawCode === code);
+            if (cached && cached.price && cached.price > 0) {
+                quote = { ...cached, price: cached.price, changeRate: cached.changeRate || 0 };
+                console.log('从全市场缓存获取价格:', name, cached.price);
+            }
+        }
+        const buyPrice = quote && quote.price > 0 ? quote.price : 0;
         if (buyPrice <= 0) {
-            alert('获取该股票实时行情失败，请稍后重试或检查网络');
+            // 不再弹alert，用提示文字告知用户
+            const tip = document.getElementById('searchResultTip') || document.querySelector('.section-tip');
+            if (tip) {
+                const old = tip.textContent;
+                tip.textContent = '⚠ 获取实时行情失败，已用搜索结果价格加入自选';
+                setTimeout(() => { if (tip) tip.textContent = old; }, 3000);
+            }
+            // 尝试用搜索结果中显示的价格
+            const card = document.querySelector(`.hot-add-btn[data-code="${code}"]`);
+            if (card) {
+                const priceEl = card.closest('.hot-card')?.querySelector('.hot-price');
+                if (priceEl) {
+                    const p = parseFloat(priceEl.textContent.replace(/[^\d.]/g, ''));
+                    if (p > 0) {
+                        const today = new Date().toISOString().slice(0, 10);
+                        favorites.push({ code, name, buyPrice: p, addDate: today });
+                        saveFavorites();
+                        renderAll();
+                        return;
+                    }
+                }
+            }
             return;
         }
         const today = new Date().toISOString().slice(0, 10);
