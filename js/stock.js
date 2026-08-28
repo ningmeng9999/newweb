@@ -1295,10 +1295,10 @@
             const q = stock.price !== undefined ? stock : (quotes[stock.code] || stock);
             const dir = q.changeRate >= 0 ? 'up' : 'down';
             const inFav = favorites.some(f => f.code === stock.code);
-            const card = document.createElement('div');
-            card.className = 'hot-card search-card';
-            card.innerHTML = `
-                <div class="card-info">
+            const row = document.createElement('div');
+            row.className = 'search-result-row';
+            row.innerHTML = `
+                <div class="hot-card">
                     <div class="hot-card-header">
                         <span class="hot-name">${q.name}</span>
                         <span class="hot-code">${stock.code.toUpperCase()}</span>
@@ -1313,13 +1313,14 @@
                     </div>
                     <button class="hot-add-btn ${inFav?'added':''}" data-code="${stock.code}" data-name="${q.name}">${inFav?'✓ 已加':'+ 自选'}</button>
                 </div>
-                <div class="search-kline-thumb">
-                    <canvas width="130" height="60" data-code="${stock.code}"></canvas>
+                <div class="search-kline-card">
+                    <div class="kline-label">近20日走势</div>
+                    <canvas width="400" height="75" data-code="${stock.code}"></canvas>
                 </div>
             `;
-            searchResultGrid.appendChild(card);
+            searchResultGrid.appendChild(row);
             // 异步加载K线缩略图
-            const canvas = card.querySelector('canvas');
+            const canvas = row.querySelector('canvas');
             if (canvas) loadKlineThumb(stock.code, canvas);
         });
         searchResultGrid.querySelectorAll('.hot-add-btn:not(.added)').forEach(btn => {

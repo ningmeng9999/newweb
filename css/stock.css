@@ -298,29 +298,46 @@
     border-style: dashed;
 }
 
-/* 搜索结果卡片：左右布局，右侧K线缩略图 */
-.hot-card.search-card {
+/* 搜索结果：每行两个卡片，左侧信息卡原大小，右侧K线填满 */
+#searchResultGrid.hot-grid {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+.search-result-row {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
     gap: 1rem;
-    padding: 0.8rem 1.2rem;
+    align-items: stretch;
 }
-.hot-card.search-card .card-info {
-    flex: 1;
-    min-width: 0;
-}
-.search-kline-thumb {
-    width: 130px;
-    height: 60px;
+.search-result-row .hot-card {
+    width: 240px;
     flex-shrink: 0;
-    border-radius: 6px;
-    background: rgba(0,0,0,0.2);
-    overflow: hidden;
+    margin: 0;
 }
-.search-kline-thumb canvas {
+.search-kline-card {
+    flex: 1;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.8rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    backdrop-filter: blur(12px);
+    transition: all 0.3s ease;
+}
+.search-kline-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+.search-kline-card .kline-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+}
+.search-kline-card canvas {
     width: 100%;
-    height: 100%;
+    height: 75px;
     display: block;
 }
 
