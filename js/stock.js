@@ -621,16 +621,24 @@
 
     // ===== 获取动态热门榜 =====
     async function fetchHotStocks(source = 'all', size = 30, fallback = true) {
-        if (hotLoading) return hotStocks;
+        if (hotLoading) {
+            console.log('[热门榜] 上一次请求未完成，等待...');
+            // 等待上一次完成
+            await new Promise(r => setTimeout(r, 100));
+            return hotStocks;
+        }
         hotLoading = true;
         const isLocal = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        console.log('[热门榜] 请求 source=' + source + ' isLocal=' + isLocal);
         try {
             if (!isLocal) {
                 const controller = new AbortController();
-                const timer = setTimeout(() => controller.abort(), 8000);
+                const timer = setTimeout(() => controller.abort(), 10000);
                 const res = await fetch(`./api/hot-stocks?source=${source}&size=${size}`, { cache: 'no-store', signal: controller.signal });
                 clearTimeout(timer);
+                console.log('[热门榜] 响应状态', res.status);
                 const json = await res.json();
+                console.log('[热门榜] 返回 success=' + json.success + ' count=' + (json.data ? json.data.length : 0));
                 if (json.success && json.data && json.data.length) {
                     hotStocks = json.data.map(s => ({
                         code: s.code,
@@ -646,22 +654,29 @@
                     } catch (e) {
                         console.warn('热门榜行情获取失败:', e.message);
                     }
+                    console.log('[热门榜] 更新成功，第一只:', hotStocks[0].name);
                     return hotStocks;
                 } else if (json.success && json.data && json.data.length === 0) {
-                    // API成功但无数据，不回退
+                    console.log('[热门榜] API返回空数组');
                     hotStocks = [];
                     return hotStocks;
+                } else {
+                    console.log('[热门榜] 返回格式不对:', JSON.stringify(json).substring(0, 200));
                 }
+            } else {
+                console.log('[热门榜] 本地环境，使用内置数据');
             }
         } catch (e) {
-            console.warn('热门榜API失败:', e.message);
+            console.warn('[热门榜] 请求失败:', e.message);
         } finally {
             hotLoading = false;
         }
         // 失败时回退到内置数据（仅fallback=true时）
         if (fallback) {
+            console.log('[热门榜] 回退到内置数据');
             hotStocks = HOT_STOCKS.slice();
         } else {
+            console.log('[热门榜] fallback=false，设置为空');
             hotStocks = [];
         }
         return hotStocks;
@@ -781,164 +796,174 @@
     }
 
     function drawKlineChart() {
-        const canvas = document.getElementById('klineCanvas');
-        if (!canvas) { console.error('[K线] canvas不存在'); return; }
-        const ctx = canvas.getContext('2d');
-        if (!ctx) { console.error('[K线] context获取失败'); return; }
-        if (!currentKlineData || !currentKlineData.length) { console.warn('[K线] 无数据'); return; }
+        try {
+            const canvas = document.getElementById('klineCanvas');
+            if (!canvas) { console.error('[K线] canvas不存在'); return; }
+            const ctx = canvas.getContext('2d');
+            if (!ctx) { console.error('[K线] context获取失败'); return; }
+            if (!currentKlineData || !currentKlineData.length) { console.warn('[K线] 无数据'); return; }
 
-        const W = canvas.width, H = canvas.height;
-        const L = getKlineLayout(W, H);
+            console.log('[K线] 开始绘制 canvas=' + canvas.width + 'x' + canvas.height + ' 数据=' + currentKlineData.length + '条');
 
-        // 清空
-        ctx.clearRect(0, 0, W, H);
-        ctx.fillStyle = 'rgba(5,10,25,0.5)';
-        ctx.fillRect(0, 0, W, H);
+            const W = canvas.width, H = canvas.height;
+            const L = getKlineLayout(W, H);
+            console.log('[K线] 布局 priceH=' + L.priceH + ' volH=' + L.volH + ' chartW=' + L.chartW);
 
-        const kline = currentKlineData.filter(k => k && k.length >= 5 && !isNaN(parseFloat(k[2])));
-        if (!kline.length) return;
+            // 清空并画测试背景（红色，确认canvas可用）
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = 'rgba(20,30,50,0.9)';
+            ctx.fillRect(0, 0, W, H);
 
-        const gap = L.chartW / kline.length;
-        const barW = Math.max(1, gap * 0.65);
+            const kline = currentKlineData.filter(k => k && k.length >= 5 && !isNaN(parseFloat(k[2])));
+            if (!kline.length) { console.warn('[K线] 过滤后无数据'); return; }
 
-        // 价格范围
-        let minP = Infinity, maxP = -Infinity;
-        kline.forEach(k => {
-            const h = parseFloat(k[3]), l = parseFloat(k[4]);
-            if (!isNaN(h) && h > maxP) maxP = h;
-            if (!isNaN(l) && l < minP) minP = l;
-        });
-        const ma5 = calcMA(kline, 5);
-        const ma10 = calcMA(kline, 10);
-        const ma30 = calcMA(kline, 30);
-        [ma5, ma10, ma30].forEach(ma => {
-            ma.forEach(v => { if (v !== null && isFinite(v)) { if (v > maxP) maxP = v; if (v < minP) minP = v; } });
-        });
-        if (!isFinite(minP) || !isFinite(maxP) || minP === maxP) {
-            minP = Math.min(...kline.map(k => parseFloat(k[2])));
-            maxP = Math.max(...kline.map(k => parseFloat(k[2])));
-        }
-        const range = maxP - minP || 1;
-        minP -= range * 0.05;
-        maxP += range * 0.05;
+            const gap = L.chartW / kline.length;
+            const barW = Math.max(1, gap * 0.65);
 
-        const yPrice = (p) => L.priceTop + (maxP - p) / (maxP - minP) * L.priceH;
-
-        // 成交量范围
-        let maxVol = 0;
-        kline.forEach(k => { const v = parseFloat(k[5]); if (!isNaN(v) && v > maxVol) maxVol = v; });
-        maxVol = maxVol || 1;
-        const yVol = (v) => L.volBottom - (v / maxVol) * L.volH;
-
-        // 价格区网格
-        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-        ctx.fillStyle = 'rgba(255,255,255,0.55)';
-        ctx.font = '11px monospace';
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'middle';
-        for (let i = 0; i <= 4; i++) {
-            const y = L.priceTop + L.priceH * i / 4;
-            const price = maxP - (maxP - minP) * i / 4;
-            ctx.beginPath();
-            ctx.moveTo(L.padL, y);
-            ctx.lineTo(W - L.padR, y);
-            ctx.stroke();
-            ctx.fillText(price.toFixed(2), L.padL - 4, y);
-        }
-
-        // 成交量区分隔线
-        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-        ctx.beginPath();
-        ctx.moveTo(L.padL, L.volTop);
-        ctx.lineTo(W - L.padR, L.volTop);
-        ctx.stroke();
-        ctx.fillStyle = 'rgba(255,255,255,0.4)';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
-        ctx.fillText('VOL', L.padL + 2, L.volTop + 2);
-
-        // 绘制K线和成交量
-        kline.forEach((k, i) => {
-            const x = L.padL + gap * i + gap / 2;
-            const open = parseFloat(k[1]);
-            const close = parseFloat(k[2]);
-            const high = parseFloat(k[3]);
-            const low = parseFloat(k[4]);
-            const vol = parseFloat(k[5]) || 0;
-            if ([open, close, high, low].some(v => isNaN(v))) return;
-            const isUp = close >= open;
-            const color = isUp ? '#ef4444' : '#22c55e';
-
-            // K线影线
-            ctx.strokeStyle = color;
-            ctx.beginPath();
-            ctx.moveTo(x, yPrice(high));
-            ctx.lineTo(x, yPrice(low));
-            ctx.stroke();
-            // K线实体
-            ctx.fillStyle = color;
-            const bodyTop = yPrice(Math.max(open, close));
-            const bodyH = Math.max(1, Math.abs(yPrice(open) - yPrice(close)));
-            ctx.fillRect(x - barW / 2, bodyTop, barW, bodyH);
-
-            // 成交量柱
-            ctx.fillStyle = isUp ? 'rgba(239,68,68,0.7)' : 'rgba(34,197,94,0.7)';
-            const vH = (vol / maxVol) * L.volH;
-            ctx.fillRect(x - barW / 2, L.volBottom - vH, barW, vH);
-        });
-
-        // 均线
-        const ma5On = document.getElementById('ma5Check')?.checked !== false;
-        const ma10On = document.getElementById('ma10Check')?.checked !== false;
-        const ma30On = document.getElementById('ma30Check')?.checked !== false;
-
-        function drawMA(ma, color) {
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            let started = false;
-            ma.forEach((v, i) => {
-                if (v === null || !isFinite(v)) return;
-                const x = L.padL + gap * i + gap / 2;
-                const y = yPrice(v);
-                if (!started) { ctx.moveTo(x, y); started = true; }
-                else ctx.lineTo(x, y);
+            // 价格范围
+            let minP = Infinity, maxP = -Infinity;
+            kline.forEach(k => {
+                const h = parseFloat(k[3]), l = parseFloat(k[4]);
+                if (!isNaN(h) && h > maxP) maxP = h;
+                if (!isNaN(l) && l < minP) minP = l;
             });
-            if (started) ctx.stroke();
-        }
-        if (ma5On) drawMA(ma5, '#fbbf24');
-        if (ma10On) drawMA(ma10, '#60a5fa');
-        if (ma30On) drawMA(ma30, '#c084fc');
-
-        // X轴日期
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        const labelCount = Math.min(6, kline.length);
-        if (labelCount > 1) {
-            for (let i = 0; i < labelCount; i++) {
-                const idx = Math.floor(i * (kline.length - 1) / (labelCount - 1));
-                const x = L.padL + gap * idx + gap / 2;
-                const date = kline[idx][0] || '';
-                ctx.fillText(date.length >= 5 ? date.slice(5) : date, x, H - L.padB + 6);
+            const ma5 = calcMA(kline, 5);
+            const ma10 = calcMA(kline, 10);
+            const ma30 = calcMA(kline, 30);
+            [ma5, ma10, ma30].forEach(ma => {
+                ma.forEach(v => { if (v !== null && isFinite(v)) { if (v > maxP) maxP = v; if (v < minP) minP = v; } });
+            });
+            if (!isFinite(minP) || !isFinite(maxP) || minP === maxP) {
+                minP = Math.min(...kline.map(k => parseFloat(k[2])));
+                maxP = Math.max(...kline.map(k => parseFloat(k[2])));
             }
-        }
+            const range = maxP - minP || 1;
+            minP -= range * 0.05;
+            maxP += range * 0.05;
+            console.log('[K线] 价格范围', minP.toFixed(2), '-', maxP.toFixed(2));
 
-        // 十字光标
-        if (klineHoverIdx >= 0 && klineHoverIdx < kline.length) {
-            const x = L.padL + gap * klineHoverIdx + gap / 2;
-            ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-            ctx.setLineDash([4, 4]);
-            ctx.lineWidth = 1;
-            // 垂直线
+            const yPrice = (p) => L.priceTop + (maxP - p) / (maxP - minP) * L.priceH;
+
+            // 成交量范围
+            let maxVol = 0;
+            kline.forEach(k => { const v = parseFloat(k[5]); if (!isNaN(v) && v > maxVol) maxVol = v; });
+            maxVol = maxVol || 1;
+            const yVol = (v) => L.volBottom - (v / maxVol) * L.volH;
+
+            // 价格区网格
+            ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+            ctx.fillStyle = 'rgba(255,255,255,0.55)';
+            ctx.font = '11px monospace';
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+            for (let i = 0; i <= 4; i++) {
+                const y = L.priceTop + L.priceH * i / 4;
+                const price = maxP - (maxP - minP) * i / 4;
+                ctx.beginPath();
+                ctx.moveTo(L.padL, y);
+                ctx.lineTo(W - L.padR, y);
+                ctx.stroke();
+                ctx.fillText(price.toFixed(2), L.padL - 4, y);
+            }
+
+            // 成交量区分隔线
+            ctx.strokeStyle = 'rgba(255,255,255,0.15)';
             ctx.beginPath();
-            ctx.moveTo(x, L.priceTop);
-            ctx.lineTo(x, L.volBottom);
+            ctx.moveTo(L.padL, L.volTop);
+            ctx.lineTo(W - L.padR, L.volTop);
             ctx.stroke();
-            ctx.setLineDash([]);
-        }
+            ctx.fillStyle = 'rgba(255,255,255,0.4)';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText('VOL', L.padL + 2, L.volTop + 2);
 
-        console.log('[K线] 绘制完成，共', kline.length, '根');
+            // 绘制K线和成交量
+            let drawn = 0;
+            kline.forEach((k, i) => {
+                const x = L.padL + gap * i + gap / 2;
+                const open = parseFloat(k[1]);
+                const close = parseFloat(k[2]);
+                const high = parseFloat(k[3]);
+                const low = parseFloat(k[4]);
+                const vol = parseFloat(k[5]) || 0;
+                if ([open, close, high, low].some(v => isNaN(v))) return;
+                const isUp = close >= open;
+                const color = isUp ? '#ef4444' : '#22c55e';
+
+                // K线影线
+                ctx.strokeStyle = color;
+                ctx.beginPath();
+                ctx.moveTo(x, yPrice(high));
+                ctx.lineTo(x, yPrice(low));
+                ctx.stroke();
+                // K线实体
+                ctx.fillStyle = color;
+                const bodyTop = yPrice(Math.max(open, close));
+                const bodyH = Math.max(1, Math.abs(yPrice(open) - yPrice(close)));
+                ctx.fillRect(x - barW / 2, bodyTop, barW, bodyH);
+
+                // 成交量柱
+                ctx.fillStyle = isUp ? 'rgba(239,68,68,0.7)' : 'rgba(34,197,94,0.7)';
+                const vH = (vol / maxVol) * L.volH;
+                ctx.fillRect(x - barW / 2, L.volBottom - vH, barW, vH);
+                drawn++;
+            });
+            console.log('[K线] 绘制了', drawn, '根K线');
+
+            // 均线
+            const ma5On = document.getElementById('ma5Check')?.checked !== false;
+            const ma10On = document.getElementById('ma10Check')?.checked !== false;
+            const ma30On = document.getElementById('ma30Check')?.checked !== false;
+
+            function drawMA(ma, color) {
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                let started = false;
+                ma.forEach((v, i) => {
+                    if (v === null || !isFinite(v)) return;
+                    const x = L.padL + gap * i + gap / 2;
+                    const y = yPrice(v);
+                    if (!started) { ctx.moveTo(x, y); started = true; }
+                    else ctx.lineTo(x, y);
+                });
+                if (started) ctx.stroke();
+            }
+            if (ma5On) drawMA(ma5, '#fbbf24');
+            if (ma10On) drawMA(ma10, '#60a5fa');
+            if (ma30On) drawMA(ma30, '#c084fc');
+
+            // X轴日期
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            const labelCount = Math.min(6, kline.length);
+            if (labelCount > 1) {
+                for (let i = 0; i < labelCount; i++) {
+                    const idx = Math.floor(i * (kline.length - 1) / (labelCount - 1));
+                    const x = L.padL + gap * idx + gap / 2;
+                    const date = kline[idx][0] || '';
+                    ctx.fillText(date.length >= 5 ? date.slice(5) : date, x, H - L.padB + 6);
+                }
+            }
+
+            // 十字光标
+            if (klineHoverIdx >= 0 && klineHoverIdx < kline.length) {
+                const x = L.padL + gap * klineHoverIdx + gap / 2;
+                ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+                ctx.setLineDash([4, 4]);
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(x, L.priceTop);
+                ctx.lineTo(x, L.volBottom);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            console.log('[K线] 绘制完成');
+        } catch (e) {
+            console.error('[K线] 绘制异常:', e);
+        }
     }
 
     function handleKlineHover(e) {
