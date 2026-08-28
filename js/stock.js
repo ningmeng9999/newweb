@@ -724,29 +724,30 @@
 
     function drawKlineChart() {
         try {
-            if (!klineCanvas) {
-                klineCanvas = document.getElementById('klineCanvas');
-                if (klineCanvas) klineCtx = klineCanvas.getContext('2d');
-            }
-            if (!klineCtx || !currentKlineData || !currentKlineData.length) return;
+            // 每次强制重新获取canvas和context
+            const canvas = document.getElementById('klineCanvas');
+            if (!canvas) { console.error('K线canvas不存在'); return; }
+            const ctx = canvas.getContext('2d');
+            if (!ctx) { console.error('K线context获取失败'); return; }
+            if (!currentKlineData || !currentKlineData.length) { console.warn('无K线数据'); return; }
 
-            const canvas = klineCanvas;
             // 确保canvas有尺寸
-            if (canvas.width === 0 || canvas.height === 0) {
-                canvas.width = 800;
-                canvas.height = 400;
-            }
+            if (!canvas.width) canvas.width = 800;
+            if (!canvas.height) canvas.height = 400;
             const W = canvas.width, H = canvas.height;
-            const ctx = klineCtx;
-            ctx.clearRect(0, 0, W, H);
 
-            const kline = currentKlineData.filter(k => k && k.length >= 5);
-            if (!kline.length) return;
+            // 清空并画背景测试
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.fillRect(0, 0, W, H);
+
+            const kline = currentKlineData.filter(k => k && k.length >= 5 && !isNaN(parseFloat(k[2])));
+            if (!kline.length) { console.warn('K线数据过滤后为空'); return; }
 
             const padL = 55, padR = 15, padT = 15, padB = 35;
             const chartW = W - padL - padR;
             const chartH = H - padT - padB;
-            if (chartW <= 0 || chartH <= 0) return;
+            if (chartW <= 0 || chartH <= 0) { console.warn('图表尺寸无效', chartW, chartH); return; }
 
             // 计算价格范围
             let minP = Infinity, maxP = -Infinity;
@@ -755,9 +756,15 @@
                 if (!isNaN(h) && h > maxP) maxP = h;
                 if (!isNaN(l) && l < minP) minP = l;
             });
-            if (!isFinite(minP) || !isFinite(maxP)) return;
+            if (!isFinite(minP) || !isFinite(maxP) || minP === maxP) {
+                console.warn('价格范围无效', minP, maxP);
+                // 用收盘价范围
+                minP = Math.min(...kline.map(k => parseFloat(k[2])));
+                maxP = Math.max(...kline.map(k => parseFloat(k[2])));
+                if (!isFinite(minP) || !isFinite(maxP)) return;
+            }
 
-            // 包含均线
+            // 均线
             const ma5 = calcMA(kline, 5);
             const ma10 = calcMA(kline, 10);
             const ma30 = calcMA(kline, 30);
@@ -773,9 +780,9 @@
             const gap = chartW / kline.length;
             const barW = Math.max(1, gap * 0.65);
 
-            // 绘制网格和Y轴标签
-            ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            // 网格
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
             ctx.font = '11px monospace';
             ctx.textAlign = 'right';
             ctx.textBaseline = 'middle';
@@ -789,7 +796,7 @@
                 ctx.fillText(price.toFixed(2), padL - 4, y);
             }
 
-            // 绘制K线
+            // K线
             kline.forEach((k, i) => {
                 const x = padL + gap * i + gap / 2;
                 const open = parseFloat(k[1]);
@@ -801,21 +808,19 @@
                 const color = isUp ? '#ef4444' : '#22c55e';
                 ctx.strokeStyle = color;
                 ctx.fillStyle = color;
-                // 影线
                 ctx.beginPath();
                 ctx.moveTo(x, yScale(high));
                 ctx.lineTo(x, yScale(low));
                 ctx.stroke();
-                // 实体
                 const bodyTop = yScale(Math.max(open, close));
                 const bodyH = Math.max(1, Math.abs(yScale(open) - yScale(close)));
                 ctx.fillRect(x - barW / 2, bodyTop, barW, bodyH);
             });
 
-            // 绘制均线
-            const showMA5 = document.getElementById('ma5Check')?.checked !== false;
-            const showMA10 = document.getElementById('ma10Check')?.checked !== false;
-            const showMA30 = document.getElementById('ma30Check')?.checked !== false;
+            // 均线
+            const ma5On = document.getElementById('ma5Check')?.checked !== false;
+            const ma10On = document.getElementById('ma10Check')?.checked !== false;
+            const ma30On = document.getElementById('ma30Check')?.checked !== false;
 
             function drawMA(ma, color) {
                 ctx.strokeStyle = color;
@@ -831,12 +836,12 @@
                 });
                 if (started) ctx.stroke();
             }
-            if (showMA5) drawMA(ma5, '#fbbf24');
-            if (showMA10) drawMA(ma10, '#60a5fa');
-            if (showMA30) drawMA(ma30, '#c084fc');
+            if (ma5On) drawMA(ma5, '#fbbf24');
+            if (ma10On) drawMA(ma10, '#60a5fa');
+            if (ma30On) drawMA(ma30, '#c084fc');
 
-            // X轴日期标签
-            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            // X轴日期
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
             const labelCount = Math.min(6, kline.length);
@@ -845,11 +850,12 @@
                     const idx = Math.floor(i * (kline.length - 1) / (labelCount - 1));
                     const x = padL + gap * idx + gap / 2;
                     const date = kline[idx][0] || '';
-                    ctx.fillText(date.slice(5), x, H - padB + 8);
+                    ctx.fillText(date.length >= 5 ? date.slice(5) : date, x, H - padB + 8);
                 }
             }
+            console.log('K线绘制完成，共', kline.length, '根');
         } catch (e) {
-            console.error('K线绘制失败:', e);
+            console.error('K线绘制异常:', e);
         }
     }
 
@@ -1247,7 +1253,8 @@
         stockTbody.innerHTML = '';
         favorites.forEach(fav => {
             const quote = quotes[fav.code];
-            const price = quote ? quote.price : fav.buyPrice;
+            const hasQuote = quote && quote.price && quote.price > 0;
+            const price = hasQuote ? quote.price : fav.buyPrice;
             const { rate, dir } = calcChange(quote);
             const pnl = (price - fav.buyPrice) * SHARES;
             const pnlRate = fav.buyPrice ? ((price - fav.buyPrice) / fav.buyPrice) * 100 : 0;
@@ -1258,8 +1265,8 @@
                 <td>${fav.code.toUpperCase()}</td>
                 <td>${fav.addDate}</td>
                 <td>¥${fav.buyPrice.toFixed(2)}</td>
-                <td>¥${price.toFixed(2)}</td>
-                <td class="pnl-${dir}">${quote ? (dir === 'up' ? '+' : '') + rate.toFixed(2) + '%' : '--'}</td>
+                <td>¥${price.toFixed(2)}${hasQuote ? '' : ' (成本)'}</td>
+                <td class="pnl-${dir}">${hasQuote ? (dir === 'up' ? '+' : '') + rate.toFixed(2) + '%' : '--'}</td>
                 <td>${SHARES}</td>
                 <td class="pnl-${pnlDir}">${pnl >= 0 ? '+' : ''}¥${pnl.toFixed(2)}</td>
                 <td class="pnl-${pnlDir}">${pnl >= 0 ? '+' : ''}${pnlRate.toFixed(2)}%</td>
