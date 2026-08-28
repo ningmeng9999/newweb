@@ -668,13 +668,12 @@
     }
 
     // ===== K线图弹窗 =====
-    let klineModal = null, klineCanvas = null, klineCtx = null;
+    let klineModal = null;
     let currentKlineCode = '', currentKlineData = [];
+    let klineHoverIdx = -1;
 
     function initKlineModal() {
         klineModal = document.getElementById('klineModal');
-        klineCanvas = document.getElementById('klineCanvas');
-        if (klineCanvas) klineCtx = klineCanvas.getContext('2d');
         const closeBtn = document.getElementById('klineCloseBtn');
         if (closeBtn) closeBtn.addEventListener('click', closeKlineModal);
         if (klineModal) {
@@ -686,28 +685,39 @@
             const el = document.getElementById(id);
             if (el) el.addEventListener('change', () => drawKlineChart());
         });
+        // 鼠标移动事件
+        const canvas = document.getElementById('klineCanvas');
+        if (canvas) {
+            canvas.addEventListener('mousemove', handleKlineHover);
+            canvas.addEventListener('mouseleave', () => {
+                klineHoverIdx = -1;
+                const tt = document.getElementById('klineTooltip');
+                if (tt) tt.style.display = 'none';
+                drawKlineChart();
+            });
+        }
     }
 
     function openKlineModal(code, name) {
-        initKlineModal(); // 强制重新获取canvas和context
+        initKlineModal();
         currentKlineCode = code;
         const titleEl = document.getElementById('klineTitle');
         const infoEl = document.getElementById('klineInfo');
         if (titleEl) titleEl.textContent = name + ' (' + code.toUpperCase() + ') 日K线';
         if (infoEl) infoEl.textContent = '加载中...';
         if (klineModal) klineModal.classList.add('show');
-        // 延迟加载，确保弹窗完全显示后canvas有尺寸
-        setTimeout(() => loadAndDrawKline(code), 80);
+        setTimeout(() => loadAndDrawKline(code), 100);
     }
 
     function closeKlineModal() {
         if (klineModal) klineModal.classList.remove('show');
+        klineHoverIdx = -1;
     }
 
     async function loadAndDrawKline(code) {
         console.log('[K线] 开始加载', code);
         const kline = await fetchKline(code, 60);
-        console.log('[K线] 获取到', kline.length, '条数据', kline.length ? kline[0] : '空');
+        console.log('[K线] 获取到', kline.length, '条数据');
         currentKlineData = kline;
         if (!kline.length) {
             const infoEl = document.getElementById('klineInfo');
@@ -727,10 +737,18 @@
                 `<span class="pnl-${dir}">${close >= prevClose ? '+' : ''}${change}%</span>` +
                 `<span>最高: ¥${parseFloat(latest[3]).toFixed(2)}</span>` +
                 `<span>最低: ¥${parseFloat(latest[4]).toFixed(2)}</span>` +
-                `<span>日期: ${latest[0]}</span>` +
-                `<span>共${kline.length}个交易日</span>`;
+                `<span>成交量: ${formatVolume(latest[5])}</span>` +
+                `<span>日期: ${latest[0]}</span>`;
         }
         drawKlineChart();
+    }
+
+    function formatVolume(v) {
+        const num = parseFloat(v);
+        if (isNaN(num)) return '--';
+        if (num >= 100000000) return (num / 100000000).toFixed(2) + '亿';
+        if (num >= 10000) return (num / 10000).toFixed(2) + '万';
+        return num.toFixed(0);
     }
 
     function calcMA(kline, period) {
@@ -744,140 +762,226 @@
         return ma;
     }
 
+    // K线布局参数
+    function getKlineLayout(W, H) {
+        const padL = 58, padR = 15, padT = 12, padB = 28;
+        const volH = Math.floor((H - padT - padB) * 0.22); // 成交量区高度
+        const gap = 8; // 价格区和成交量区间距
+        const priceH = H - padT - padB - volH - gap;
+        return {
+            padL, padR, padT, padB,
+            priceTop: padT,
+            priceH: priceH,
+            priceBottom: padT + priceH,
+            volTop: padT + priceH + gap,
+            volH: volH,
+            volBottom: padT + priceH + gap + volH,
+            chartW: W - padL - padR
+        };
+    }
+
     function drawKlineChart() {
-        try {
-            // 每次强制重新获取canvas和context
-            const canvas = document.getElementById('klineCanvas');
-            if (!canvas) { console.error('K线canvas不存在'); return; }
-            const ctx = canvas.getContext('2d');
-            if (!ctx) { console.error('K线context获取失败'); return; }
-            if (!currentKlineData || !currentKlineData.length) { console.warn('无K线数据'); return; }
+        const canvas = document.getElementById('klineCanvas');
+        if (!canvas) { console.error('[K线] canvas不存在'); return; }
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { console.error('[K线] context获取失败'); return; }
+        if (!currentKlineData || !currentKlineData.length) { console.warn('[K线] 无数据'); return; }
 
-            // 确保canvas有尺寸
-            if (!canvas.width) canvas.width = 800;
-            if (!canvas.height) canvas.height = 400;
-            const W = canvas.width, H = canvas.height;
+        const W = canvas.width, H = canvas.height;
+        const L = getKlineLayout(W, H);
 
-            // 清空并画背景测试
-            ctx.clearRect(0, 0, W, H);
-            ctx.fillStyle = 'rgba(0,0,0,0.3)';
-            ctx.fillRect(0, 0, W, H);
+        // 清空
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = 'rgba(5,10,25,0.5)';
+        ctx.fillRect(0, 0, W, H);
 
-            const kline = currentKlineData.filter(k => k && k.length >= 5 && !isNaN(parseFloat(k[2])));
-            if (!kline.length) { console.warn('K线数据过滤后为空'); return; }
+        const kline = currentKlineData.filter(k => k && k.length >= 5 && !isNaN(parseFloat(k[2])));
+        if (!kline.length) return;
 
-            const padL = 55, padR = 15, padT = 15, padB = 35;
-            const chartW = W - padL - padR;
-            const chartH = H - padT - padB;
-            if (chartW <= 0 || chartH <= 0) { console.warn('图表尺寸无效', chartW, chartH); return; }
+        const gap = L.chartW / kline.length;
+        const barW = Math.max(1, gap * 0.65);
 
-            // 计算价格范围
-            let minP = Infinity, maxP = -Infinity;
-            kline.forEach(k => {
-                const h = parseFloat(k[3]), l = parseFloat(k[4]);
-                if (!isNaN(h) && h > maxP) maxP = h;
-                if (!isNaN(l) && l < minP) minP = l;
+        // 价格范围
+        let minP = Infinity, maxP = -Infinity;
+        kline.forEach(k => {
+            const h = parseFloat(k[3]), l = parseFloat(k[4]);
+            if (!isNaN(h) && h > maxP) maxP = h;
+            if (!isNaN(l) && l < minP) minP = l;
+        });
+        const ma5 = calcMA(kline, 5);
+        const ma10 = calcMA(kline, 10);
+        const ma30 = calcMA(kline, 30);
+        [ma5, ma10, ma30].forEach(ma => {
+            ma.forEach(v => { if (v !== null && isFinite(v)) { if (v > maxP) maxP = v; if (v < minP) minP = v; } });
+        });
+        if (!isFinite(minP) || !isFinite(maxP) || minP === maxP) {
+            minP = Math.min(...kline.map(k => parseFloat(k[2])));
+            maxP = Math.max(...kline.map(k => parseFloat(k[2])));
+        }
+        const range = maxP - minP || 1;
+        minP -= range * 0.05;
+        maxP += range * 0.05;
+
+        const yPrice = (p) => L.priceTop + (maxP - p) / (maxP - minP) * L.priceH;
+
+        // 成交量范围
+        let maxVol = 0;
+        kline.forEach(k => { const v = parseFloat(k[5]); if (!isNaN(v) && v > maxVol) maxVol = v; });
+        maxVol = maxVol || 1;
+        const yVol = (v) => L.volBottom - (v / maxVol) * L.volH;
+
+        // 价格区网格
+        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+        ctx.fillStyle = 'rgba(255,255,255,0.55)';
+        ctx.font = '11px monospace';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        for (let i = 0; i <= 4; i++) {
+            const y = L.priceTop + L.priceH * i / 4;
+            const price = maxP - (maxP - minP) * i / 4;
+            ctx.beginPath();
+            ctx.moveTo(L.padL, y);
+            ctx.lineTo(W - L.padR, y);
+            ctx.stroke();
+            ctx.fillText(price.toFixed(2), L.padL - 4, y);
+        }
+
+        // 成交量区分隔线
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.beginPath();
+        ctx.moveTo(L.padL, L.volTop);
+        ctx.lineTo(W - L.padR, L.volTop);
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText('VOL', L.padL + 2, L.volTop + 2);
+
+        // 绘制K线和成交量
+        kline.forEach((k, i) => {
+            const x = L.padL + gap * i + gap / 2;
+            const open = parseFloat(k[1]);
+            const close = parseFloat(k[2]);
+            const high = parseFloat(k[3]);
+            const low = parseFloat(k[4]);
+            const vol = parseFloat(k[5]) || 0;
+            if ([open, close, high, low].some(v => isNaN(v))) return;
+            const isUp = close >= open;
+            const color = isUp ? '#ef4444' : '#22c55e';
+
+            // K线影线
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x, yPrice(high));
+            ctx.lineTo(x, yPrice(low));
+            ctx.stroke();
+            // K线实体
+            ctx.fillStyle = color;
+            const bodyTop = yPrice(Math.max(open, close));
+            const bodyH = Math.max(1, Math.abs(yPrice(open) - yPrice(close)));
+            ctx.fillRect(x - barW / 2, bodyTop, barW, bodyH);
+
+            // 成交量柱
+            ctx.fillStyle = isUp ? 'rgba(239,68,68,0.7)' : 'rgba(34,197,94,0.7)';
+            const vH = (vol / maxVol) * L.volH;
+            ctx.fillRect(x - barW / 2, L.volBottom - vH, barW, vH);
+        });
+
+        // 均线
+        const ma5On = document.getElementById('ma5Check')?.checked !== false;
+        const ma10On = document.getElementById('ma10Check')?.checked !== false;
+        const ma30On = document.getElementById('ma30Check')?.checked !== false;
+
+        function drawMA(ma, color) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            let started = false;
+            ma.forEach((v, i) => {
+                if (v === null || !isFinite(v)) return;
+                const x = L.padL + gap * i + gap / 2;
+                const y = yPrice(v);
+                if (!started) { ctx.moveTo(x, y); started = true; }
+                else ctx.lineTo(x, y);
             });
-            if (!isFinite(minP) || !isFinite(maxP) || minP === maxP) {
-                console.warn('价格范围无效', minP, maxP);
-                // 用收盘价范围
-                minP = Math.min(...kline.map(k => parseFloat(k[2])));
-                maxP = Math.max(...kline.map(k => parseFloat(k[2])));
-                if (!isFinite(minP) || !isFinite(maxP)) return;
+            if (started) ctx.stroke();
+        }
+        if (ma5On) drawMA(ma5, '#fbbf24');
+        if (ma10On) drawMA(ma10, '#60a5fa');
+        if (ma30On) drawMA(ma30, '#c084fc');
+
+        // X轴日期
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        const labelCount = Math.min(6, kline.length);
+        if (labelCount > 1) {
+            for (let i = 0; i < labelCount; i++) {
+                const idx = Math.floor(i * (kline.length - 1) / (labelCount - 1));
+                const x = L.padL + gap * idx + gap / 2;
+                const date = kline[idx][0] || '';
+                ctx.fillText(date.length >= 5 ? date.slice(5) : date, x, H - L.padB + 6);
             }
+        }
 
-            // 均线
-            const ma5 = calcMA(kline, 5);
-            const ma10 = calcMA(kline, 10);
-            const ma30 = calcMA(kline, 30);
-            [ma5, ma10, ma30].forEach(ma => {
-                ma.forEach(v => { if (v !== null && isFinite(v)) { if (v > maxP) maxP = v; if (v < minP) minP = v; } });
-            });
+        // 十字光标
+        if (klineHoverIdx >= 0 && klineHoverIdx < kline.length) {
+            const x = L.padL + gap * klineHoverIdx + gap / 2;
+            ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+            ctx.setLineDash([4, 4]);
+            ctx.lineWidth = 1;
+            // 垂直线
+            ctx.beginPath();
+            ctx.moveTo(x, L.priceTop);
+            ctx.lineTo(x, L.volBottom);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
 
-            const range = maxP - minP || 1;
-            minP -= range * 0.05;
-            maxP += range * 0.05;
+        console.log('[K线] 绘制完成，共', kline.length, '根');
+    }
 
-            const yScale = (price) => padT + (maxP - price) / (maxP - minP) * chartH;
-            const gap = chartW / kline.length;
-            const barW = Math.max(1, gap * 0.65);
+    function handleKlineHover(e) {
+        const canvas = document.getElementById('klineCanvas');
+        if (!canvas || !currentKlineData.length) return;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const x = (e.clientX - rect.left) * scaleX;
+        const W = canvas.width;
+        const L = getKlineLayout(W, canvas.height);
+        const kline = currentKlineData.filter(k => k && k.length >= 5);
+        const gap = L.chartW / kline.length;
+        const idx = Math.floor((x - L.padL) / gap);
+        if (idx < 0 || idx >= kline.length) return;
+        klineHoverIdx = idx;
+        drawKlineChart();
 
-            // 网格
-            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-            ctx.fillStyle = 'rgba(255,255,255,0.6)';
-            ctx.font = '11px monospace';
-            ctx.textAlign = 'right';
-            ctx.textBaseline = 'middle';
-            for (let i = 0; i <= 4; i++) {
-                const y = padT + chartH * i / 4;
-                const price = maxP - (maxP - minP) * i / 4;
-                ctx.beginPath();
-                ctx.moveTo(padL, y);
-                ctx.lineTo(W - padR, y);
-                ctx.stroke();
-                ctx.fillText(price.toFixed(2), padL - 4, y);
-            }
-
-            // K线
-            kline.forEach((k, i) => {
-                const x = padL + gap * i + gap / 2;
-                const open = parseFloat(k[1]);
-                const close = parseFloat(k[2]);
-                const high = parseFloat(k[3]);
-                const low = parseFloat(k[4]);
-                if ([open, close, high, low].some(v => isNaN(v))) return;
-                const isUp = close >= open;
-                const color = isUp ? '#ef4444' : '#22c55e';
-                ctx.strokeStyle = color;
-                ctx.fillStyle = color;
-                ctx.beginPath();
-                ctx.moveTo(x, yScale(high));
-                ctx.lineTo(x, yScale(low));
-                ctx.stroke();
-                const bodyTop = yScale(Math.max(open, close));
-                const bodyH = Math.max(1, Math.abs(yScale(open) - yScale(close)));
-                ctx.fillRect(x - barW / 2, bodyTop, barW, bodyH);
-            });
-
-            // 均线
-            const ma5On = document.getElementById('ma5Check')?.checked !== false;
-            const ma10On = document.getElementById('ma10Check')?.checked !== false;
-            const ma30On = document.getElementById('ma30Check')?.checked !== false;
-
-            function drawMA(ma, color) {
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 1.5;
-                ctx.beginPath();
-                let started = false;
-                ma.forEach((v, i) => {
-                    if (v === null || !isFinite(v)) return;
-                    const x = padL + gap * i + gap / 2;
-                    const y = yScale(v);
-                    if (!started) { ctx.moveTo(x, y); started = true; }
-                    else ctx.lineTo(x, y);
-                });
-                if (started) ctx.stroke();
-            }
-            if (ma5On) drawMA(ma5, '#fbbf24');
-            if (ma10On) drawMA(ma10, '#60a5fa');
-            if (ma30On) drawMA(ma30, '#c084fc');
-
-            // X轴日期
-            ctx.fillStyle = 'rgba(255,255,255,0.6)';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'top';
-            const labelCount = Math.min(6, kline.length);
-            if (labelCount > 1) {
-                for (let i = 0; i < labelCount; i++) {
-                    const idx = Math.floor(i * (kline.length - 1) / (labelCount - 1));
-                    const x = padL + gap * idx + gap / 2;
-                    const date = kline[idx][0] || '';
-                    ctx.fillText(date.length >= 5 ? date.slice(5) : date, x, H - padB + 8);
-                }
-            }
-            console.log('K线绘制完成，共', kline.length, '根');
-        } catch (e) {
-            console.error('K线绘制异常:', e);
+        // 显示tooltip
+        const k = kline[idx];
+        const open = parseFloat(k[1]);
+        const close = parseFloat(k[2]);
+        const high = parseFloat(k[3]);
+        const low = parseFloat(k[4]);
+        const vol = parseFloat(k[5]) || 0;
+        const prevClose = idx > 0 ? parseFloat(kline[idx - 1][2]) : open;
+        const chg = prevClose ? ((close - prevClose) / prevClose * 100) : 0;
+        const dir = close >= open ? 'tt-up' : 'tt-down';
+        const tt = document.getElementById('klineTooltip');
+        if (tt) {
+            tt.innerHTML =
+                `<div><span class="tt-label">日期:</span> ${k[0]}</div>` +
+                `<div><span class="tt-label">开:</span> ¥${open.toFixed(2)} <span class="tt-label">收:</span> <span class="${dir}">¥${close.toFixed(2)}</span></div>` +
+                `<div><span class="tt-label">高:</span> ¥${high.toFixed(2)} <span class="tt-label">低:</span> ¥${low.toFixed(2)}</div>` +
+                `<div><span class="tt-label">涨跌:</span> <span class="${dir}">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</span> <span class="tt-label">量:</span> ${formatVolume(vol)}</div>`;
+            tt.style.display = 'block';
+            // 定位tooltip在鼠标右侧
+            const ttRect = tt.getBoundingClientRect();
+            let left = e.clientX - rect.left + 15;
+            if (left + ttRect.width > rect.width) left = e.clientX - rect.left - ttRect.width - 15;
+            let top = e.clientY - rect.top + 15;
+            if (top + ttRect.height > rect.height) top = e.clientY - rect.top - ttRect.height - 15;
+            tt.style.left = left + 'px';
+            tt.style.top = top + 'px';
         }
     }
 

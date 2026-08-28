@@ -34,7 +34,7 @@ function fetchUrl(url, referer = 'https://quote.eastmoney.com/') {
 async function fetchEastmoneyRank(fid, size = 30, label = '') {
     // fid: f3=涨跌幅, f6=成交额, f8=换手率, f5=成交量
     const fs = 'm:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23'; // 沪深A股
-    const url = `https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=${size}&po=1&np=1&fltt=2&invt=2&fid=${fid}&fs=${encodeURIComponent(fs)}&fields=f2,f3,f5,f6,f8,f12,f14,f15,f16,f17,f18`;
+    const url = `https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=${size}&po=1&np=1&fltt=2&invt=2&fid=${fid}&fs=${fs}&fields=f2,f3,f5,f6,f8,f12,f14,f15,f16,f17,f18`;
     try {
         const text = await fetchUrl(url);
         const json = JSON.parse(text);
@@ -55,6 +55,7 @@ async function fetchEastmoneyRank(fid, size = 30, label = '') {
                 };
             }).filter(s => s.code && s.name && s.price > 0);
         }
+        console.warn(`东方财富${label}榜: 无diff数据`, text.substring(0, 100));
     } catch (e) {
         console.warn(`东方财富${label}榜失败:`, e.message);
     }

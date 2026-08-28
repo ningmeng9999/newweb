@@ -979,6 +979,7 @@
 }
 .kline-modal-body {
     padding: 1rem 1.2rem;
+    position: relative;
 }
 .kline-info {
     display: flex;
@@ -992,11 +993,30 @@
 .kline-info .pnl-down { color: #22c55e; }
 #klineCanvas {
     width: 100%;
-    height: 380px;
-    background: rgba(0,0,0,0.2);
+    height: 500px;
+    background: rgba(0,0,0,0.25);
     border-radius: 8px;
     display: block;
+    cursor: crosshair;
 }
+.kline-tooltip {
+    position: absolute;
+    background: rgba(10,15,30,0.95);
+    border: 1px solid rgba(0,212,255,0.4);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #fff;
+    pointer-events: none;
+    display: none;
+    z-index: 100;
+    white-space: nowrap;
+    line-height: 1.6;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+.kline-tooltip .tt-up { color: #ef4444; }
+.kline-tooltip .tt-down { color: #22c55e; }
+.kline-tooltip .tt-label { color: rgba(255,255,255,0.6); }
 .kline-legend {
     display: flex;
     gap: 1rem;
