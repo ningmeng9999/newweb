@@ -1,12 +1,37 @@
 // Vercel Serverless Function - K线数据代理（腾讯财经）
 const https = require('https');
+const http = require('http');
 
 function sendJson(res, statusCode, data) {
     res.writeHead(statusCode, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify(data));
 }
 
-module.exports = (req, res) => {
+function fetchUrl(url) {
+    return new Promise((resolve, reject) => {
+        const client = url.startsWith('https') ? https : http;
+        const req = client.get(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Referer': 'https://gu.qq.com/'
+            },
+            timeout: 10000
+        }, (response) => {
+            const chunks = [];
+            response.on('data', c => chunks.push(c));
+            response.on('end', () => {
+                const buf = Buffer.concat(chunks);
+                let text;
+                try { text = new TextDecoder('utf-8').decode(buf); } catch(e) { text = buf.toString(); }
+                resolve({ status: response.statusCode, text });
+            });
+        });
+        req.on('error', reject);
+        req.on('timeout', () => { req.destroy(); reject(new Error('timeout')); });
+    });
+}
+
+module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -26,35 +51,19 @@ module.exports = (req, res) => {
         return;
     }
 
-    // 腾讯财经日K线API（前复权）
-    const url = `https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=${code},day,,,${days},qfq`;
-
-    const reqProxy = https.get(url, {
-        headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'Referer': 'https://gu.qq.com/'
-        },
-        timeout: 10000
-    }, (response) => {
-        let data = '';
-        response.on('data', chunk => data += chunk);
-        response.on('end', () => {
-            try {
-                const json = JSON.parse(data);
-                // 直接透传原始数据，前端自己解析
-                sendJson(res, 200, json);
-            } catch (e) {
-                sendJson(res, 500, { error: '解析失败', raw: data.substring(0, 200) });
-            }
-        });
-    });
-
-    reqProxy.on('error', (err) => {
-        sendJson(res, 502, { error: '上游请求失败', detail: err.message });
-    });
-
-    reqProxy.on('timeout', () => {
-        reqProxy.destroy();
-        sendJson(res, 504, { error: '上游超时' });
-    });
+    try {
+        const httpsUrl = `https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=${code},day,,,${days},qfq`;
+        let result;
+        try {
+            result = await fetchUrl(httpsUrl);
+        } catch (e) {
+            // HTTPS失败回退HTTP
+            const httpUrl = httpsUrl.replace('https://', 'http://');
+            result = await fetchUrl(httpUrl);
+        }
+        const json = JSON.parse(result.text);
+        sendJson(res, 200, json);
+    } catch (e) {
+        sendJson(res, 502, { error: 'K线获取失败', detail: e.message, data: {} });
+    }
 };

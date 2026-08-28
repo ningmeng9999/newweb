@@ -612,7 +612,7 @@
     }
 
     // ===== 获取动态热门榜 =====
-    async function fetchHotStocks(source = 'all', size = 30) {
+    async function fetchHotStocks(source = 'all', size = 30, fallback = true) {
         if (hotLoading) return hotStocks;
         hotLoading = true;
         const isLocal = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
@@ -639,15 +639,23 @@
                         console.warn('热门榜行情获取失败:', e.message);
                     }
                     return hotStocks;
+                } else if (json.success && json.data && json.data.length === 0) {
+                    // API成功但无数据，不回退
+                    hotStocks = [];
+                    return hotStocks;
                 }
             }
         } catch (e) {
-            console.warn('热门榜API失败，使用内置数据:', e.message);
+            console.warn('热门榜API失败:', e.message);
         } finally {
             hotLoading = false;
         }
-        // 失败时回退到内置数据
-        hotStocks = HOT_STOCKS.slice();
+        // 失败时回退到内置数据（仅fallback=true时）
+        if (fallback) {
+            hotStocks = HOT_STOCKS.slice();
+        } else {
+            hotStocks = [];
+        }
         return hotStocks;
     }
 
@@ -689,25 +697,31 @@
     }
 
     async function loadAndDrawKline(code) {
+        console.log('[K线] 开始加载', code);
         const kline = await fetchKline(code, 60);
+        console.log('[K线] 获取到', kline.length, '条数据', kline.length ? kline[0] : '空');
         currentKlineData = kline;
         if (!kline.length) {
-            document.getElementById('klineInfo').textContent = '暂无K线数据';
+            const infoEl = document.getElementById('klineInfo');
+            if (infoEl) infoEl.textContent = '暂无K线数据（API请求失败，请稍后重试）';
             return;
         }
         const latest = kline[kline.length - 1];
         const prev = kline.length > 1 ? kline[kline.length - 2] : null;
         const close = parseFloat(latest[2]);
         const prevClose = prev ? parseFloat(prev[2]) : close;
-        const change = ((close - prevClose) / prevClose * 100).toFixed(2);
+        const change = prevClose ? ((close - prevClose) / prevClose * 100).toFixed(2) : '0.00';
         const dir = close >= prevClose ? 'up' : 'down';
-        document.getElementById('klineInfo').innerHTML =
-            `<span>最新: ¥${close.toFixed(2)}</span>` +
-            `<span class="pnl-${dir}">${close >= prevClose ? '+' : ''}${change}%</span>` +
-            `<span>最高: ¥${parseFloat(latest[3]).toFixed(2)}</span>` +
-            `<span>最低: ¥${parseFloat(latest[4]).toFixed(2)}</span>` +
-            `<span>日期: ${latest[0]}</span>` +
-            `<span>共${kline.length}个交易日</span>`;
+        const infoEl = document.getElementById('klineInfo');
+        if (infoEl) {
+            infoEl.innerHTML =
+                `<span>最新: ¥${close.toFixed(2)}</span>` +
+                `<span class="pnl-${dir}">${close >= prevClose ? '+' : ''}${change}%</span>` +
+                `<span>最高: ¥${parseFloat(latest[3]).toFixed(2)}</span>` +
+                `<span>最低: ¥${parseFloat(latest[4]).toFixed(2)}</span>` +
+                `<span>日期: ${latest[0]}</span>` +
+                `<span>共${kline.length}个交易日</span>`;
+        }
         drawKlineChart();
     }
 
@@ -1996,10 +2010,14 @@
             btn.classList.add('active');
             hotSource = btn.dataset.source;
             if (hotSectionTip) hotSectionTip.textContent = '正在加载' + btn.textContent + '热门榜...';
-            await fetchHotStocks(hotSource, 30);
+            await fetchHotStocks(hotSource, 30, false);
             if (currentView === 'hot') renderAll();
             if (hotSectionTip) {
-                hotSectionTip.textContent = `来源：${btn.textContent} · 共 ${hotStocks.length} 只 · 点击「+自选」加入，默认买入100股`;
+                if (hotStocks.length === 0) {
+                    hotSectionTip.textContent = `来源：${btn.textContent} · 暂无数据，请切换其他来源`;
+                } else {
+                    hotSectionTip.textContent = `来源：${btn.textContent} · 共 ${hotStocks.length} 只 · 点击「+自选」加入，默认买入100股`;
+                }
             }
         });
     });
