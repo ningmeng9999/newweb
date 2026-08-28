@@ -441,6 +441,9 @@
     let lastSearchKeyword = '';
     let strategyResults = []; // 当前策略筛选结果
     let currentStrategyName = '';
+    let hotStocks = []; // 动态热门榜数据
+    let hotSource = 'all'; // 热门榜来源: all/eastmoney/ths/xueqiu
+    let hotLoading = false;
 
     // ===== DOM =====
     const hotGrid = document.getElementById('hotGrid');
@@ -477,6 +480,8 @@
     const searchProgress = document.getElementById('searchProgress');
     const progressFill = document.getElementById('progressFill');
     const progressText = document.getElementById('progressText');
+    const hotSectionTitle = document.getElementById('hotSectionTitle');
+    const hotSectionTip = document.getElementById('hotSectionTip');
 
     if (!hotGrid) return;
 
@@ -556,6 +561,212 @@
         } catch (e) {
             console.warn('K线获取失败:', code, e.message);
             return [];
+        }
+    }
+
+    // ===== 获取动态热门榜 =====
+    async function fetchHotStocks(source = 'all', size = 30) {
+        if (hotLoading) return hotStocks;
+        hotLoading = true;
+        try {
+            const res = await fetch(`./api/hot-stocks?source=${source}&size=${size}`, { cache: 'no-store' });
+            const json = await res.json();
+            if (json.success && json.data && json.data.length) {
+                hotStocks = json.data.map(s => ({
+                    code: s.code,
+                    name: s.name,
+                    hotValue: s.hotValue || 0,
+                    source: s.source || (s.sources ? s.sources.join('/') : '综合')
+                }));
+                // 同时获取这些股票的实时行情
+                const codes = hotStocks.map(s => ({ code: s.code }));
+                try {
+                    const quotesData = await fetchQuotes(codes);
+                    quotes = { ...quotes, ...quotesData };
+                } catch (e) {
+                    console.warn('热门榜行情获取失败:', e.message);
+                }
+                return hotStocks;
+            }
+        } catch (e) {
+            console.warn('热门榜API失败，使用内置数据:', e.message);
+        } finally {
+            hotLoading = false;
+        }
+        // 失败时回退到内置数据
+        hotStocks = HOT_STOCKS.slice();
+        return hotStocks;
+    }
+
+    // ===== K线图弹窗 =====
+    let klineModal = null, klineCanvas = null, klineCtx = null;
+    let currentKlineCode = '', currentKlineData = [];
+
+    function initKlineModal() {
+        klineModal = document.getElementById('klineModal');
+        klineCanvas = document.getElementById('klineCanvas');
+        if (klineCanvas) klineCtx = klineCanvas.getContext('2d');
+        const closeBtn = document.getElementById('klineCloseBtn');
+        if (closeBtn) closeBtn.addEventListener('click', closeKlineModal);
+        if (klineModal) {
+            klineModal.addEventListener('click', (e) => {
+                if (e.target === klineModal) closeKlineModal();
+            });
+        }
+        ['ma5Check', 'ma10Check', 'ma30Check'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', () => drawKlineChart());
+        });
+    }
+
+    function openKlineModal(code, name) {
+        if (!klineModal) initKlineModal();
+        currentKlineCode = code;
+        document.getElementById('klineTitle').textContent = name + ' (' + code.toUpperCase() + ') 日K线';
+        document.getElementById('klineInfo').textContent = '加载中...';
+        klineModal.classList.add('show');
+        loadAndDrawKline(code);
+    }
+
+    function closeKlineModal() {
+        if (klineModal) klineModal.classList.remove('show');
+    }
+
+    async function loadAndDrawKline(code) {
+        const kline = await fetchKline(code, 60);
+        currentKlineData = kline;
+        if (!kline.length) {
+            document.getElementById('klineInfo').textContent = '暂无K线数据';
+            return;
+        }
+        const latest = kline[kline.length - 1];
+        const prev = kline.length > 1 ? kline[kline.length - 2] : null;
+        const close = parseFloat(latest[2]);
+        const prevClose = prev ? parseFloat(prev[2]) : close;
+        const change = ((close - prevClose) / prevClose * 100).toFixed(2);
+        const dir = close >= prevClose ? 'up' : 'down';
+        document.getElementById('klineInfo').innerHTML =
+            `<span>最新: ¥${close.toFixed(2)}</span>` +
+            `<span class="pnl-${dir}">${close >= prevClose ? '+' : ''}${change}%</span>` +
+            `<span>最高: ¥${parseFloat(latest[3]).toFixed(2)}</span>` +
+            `<span>最低: ¥${parseFloat(latest[4]).toFixed(2)}</span>` +
+            `<span>日期: ${latest[0]}</span>` +
+            `<span>共${kline.length}个交易日</span>`;
+        drawKlineChart();
+    }
+
+    function calcMA(kline, period) {
+        const ma = [];
+        for (let i = 0; i < kline.length; i++) {
+            if (i < period - 1) { ma.push(null); continue; }
+            let sum = 0;
+            for (let j = i - period + 1; j <= i; j++) sum += parseFloat(kline[j][2]);
+            ma.push(sum / period);
+        }
+        return ma;
+    }
+
+    function drawKlineChart() {
+        if (!klineCtx || !currentKlineData.length) return;
+        const canvas = klineCanvas;
+        const W = canvas.width, H = canvas.height;
+        const ctx = klineCtx;
+        ctx.clearRect(0, 0, W, H);
+
+        const kline = currentKlineData;
+        const padL = 50, padR = 20, padT = 20, padB = 40;
+        const chartW = W - padL - padR;
+        const chartH = H - padT - padB;
+
+        // 计算价格范围
+        let minP = Infinity, maxP = -Infinity;
+        kline.forEach(k => {
+            const h = parseFloat(k[3]), l = parseFloat(k[4]);
+            if (h > maxP) maxP = h;
+            if (l < minP) minP = l;
+        });
+        // 包含均线
+        const ma5 = calcMA(kline, 5);
+        const ma10 = calcMA(kline, 10);
+        const ma30 = calcMA(kline, 30);
+        [ma5, ma10, ma30].forEach(ma => {
+            ma.forEach(v => { if (v !== null) { if (v > maxP) maxP = v; if (v < minP) minP = v; } });
+        });
+        const range = maxP - minP || 1;
+        minP -= range * 0.05;
+        maxP += range * 0.05;
+
+        const yScale = (price) => padT + (maxP - price) / (maxP - minP) * chartH;
+        const barW = Math.max(2, chartW / kline.length * 0.7);
+        const gap = chartW / kline.length;
+
+        // 绘制网格和Y轴标签
+        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.font = '11px sans-serif';
+        ctx.textAlign = 'right';
+        for (let i = 0; i <= 4; i++) {
+            const y = padT + chartH * i / 4;
+            const price = maxP - (maxP - minP) * i / 4;
+            ctx.beginPath();
+            ctx.moveTo(padL, y);
+            ctx.lineTo(W - padR, y);
+            ctx.stroke();
+            ctx.fillText(price.toFixed(2), padL - 5, y + 4);
+        }
+
+        // 绘制K线
+        kline.forEach((k, i) => {
+            const x = padL + gap * i + gap / 2;
+            const open = parseFloat(k[1]);
+            const close = parseFloat(k[2]);
+            const high = parseFloat(k[3]);
+            const low = parseFloat(k[4]);
+            const isUp = close >= open;
+            ctx.strokeStyle = isUp ? '#ef4444' : '#22c55e';
+            ctx.fillStyle = isUp ? '#ef4444' : '#22c55e';
+            // 影线
+            ctx.beginPath();
+            ctx.moveTo(x, yScale(high));
+            ctx.lineTo(x, yScale(low));
+            ctx.stroke();
+            // 实体
+            const bodyTop = yScale(Math.max(open, close));
+            const bodyH = Math.max(1, Math.abs(yScale(open) - yScale(close)));
+            ctx.fillRect(x - barW / 2, bodyTop, barW, bodyH);
+        });
+
+        // 绘制均线
+        const showMA5 = document.getElementById('ma5Check')?.checked;
+        const showMA10 = document.getElementById('ma10Check')?.checked;
+        const showMA30 = document.getElementById('ma30Check')?.checked;
+
+        function drawMA(ma, color) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            let started = false;
+            ma.forEach((v, i) => {
+                if (v === null) return;
+                const x = padL + gap * i + gap / 2;
+                const y = yScale(v);
+                if (!started) { ctx.moveTo(x, y); started = true; }
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+        }
+        if (showMA5) drawMA(ma5, '#fbbf24');
+        if (showMA10) drawMA(ma10, '#60a5fa');
+        if (showMA30) drawMA(ma30, '#c084fc');
+
+        // X轴日期标签
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.textAlign = 'center';
+        const labelCount = Math.min(6, kline.length);
+        for (let i = 0; i < labelCount; i++) {
+            const idx = Math.floor(i * (kline.length - 1) / (labelCount - 1));
+            const x = padL + gap * idx + gap / 2;
+            ctx.fillText(kline[idx][0].slice(5), x, H - padB + 20);
         }
     }
 
@@ -710,10 +921,13 @@
             hotGrid.appendChild(card);
         });
         hotGrid.querySelectorAll('.hot-add-btn:not(.added)').forEach(btn => {
-            btn.addEventListener('click', () => {
-                addToFavorites(btn.dataset.code, btn.dataset.name);
-                btn.textContent = '✓ 已加';
-                btn.classList.add('added');
+            btn.addEventListener('click', async () => {
+                const before = favorites.length;
+                await addToFavorites(btn.dataset.code, btn.dataset.name);
+                if (favorites.length > before) {
+                    btn.textContent = '✓ 已加';
+                    btn.classList.add('added');
+                }
             });
         });
     }
@@ -751,7 +965,8 @@
                 if (hotSectionTip) hotSectionTip.textContent = '综合股吧/雪球/社区热度 · 点击「+自选」加入，默认买入100股';
                 if (stockSearch) stockSearch.placeholder = '输入股票名称或代码，回车搜索（如：茅台、600519）';
                 renderStrategyList();
-                renderHotStocks();
+                const list = hotStocks.length ? hotStocks : HOT_STOCKS;
+                renderStockCards(list);
             });
             hotSectionTip.appendChild(btn);
         }
@@ -789,10 +1004,13 @@
             searchResultGrid.appendChild(card);
         });
         searchResultGrid.querySelectorAll('.hot-add-btn:not(.added)').forEach(btn => {
-            btn.addEventListener('click', () => {
-                addToFavorites(btn.dataset.code, btn.dataset.name);
-                btn.textContent = '✓ 已加';
-                btn.classList.add('added');
+            btn.addEventListener('click', async () => {
+                const before = favorites.length;
+                await addToFavorites(btn.dataset.code, btn.dataset.name);
+                if (favorites.length > before) {
+                    btn.textContent = '✓ 已加';
+                    btn.classList.add('added');
+                }
             });
         });
     }
@@ -908,10 +1126,24 @@
     }
 
     // ===== 自选股操作 =====
-    function addToFavorites(code, name) {
+    async function addToFavorites(code, name) {
         if (favorites.some(f => f.code === code)) return;
-        const quote = quotes[code];
+        // 确保有实时行情
+        let quote = quotes[code];
+        if (!quote) {
+            try {
+                const result = await fetchQuotes([{ code }]);
+                quote = result[code];
+                if (quote) quotes[code] = quote;
+            } catch (e) {
+                console.warn('获取行情失败，使用0作为买入价', e);
+            }
+        }
         const buyPrice = quote ? quote.price : 0;
+        if (buyPrice <= 0) {
+            alert('获取该股票实时行情失败，请稍后重试或检查网络');
+            return;
+        }
         const today = new Date().toISOString().slice(0, 10);
         favorites.push({ code, name, buyPrice, addDate: today });
         saveFavorites();
@@ -926,7 +1158,7 @@
 
     function renderFavorites() {
         if (!favorites.length) {
-            stockTbody.innerHTML = '<tr class="empty-row"><td colspan="10">暂无自选股，从上方热门股票中添加</td></tr>';
+            stockTbody.innerHTML = '<tr class="empty-row"><td colspan="11">暂无自选股，从上方热门股票中添加</td></tr>';
             return;
         }
         stockTbody.innerHTML = '';
@@ -939,7 +1171,7 @@
             const pnlDir = pnl > 0.01 ? 'up' : (pnl < -0.01 ? 'down' : 'flat');
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong>${fav.name}</strong></td>
+                <td><strong class="stock-name-link" data-code="${fav.code}" data-name="${fav.name}" style="cursor:pointer;color:var(--accent,#00d4ff);text-decoration:underline">${fav.name}</strong></td>
                 <td>${fav.code.toUpperCase()}</td>
                 <td>${fav.addDate}</td>
                 <td>¥${fav.buyPrice.toFixed(2)}</td>
@@ -948,6 +1180,7 @@
                 <td>${SHARES}</td>
                 <td class="pnl-${pnlDir}">${pnl >= 0 ? '+' : ''}¥${pnl.toFixed(2)}</td>
                 <td class="pnl-${pnlDir}">${pnl >= 0 ? '+' : ''}${pnlRate.toFixed(2)}%</td>
+                <td><button class="kline-btn" data-code="${fav.code}" data-name="${fav.name}">📈 走势</button></td>
                 <td><button class="del-btn" data-code="${fav.code}">移除</button></td>
             `;
             stockTbody.appendChild(tr);
@@ -956,6 +1189,9 @@
             btn.addEventListener('click', () => {
                 if (confirm('确定移除该自选股？')) removeFromFavorites(btn.dataset.code);
             });
+        });
+        stockTbody.querySelectorAll('.kline-btn, .stock-name-link').forEach(btn => {
+            btn.addEventListener('click', () => openKlineModal(btn.dataset.code, btn.dataset.name));
         });
     }
 
@@ -1563,7 +1799,12 @@
 
     function renderAll() {
         renderMarketBar();
-        renderHotStocks();
+        // 热门榜统一用renderStockCards样式（含换手/PE），currentView为hot时才渲染
+        if (currentView === 'hot') {
+            const list = hotStocks.length ? hotStocks : HOT_STOCKS;
+            renderStockCards(list);
+        }
+        else if (currentView === 'strategy' && strategyResults.length) renderStockCards(strategyResults);
         renderFavorites();
         renderCloud();
         updateOverview();
@@ -1634,9 +1875,44 @@
     loadStrategies();
     renderStrategyList();
     clearScreenResult();
-    renderAll();
+    renderAll(); // 先用内置数据渲染
     initSearch();
+    initKlineModal();
     refreshAll();
+
+    // 异步加载动态热门榜
+    (async function initHotStocks() {
+        if (hotSectionTip) hotSectionTip.textContent = '正在加载实时热门榜...';
+        await fetchHotStocks('all', 30);
+        if (currentView === 'hot') renderAll();
+        if (hotSectionTip) {
+            const srcInfo = hotStocks.length ? `已加载 ${hotStocks.length} 只热门股 · 来源：东方财富/同花顺/雪球 · ` : '';
+            hotSectionTip.textContent = srcInfo + '点击「+自选」加入，默认买入100股';
+        }
+    })();
+
+    // 每5分钟刷新一次热门榜
+    setInterval(() => {
+        if (document.hidden) return;
+        fetchHotStocks('all', 30).then(() => {
+            if (currentView === 'hot') renderAll();
+        });
+    }, 5 * 60 * 1000);
+
+    // 热门榜来源切换
+    document.querySelectorAll('.hot-source-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            document.querySelectorAll('.hot-source-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            hotSource = btn.dataset.source;
+            if (hotSectionTip) hotSectionTip.textContent = '正在加载' + btn.textContent + '热门榜...';
+            await fetchHotStocks(hotSource, 30);
+            if (currentView === 'hot') renderAll();
+            if (hotSectionTip) {
+                hotSectionTip.textContent = `来源：${btn.textContent} · 共 ${hotStocks.length} 只 · 点击「+自选」加入，默认买入100股`;
+            }
+        });
+    });
 
     // 更新加载按钮状态
     function updateLoadAllBtn() {

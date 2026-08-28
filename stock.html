@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN" data-theme="night" data-dark="false">
 <head>
     <meta charset="UTF-8">
@@ -160,8 +160,16 @@
         <!-- 人气热门榜 -->
         <section class="stock-section animate-on-scroll">
             <div class="section-header">
-                <h2 class="section-h2">人气热门榜</h2>
-                <span class="section-tip">综合股吧/雪球/社区热度 · 点击「+自选」加入，默认买入100股</span>
+                <h2 class="section-h2" id="hotSectionTitle">人气热门榜</h2>
+                <div class="hot-source-toggle">
+                    <button class="hot-source-btn active" data-source="all">综合</button>
+                    <button class="hot-source-btn" data-source="eastmoney">东方财富</button>
+                    <button class="hot-source-btn" data-source="ths">同花顺</button>
+                    <button class="hot-source-btn" data-source="xueqiu">雪球</button>
+                </div>
+            </div>
+            <div class="section-header" style="margin-top:-0.5rem">
+                <span class="section-tip" id="hotSectionTip">综合股吧/雪球/社区热度 · 点击「+自选」加入，默认买入100股</span>
             </div>
             <div class="hot-grid" id="hotGrid">
                 <!-- 动态生成 -->
@@ -192,12 +200,13 @@
                             <th>持仓(股)</th>
                             <th>盈亏</th>
                             <th>收益率</th>
+                            <th>走势</th>
                             <th>操作</th>
                         </tr>
                     </thead>
                     <tbody id="stockTbody">
                         <tr class="empty-row">
-                            <td colspan="10">暂无自选股，从上方热门股票中添加</td>
+                            <td colspan="11">暂无自选股，从上方热门股票中添加</td>
                         </tr>
                     </tbody>
                 </table>
@@ -269,6 +278,32 @@
             <div class="strategy-modal-footer">
                 <button class="stock-btn outline" id="closeModalBtn2">取消</button>
                 <button class="stock-btn" id="saveStrategyBtn">保存策略</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- K线图弹窗 -->
+    <div class="kline-modal" id="klineModal">
+        <div class="kline-modal-content">
+            <div class="kline-modal-header">
+                <h3 id="klineTitle">股票走势</h3>
+                <div class="kline-ma-toggle">
+                    <label><input type="checkbox" id="ma5Check" checked> MA5</label>
+                    <label><input type="checkbox" id="ma10Check" checked> MA10</label>
+                    <label><input type="checkbox" id="ma30Check" checked> MA30</label>
+                </div>
+                <button class="modal-close" id="klineCloseBtn">×</button>
+            </div>
+            <div class="kline-modal-body">
+                <div class="kline-info" id="klineInfo">加载中...</div>
+                <canvas id="klineCanvas" width="800" height="400"></canvas>
+                <div class="kline-legend">
+                    <span class="kline-legend-item"><i class="legend-line ma5-line"></i>MA5</span>
+                    <span class="kline-legend-item"><i class="legend-line ma10-line"></i>MA10</span>
+                    <span class="kline-legend-item"><i class="legend-line ma30-line"></i>MA30</span>
+                    <span class="kline-legend-item"><i class="legend-dot kline-up"></i>阳线</span>
+                    <span class="kline-legend-item"><i class="legend-dot kline-down"></i>阴线</span>
+                </div>
             </div>
         </div>
     </div>

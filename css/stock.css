@@ -923,6 +923,157 @@
     flex-shrink: 0;
 }
 
+/* ===== K线图弹窗 ===== */
+.kline-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+}
+.kline-modal.show {
+    display: flex;
+}
+.kline-modal-content {
+    background: var(--card-bg, #1a1a2e);
+    border: 1px solid var(--border, rgba(0,212,255,0.2));
+    border-radius: 12px;
+    width: 90%;
+    max-width: 860px;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.kline-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid var(--border, rgba(255,255,255,0.1));
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.kline-modal-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+.kline-ma-toggle {
+    display: flex;
+    gap: 0.8rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+.kline-ma-toggle label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+}
+.kline-ma-toggle input[type="checkbox"] {
+    accent-color: #00d4ff;
+}
+.kline-modal-body {
+    padding: 1rem 1.2rem;
+}
+.kline-info {
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.8rem;
+}
+.kline-info .pnl-up { color: #ef4444; }
+.kline-info .pnl-down { color: #22c55e; }
+#klineCanvas {
+    width: 100%;
+    height: auto;
+    max-height: 420px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+}
+.kline-legend {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.6rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+}
+.kline-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.legend-line {
+    display: inline-block;
+    width: 20px;
+    height: 2px;
+    border-radius: 1px;
+}
+.ma5-line { background: #fbbf24; }
+.ma10-line { background: #60a5fa; }
+.ma30-line { background: #c084fc; }
+.legend-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+}
+.kline-up { background: #ef4444; }
+.kline-down { background: #22c55e; }
+
+/* 走势按钮 */
+.kline-btn {
+    background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(0,153,204,0.15));
+    border: 1px solid rgba(0,212,255,0.3);
+    color: #00d4ff;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.78rem;
+    transition: all 0.2s;
+}
+.kline-btn:hover {
+    background: linear-gradient(135deg, rgba(0,212,255,0.3), rgba(0,153,204,0.3));
+    border-color: #00d4ff;
+}
+.stock-name-link:hover {
+    opacity: 0.8;
+}
+
+/* 热门榜来源切换 */
+.hot-source-toggle {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+.hot-source-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border, rgba(255,255,255,0.1));
+    color: var(--text-muted);
+    padding: 0.3rem 0.8rem;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 0.78rem;
+    transition: all 0.2s;
+}
+.hot-source-btn:hover {
+    background: rgba(0,212,255,0.1);
+    border-color: rgba(0,212,255,0.3);
+    color: var(--text-primary);
+}
+.hot-source-btn.active {
+    background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(0,153,204,0.2));
+    border-color: #00d4ff;
+    color: #00d4ff;
+}
+
 .condition-select {
     flex: 1;
     padding: 0.4rem 0.6rem;
