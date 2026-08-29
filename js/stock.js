@@ -486,8 +486,33 @@
     if (!hotGrid) return;
 
     // ===== 本地存储 =====
+    // 规范化股票代码：自动补全市场前缀
+    function normalizeCode(code) {
+        if (!code) return code;
+        code = String(code).toLowerCase().trim();
+        // 已有前缀
+        if (/^(sh|sz|bj)\d{6}$/.test(code)) return code;
+        // 纯6位数字
+        if (/^\d{6}$/.test(code)) {
+            if (code.startsWith('6')) return 'sh' + code;
+            if (code.startsWith('0') || code.startsWith('3')) return 'sz' + code;
+            if (code.startsWith('4') || code.startsWith('8')) return 'bj' + code;
+            return 'sh' + code; // 默认上海
+        }
+        return code;
+    }
     function loadFavorites() {
-        try { favorites = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+        try {
+            favorites = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            // 规范化所有自选股代码
+            let changed = false;
+            favorites = favorites.map(f => {
+                const normalized = normalizeCode(f.code);
+                if (normalized !== f.code) { changed = true; return { ...f, code: normalized }; }
+                return f;
+            });
+            if (changed) saveFavorites();
+        }
         catch (e) { favorites = []; }
     }
     function saveFavorites() {
@@ -506,7 +531,12 @@
     // ===== 实时行情API（优先Vercel代理，避免Mixed Content，失败回退JSONP） =====
     async function fetchQuotes(stockList) {
         if (!stockList || !stockList.length) return {};
-        const codes = stockList.map(s => s.code || s).join(',');
+        // 规范化所有code
+        const normalizedList = stockList.map(s => {
+            if (typeof s === 'string') return normalizeCode(s);
+            return { ...s, code: normalizeCode(s.code) };
+        });
+        const codes = normalizedList.map(s => s.code || s).join(',');
         const isLocal = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
         // 方式1：Vercel代理（部署后用，避免HTTPS页面请求HTTP）
@@ -537,7 +567,7 @@
             script.onload = () => {
                 clearTimeout(timeout);
                 const result = {};
-                stockList.forEach(stock => {
+                normalizedList.forEach(stock => {
                     const code = stock.code || stock;
                     const raw = window['v_' + code];
                     if (raw && typeof raw === 'string') {
@@ -569,6 +599,7 @@
 
     // ===== K线API（优先Vercel代理，失败回退直接请求） =====
     async function fetchKline(code, days = 25) {
+        code = normalizeCode(code);
         if (klineCache[code]) {
             console.log('[K线] 使用缓存', code, klineCache[code].length, '条');
             return klineCache[code];
@@ -1292,16 +1323,18 @@
             return;
         }
         list.slice(0, 20).forEach(stock => {
-            const q = stock.price !== undefined ? stock : (quotes[stock.code] || stock);
+            // 规范化code，确保带sh/sz前缀
+            const code = normalizeCode(stock.code || stock.rawCode || '');
+            const q = stock.price !== undefined ? stock : (quotes[code] || stock);
             const dir = q.changeRate >= 0 ? 'up' : 'down';
-            const inFav = favorites.some(f => f.code === stock.code);
+            const inFav = favorites.some(f => f.code === code);
             const row = document.createElement('div');
             row.className = 'search-result-row';
             row.innerHTML = `
                 <div class="hot-card">
                     <div class="hot-card-header">
                         <span class="hot-name">${q.name}</span>
-                        <span class="hot-code">${stock.code.toUpperCase()}</span>
+                        <span class="hot-code">${code.toUpperCase()}</span>
                     </div>
                     <div class="hot-card-price">
                         <span class="price-num">¥${q.price ? q.price.toFixed(2) : '--'}</span>
@@ -1311,17 +1344,17 @@
                         <span>换手:${q.turnover ? q.turnover.toFixed(2) : '--'}%</span>
                         <span>PE:${q.pe ? q.pe.toFixed(1) : '--'}</span>
                     </div>
-                    <button class="hot-add-btn ${inFav?'added':''}" data-code="${stock.code}" data-name="${q.name}">${inFav?'✓ 已加':'+ 自选'}</button>
+                    <button class="hot-add-btn ${inFav?'added':''}" data-code="${code}" data-name="${q.name}">${inFav?'✓ 已加':'+ 自选'}</button>
                 </div>
                 <div class="search-kline-card">
                     <div class="kline-label">近20日走势</div>
-                    <canvas width="400" height="75" data-code="${stock.code}"></canvas>
+                    <canvas width="400" height="75" data-code="${code}"></canvas>
                 </div>
             `;
             searchResultGrid.appendChild(row);
             // 异步加载K线缩略图
             const canvas = row.querySelector('canvas');
-            if (canvas) loadKlineThumb(stock.code, canvas);
+            if (canvas) loadKlineThumb(code, canvas);
         });
         searchResultGrid.querySelectorAll('.hot-add-btn:not(.added)').forEach(btn => {
             btn.addEventListener('click', async () => {
