@@ -1,4 +1,4 @@
-/**
+﻿/**
  * anime.js - 动漫推荐页面
  * 策略：先立即渲染备用数据确保页面不为空，再异步尝试 AniList 真实数据
  */
@@ -107,7 +107,7 @@
             var desc = cut(stripHtml(a.description), 80);
             html += '<a href="' + url + '" target="_blank" class="anime-card" style="--accent-color:' + color + '">' +
                 '<div class="anime-cover">' +
-                    (cover ? '<img src="' + cover + '" alt="' + title + '" loading="lazy">' : '<div class="anime-cover-placeholder">📺</div>') +
+                    (cover ? '<img src="' + cover + '" alt="' + title + '" loading="lazy" decoding="async">' : '<div class="anime-cover-placeholder">📺</div>') +
                     '<div class="anime-score">' + score + '</div>' +
                     (status ? '<div class="anime-status">' + status + '</div>' : '') +
                 '</div>' +

@@ -128,6 +128,72 @@
             .pl-block-name { font-size: 0.78rem; }
             .pl-block-desc { font-size: 0.62rem; }
         }
+    
+        /* 音乐律动（CSS动画） */
+        .music-visual {
+            position: relative;
+            height: 220px;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color, rgba(0,212,255,0.15));
+        }
+        .music-visual-bg {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(10,25,47,0.9) 0%, rgba(20,40,80,0.8) 50%, rgba(10,25,47,0.9) 100%);
+            animation: bgShift 8s ease-in-out infinite;
+        }
+        @keyframes bgShift {
+            0%, 100% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(30deg); }
+        }
+        .music-visual-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .music-visual-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(0,212,255,0.5);
+            letter-spacing: 2px;
+        }
+        .music-visual-artist {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+        }
+        .music-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 50px;
+            margin-top: 8px;
+        }
+        .music-bars span {
+            width: 6px;
+            background: linear-gradient(to top, #00d4ff, #00ff88);
+            border-radius: 3px;
+            animation: barJump 1.2s ease-in-out infinite;
+            animation-delay: calc(var(--i) * 0.08s);
+            box-shadow: 0 0 10px rgba(0,212,255,0.5);
+        }
+        @keyframes barJump {
+            0%, 100% { height: 10px; }
+            50% { height: 45px; }
+        }
+        .music-bars span:nth-child(odd) {
+            animation-duration: 0.9s;
+        }
+        .music-bars span:nth-child(3n) {
+            animation-duration: 1.5s;
+        }
     </style>
 </head>
 <body>
@@ -141,12 +207,12 @@
         <nav class="sidebar-nav"><ul>
             <li><a href="index.html"><span class="nav-icon">⌂</span>首页</a></li>
             <li><a href="about.html"><span class="nav-icon">◉</span>关于我</a></li>
-            <li class="has-submenu"><a href="javascript:void(0)" class="submenu-toggle"><span class="nav-icon">▤</span>工作<span class="submenu-arrow">▶</span></a><ul class="submenu"><li><a href="blog.html">实用工具</a></li><li><a href="finance-news.html">新闻大事</a></li><li><a href="dashboard.html">店铺管理</a></li></ul></li>
+            <li class="has-submenu"><a href="javascript:void(0)" class="submenu-toggle"><span class="nav-icon">▤</span>工作<span class="submenu-arrow">▶</span></a><ul class="submenu"><li><a href="blog.html">实用工具</a></li><li><a href="finance-news.html">新闻大事</a></li></ul></li>
             <li class="has-submenu open"><a href="javascript:void(0)" class="submenu-toggle"><span class="nav-icon">◈</span>生活<span class="submenu-arrow">▶</span></a><ul class="submenu"><li><a href="cook.html">菜谱</a></li><li><a href="stock.html">股票走势</a></li><li><a href="anime.html">动漫</a></li><li class="active"><a href="music.html">在线音乐</a></li></ul></li>
             <li class="has-submenu"><a href="javascript:void(0)" class="submenu-toggle"><span class="nav-icon">⚡</span>AI工具<span class="submenu-arrow">▶</span></a><ul class="submenu"><li><a href="ecommerce-rpa.html">电商RPA自动化</a></li><li><a href="ai-comic.html">AI漫剧工坊</a></li></ul></li>
             <li><a href="works.html"><span class="nav-icon">◆</span>项目作品</a></li>
             <li><a href="album.html"><span class="nav-icon">▣</span>相册</a></li>
-            <li><a href="contact.html"><span class="nav-icon">✉</span>联系我</a></li>
+
         </ul></nav>
     </aside>
 
@@ -154,16 +220,23 @@
         <div class="music-container">
             <div class="page-header">
                 <h1 class="page-title">🎵 在线音乐</h1>
-                <p class="page-subtitle">Music · 炫酷频谱可视化 · 网易云歌单 · 本地音乐</p>
+                <p class="page-subtitle">Music · 网易云歌单 · 本地音乐 · 律动空间</p>
             </div>
 
-            <!-- 频谱可视化 -->
-            <div class="visualizer-wrap">
-                <canvas class="visualizer-canvas" id="visualizer"></canvas>
-                <div class="visualizer-overlay">
-                    <div class="vis-song-title" id="visTitle">音乐可视化</div>
-                    <div class="vis-song-artist" id="visArtist">选择音乐开始播放</div>
+            <!-- 音乐律动（CSS动画） -->
+            <div class="music-visual">
+                <div class="music-visual-bg"></div>
+                <div class="music-visual-content">
+                    <div class="music-visual-title" id="visTitle">音乐空间</div>
+                    <div class="music-visual-artist" id="visArtist">选择歌单开始聆听</div>
+                    <div class="music-bars">
+                        <span style="--i:0"></span><span style="--i:1"></span><span style="--i:2"></span>
+                        <span style="--i:3"></span><span style="--i:4"></span><span style="--i:5"></span>
+                        <span style="--i:6"></span><span style="--i:7"></span><span style="--i:8"></span>
+                        <span style="--i:9"></span><span style="--i:10"></span><span style="--i:11"></span>
+                    </div>
                 </div>
+            </div>
                 <div class="vis-mode-bar">
                     <div class="vis-mode-btn active" data-mode="bars" onclick="setVisMode('bars')">柱状</div>
                     <div class="vis-mode-btn" data-mode="circle" onclick="setVisMode('circle')">环形</div>
@@ -233,7 +306,7 @@
                     <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
                         <div class="upload-icon">📁</div>
                         <div class="upload-text">点击或拖拽音乐文件到此处</div>
-                        <div class="upload-hint">支持 MP3 / WAV / OGG / FLAC / M4A，可多选 · 播放时频谱联动真实音频</div>
+                        <div class="upload-hint">支持 MP3 / WAV / OGG / FLAC / M4A，可多选</div>
                         <input type="file" id="fileInput" accept="audio/*" multiple style="display:none;">
                     </div>
                     <div id="aplayer"></div>
@@ -251,307 +324,9 @@
     <script src="./js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
     <script>
-        // ========== 炫酷频谱可视化 ==========
-        const canvas = document.getElementById('visualizer');
-        const ctx = canvas.getContext('2d');
-        let visMode = 'bars';
-        let audioCtx = null;
-        let analyser = null;
-        let dataArray = null;
-        let isRealAudio = false;
-        let time = 0;
+        // 音乐律动（CSS动画，无需JS）
 
-        // 粒子系统
-        const particles = [];
-        const PARTICLE_COUNT = 80;
-        for (let i = 0; i < PARTICLE_COUNT; i++) {
-            particles.push({
-                x: Math.random(), y: Math.random(),
-                vx: (Math.random() - 0.5) * 0.002,
-                vy: (Math.random() - 0.5) * 0.002,
-                size: Math.random() * 2 + 1,
-                hue: Math.random() * 60 + 160 // 蓝绿色系
-            });
-        }
-
-        function resizeCanvas() {
-            canvas.width = canvas.offsetWidth * window.devicePixelRatio;
-            canvas.height = canvas.offsetHeight * window.devicePixelRatio;
-            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-        }
-        resizeCanvas();
-        window.addEventListener('resize', () => { resizeCanvas(); });
-
-        function setVisMode(mode) {
-            visMode = mode;
-            document.querySelectorAll('.vis-mode-btn').forEach(b => b.classList.remove('active'));
-            document.querySelector(`.vis-mode-btn[data-mode="${mode}"]`).classList.add('active');
-        }
-
-        // 模拟频率数据（无音频时使用，模拟音乐节奏）
-        function getSimulatedData(count) {
-            const data = new Uint8Array(count);
-            const beat = Math.sin(time * 0.08) * 0.5 + 0.5; // 基础节拍
-            for (let i = 0; i < count; i++) {
-                const freq = i / count;
-                // 低频强、高频弱，模拟真实频谱
-                const base = (1 - freq) * 180 + 30;
-                const wave1 = Math.sin(time * 0.05 + i * 0.15) * 40;
-                const wave2 = Math.sin(time * 0.12 + i * 0.08) * 25;
-                const beatPulse = beat * (1 - freq) * 60;
-                const noise = (Math.random() - 0.5) * 15;
-                data[i] = Math.max(10, Math.min(255, base + wave1 + wave2 + beatPulse + noise));
-            }
-            return data;
-        }
-
-        function draw() {
-            const w = canvas.offsetWidth;
-            const h = canvas.offsetHeight;
-            time++;
-
-            // 获取频率数据
-            let freqData;
-            if (analyser && isRealAudio) {
-                freqData = new Uint8Array(analyser.frequencyBinCount);
-                analyser.getByteFrequencyData(freqData);
-            } else {
-                freqData = getSimulatedData(64);
-            }
-
-            // 背景渐变
-            const bgGrad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w,h)/2);
-            bgGrad.addColorStop(0, 'rgba(10, 20, 50, 0.95)');
-            bgGrad.addColorStop(1, 'rgba(5, 8, 20, 0.98)');
-            ctx.fillStyle = bgGrad;
-            ctx.fillRect(0, 0, w, h);
-
-            if (visMode === 'bars') {
-                drawBars(w, h, freqData);
-            } else if (visMode === 'circle') {
-                drawCircle(w, h, freqData);
-            } else if (visMode === 'wave') {
-                drawWave(w, h, freqData);
-            } else if (visMode === 'particles') {
-                drawParticles(w, h, freqData);
-            }
-
-            requestAnimationFrame(draw);
-        }
-
-        // 模式1：柱状频谱（带镜像+发光）
-        function drawBars(w, h, data) {
-            const barCount = 64;
-            const barWidth = w / barCount - 2;
-            const avg = data.reduce((a,b) => a+b, 0) / data.length;
-
-            for (let i = 0; i < barCount; i++) {
-                const idx = Math.floor(i * data.length / barCount);
-                const value = data[idx];
-                const barH = (value / 255) * h * 0.42;
-
-                const gradient = ctx.createLinearGradient(0, h/2 - barH, 0, h/2 + barH);
-                const hue = 160 + (i / barCount) * 60; // 160-220 蓝到紫
-                gradient.addColorStop(0, `hsla(${hue}, 100%, 60%, 0.9)`);
-                gradient.addColorStop(0.5, `hsla(${hue + 20}, 100%, 50%, 1)`);
-                gradient.addColorStop(1, `hsla(${hue}, 100%, 60%, 0.9)`);
-
-                ctx.fillStyle = gradient;
-                ctx.shadowColor = `hsla(${hue}, 100%, 50%, 0.8)`;
-                ctx.shadowBlur = 10;
-                // 上半部分
-                ctx.fillRect(i * (barWidth + 2), h/2 - barH, barWidth, barH);
-                // 下半部分（镜像，渐隐）
-                ctx.globalAlpha = 0.4;
-                ctx.fillRect(i * (barWidth + 2), h/2, barWidth, barH * 0.7);
-                ctx.globalAlpha = 1;
-            }
-            ctx.shadowBlur = 0;
-
-            // 中心分割线
-            ctx.strokeStyle = 'rgba(0,212,255,0.3)';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(0, h/2);
-            ctx.lineTo(w, h/2);
-            ctx.stroke();
-        }
-
-        // 模式2：环形频谱
-        function drawCircle(w, h, data) {
-            const cx = w / 2;
-            const cy = h / 2;
-            const baseRadius = Math.min(w, h) * 0.22;
-            const barCount = 96;
-
-            ctx.save();
-            ctx.translate(cx, cy);
-            ctx.rotate(time * 0.003);
-
-            for (let i = 0; i < barCount; i++) {
-                const idx = Math.floor(i * data.length / barCount);
-                const value = data[idx];
-                const barH = (value / 255) * Math.min(w, h) * 0.2;
-                const angle = (i / barCount) * Math.PI * 2;
-                const hue = (i / barCount) * 360 + time * 0.5;
-
-                ctx.save();
-                ctx.rotate(angle);
-                const gradient = ctx.createLinearGradient(0, -baseRadius, 0, -baseRadius - barH);
-                gradient.addColorStop(0, `hsla(${hue}, 100%, 50%, 0.3)`);
-                gradient.addColorStop(1, `hsla(${hue}, 100%, 60%, 1)`);
-                ctx.fillStyle = gradient;
-                ctx.shadowColor = `hsla(${hue}, 100%, 50%, 0.6)`;
-                ctx.shadowBlur = 8;
-                ctx.fillRect(-2, -baseRadius - barH, 4, barH);
-                ctx.restore();
-            }
-            ctx.shadowBlur = 0;
-
-            // 中心圆
-            const avg = data.reduce((a,b) => a+b, 0) / data.length;
-            const pulseR = baseRadius * 0.6 + (avg / 255) * 15;
-            const centerGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, pulseR);
-            centerGrad.addColorStop(0, 'rgba(0,255,136,0.4)');
-            centerGrad.addColorStop(0.5, 'rgba(0,212,255,0.2)');
-            centerGrad.addColorStop(1, 'rgba(0,100,255,0)');
-            ctx.fillStyle = centerGrad;
-            ctx.beginPath();
-            ctx.arc(0, 0, pulseR, 0, Math.PI * 2);
-            ctx.fill();
-
-            // 内圈装饰
-            ctx.strokeStyle = 'rgba(0,212,255,0.4)';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.arc(0, 0, baseRadius * 0.7, 0, Math.PI * 2);
-            ctx.stroke();
-
-            ctx.restore();
-        }
-
-        // 模式3：波形线（多层）
-        function drawWave(w, h, data) {
-            const layers = 3;
-            for (let layer = 0; layer < layers; layer++) {
-                ctx.beginPath();
-                const alpha = 0.8 - layer * 0.25;
-                const hue = 160 + layer * 30;
-                ctx.strokeStyle = `hsla(${hue}, 100%, 60%, ${alpha})`;
-                ctx.lineWidth = 2 - layer * 0.4;
-                ctx.shadowColor = `hsla(${hue}, 100%, 50%, 0.5)`;
-                ctx.shadowBlur = 8;
-
-                const points = 128;
-                for (let i = 0; i <= points; i++) {
-                    const x = (i / points) * w;
-                    const idx = Math.floor((i / points) * data.length);
-                    const value = data[idx] / 255;
-                    const baseY = h / 2 + (layer - 1) * 20;
-                    const amp = (h * 0.3) * (1 - layer * 0.2);
-                    const wave1 = Math.sin(time * 0.03 + i * 0.08 + layer) * value * amp;
-                    const wave2 = Math.sin(time * 0.05 + i * 0.15 - layer * 2) * value * amp * 0.5;
-                    const y = baseY + wave1 + wave2;
-                    if (i === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
-                }
-                ctx.stroke();
-
-                // 填充下方
-                ctx.lineTo(w, h);
-                ctx.lineTo(0, h);
-                ctx.closePath();
-                const fillGrad = ctx.createLinearGradient(0, h/2, 0, h);
-                fillGrad.addColorStop(0, `hsla(${hue}, 100%, 50%, ${alpha * 0.3})`);
-                fillGrad.addColorStop(1, `hsla(${hue}, 100%, 50%, 0)`);
-                ctx.fillStyle = fillGrad;
-                ctx.fill();
-            }
-            ctx.shadowBlur = 0;
-        }
-
-        // 模式4：粒子爆发
-        function drawParticles(w, h, data) {
-            const avg = data.reduce((a,b) => a+b, 0) / data.length;
-            const intensity = avg / 255;
-
-            // 更新并绘制粒子
-            particles.forEach((p, i) => {
-                const idx = Math.floor((i / particles.length) * data.length);
-                const value = data[idx] / 255;
-
-                p.x += p.vx * (1 + value * 3);
-                p.y += p.vy * (1 + value * 3);
-
-                // 边界反弹
-                if (p.x < 0 || p.x > 1) p.vx *= -1;
-                if (p.y < 0 || p.y > 1) p.vy *= -1;
-
-                const px = p.x * w;
-                const py = p.y * h;
-                const size = p.size * (1 + value * 4);
-
-                // 粒子发光
-                const grad = ctx.createRadialGradient(px, py, 0, px, py, size * 3);
-                grad.addColorStop(0, `hsla(${p.hue}, 100%, 65%, ${0.8 + value * 0.2})`);
-                grad.addColorStop(0.5, `hsla(${p.hue}, 100%, 50%, ${0.3 * value})`);
-                grad.addColorStop(1, 'transparent');
-                ctx.fillStyle = grad;
-                ctx.beginPath();
-                ctx.arc(px, py, size * 3, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = `hsla(${p.hue}, 100%, 80%, 0.9)`;
-                ctx.beginPath();
-                ctx.arc(px, py, size, 0, Math.PI * 2);
-                ctx.fill();
-            });
-
-            // 粒子连线
-            ctx.strokeStyle = `rgba(0,212,255,${0.1 + intensity * 0.2})`;
-            ctx.lineWidth = 0.5;
-            for (let i = 0; i < particles.length; i++) {
-                for (let j = i + 1; j < particles.length; j++) {
-                    const dx = (particles[i].x - particles[j].x) * w;
-                    const dy = (particles[i].y - particles[j].y) * h;
-                    const dist = Math.sqrt(dx*dx + dy*dy);
-                    if (dist < 100) {
-                        ctx.globalAlpha = (1 - dist / 100) * (0.3 + intensity * 0.4);
-                        ctx.beginPath();
-                        ctx.moveTo(particles[i].x * w, particles[i].y * h);
-                        ctx.lineTo(particles[j].x * w, particles[j].y * h);
-                        ctx.stroke();
-                    }
-                }
-            }
-            ctx.globalAlpha = 1;
-
-            // 中心脉冲
-            const pulseR = 30 + intensity * 80 + Math.sin(time * 0.1) * 10;
-            const pulseGrad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, pulseR);
-            pulseGrad.addColorStop(0, `rgba(0,255,136,${0.3 * intensity})`);
-            pulseGrad.addColorStop(1, 'transparent');
-            ctx.fillStyle = pulseGrad;
-            ctx.beginPath();
-            ctx.arc(w/2, h/2, pulseR, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        draw();
-
-        // ========== 音频分析（本地音乐模式） ==========
-        function initAudioContext(audioEl) {
-            if (audioCtx) return;
-            try {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 128;
-                const source = audioCtx.createMediaElementSource(audioEl);
-                source.connect(analyser);
-                analyser.connect(audioCtx.destination);
-                dataArray = new Uint8Array(analyser.frequencyBinCount);
-            } catch(e) { console.warn('音频分析初始化失败:', e); }
-        }
+        
 
         // ========== 模式切换 ==========
         function switchMode(mode) {
@@ -606,16 +381,16 @@
             setTimeout(() => {
                 const audioEl = localAp.audio;
                 if (audioEl) {
-                    initAudioContext(audioEl);
+                    
                     audioEl.addEventListener('play', () => {
-                        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-                        isRealAudio = true;
+                        
+                        
                         const current = localAp.list.audios[localAp.list.index];
                         document.getElementById('visTitle').textContent = current ? current.name : '本地音乐';
                         document.getElementById('visArtist').textContent = current ? current.artist : '';
                     });
-                    audioEl.addEventListener('pause', () => { isRealAudio = false; });
-                    audioEl.addEventListener('ended', () => { isRealAudio = false; });
+                    
+                    
                 }
             }, 100);
         }

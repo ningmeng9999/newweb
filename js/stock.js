@@ -247,7 +247,7 @@
             const res = await fetch('./api/stock-sync', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ favorites, history, strategies })
+                body: JSON.stringify({ favorites, history })
             });
             const data = await res.json();
             if (data.ok) { syncStatus = 'synced'; }
@@ -271,10 +271,6 @@
                 if (data.data.history && Array.isArray(data.data.history)) {
                     history = data.data.history;
                     saveHistory();
-                }
-                if (data.data.strategies && Array.isArray(data.data.strategies)) {
-                    strategies = data.data.strategies;
-                    saveStrategies();
                 }
                 syncStatus = 'synced';
                 console.log('[Í¬²½] ´ÓVercel KV»Ö¸´Êý¾Ý£¬×ÔÑ¡:', favorites.length, 'ÀúÊ·:', history.length);
@@ -2381,7 +2377,8 @@
     loadHistory();
     renderStrategyList();
     // ³¢ÊÔ´ÓVercel KVÍ¬²½Êý¾Ý
-    syncFromServer().then(() => { renderAll(); });
+    // ÔÆ¶ËÍ¬²½£¨´ø³¬Ê±£¬²»×èÈûäÖÈ¾£©
+    Promise.race([syncFromServer(), new Promise(r => setTimeout(r, 3000))]).then(() => { renderAll(); });
     clearScreenResult();
     renderAll(); // å…ˆç”¨å†…ç½®æ•°æ®æ¸²æŸ“
     initSearch();
@@ -2391,7 +2388,7 @@
     // å¼‚æ­¥åŠ è½½åŠ¨æ€çƒ­é—¨æ¦œ
     (async function initHotStocks() {
         if (hotSectionTip) hotSectionTip.textContent = 'æ­£åœ¨åŠ è½½å®žæ—¶çƒ­é—¨æ¦?..';
-        await fetchHotStocks('all', 30);
+        await fetchHotStocks('all', 10);
         if (currentView === 'hot') renderAll();
         if (hotSectionTip) {
             const srcInfo = hotStocks.length ? `å·²åŠ è½?${hotStocks.length} åªçƒ­é—¨è‚¡ Â· æ¥æºï¼šä¸œæ–¹è´¢å¯?åŒèŠ±é¡?é›ªçƒ Â· ` : '';
@@ -2402,7 +2399,7 @@
     // æ¯?åˆ†é’Ÿåˆ·æ–°ä¸€æ¬¡çƒ­é—¨æ¦œ
     setInterval(() => {
         if (document.hidden) return;
-        fetchHotStocks('all', 30).then(() => {
+        fetchHotStocks('all', 10).then(() => {
             if (currentView === 'hot') renderAll();
         });
     }, 5 * 60 * 1000);
@@ -2414,7 +2411,7 @@
             btn.classList.add('active');
             hotSource = btn.dataset.source;
             if (hotSectionTip) hotSectionTip.textContent = 'æ­£åœ¨åŠ è½½' + btn.textContent + 'çƒ­é—¨æ¦?..';
-            await fetchHotStocks(hotSource, 30, false);
+            await fetchHotStocks(hotSource, 10, false);
             if (currentView === 'hot') renderAll();
             if (hotSectionTip) {
                 if (hotStocks.length === 0) {

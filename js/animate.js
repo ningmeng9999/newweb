@@ -1,4 +1,4 @@
-/**
+﻿/**
  * animate.js - 全局动画系统
  * 包含：Canvas粒子背景、滚动入场动画、导航栏滚动效果、移动端菜单、筛选交互、相册灯箱
  */
@@ -17,8 +17,8 @@
         let particles = [];
         let width, height;
         let mouseX = -1000, mouseY = -1000;
-        const PARTICLE_COUNT = window.innerWidth < 768 ? 40 : 80;
-        const CONNECT_DISTANCE = 120;
+        const PARTICLE_COUNT = window.innerWidth < 768 ? 25 : 50;
+        const CONNECT_DISTANCE = 100;
 
         function resize() {
             width = canvas.width = window.innerWidth;
@@ -43,9 +43,14 @@
             return styles.getPropertyValue('--accent').trim() || '#00d4ff';
         }
 
+        let paused = false;
+        let accentColor = null;
+        document.addEventListener('visibilitychange', () => { paused = document.hidden; if (!paused) requestAnimationFrame(draw); });
         function draw() {
+            if (paused) return;
             ctx.clearRect(0, 0, width, height);
-            const accent = getAccentColor();
+            if (!accentColor) accentColor = getAccentColor();
+            const accent = accentColor;
 
             // 更新并绘制粒子
             for (let i = 0; i < particles.length; i++) {
