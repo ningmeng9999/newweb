@@ -120,22 +120,28 @@
             .param-grid { grid-template-columns: 1fr 1fr; }
         }
     
-        /* 爆火AI漫剧推荐 */
-        .hot-comic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-        .hot-comic-card { display: flex; gap: 12px; padding: 14px; background: var(--card-bg, rgba(10,25,47,0.5)); border: 1px solid var(--border-color, rgba(0,212,255,0.15)); border-radius: 12px; text-decoration: none; transition: all 0.3s; }
-        .hot-comic-card:hover { transform: translateY(-3px); border-color: rgba(0,212,255,0.4); box-shadow: 0 8px 24px rgba(0,212,255,0.15); }
-        .hot-comic-cover { width: 60px; height: 80px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0; }
-        .hot-comic-info { flex: 1; min-width: 0; }
-        .hot-comic-title { font-size: 0.95rem; font-weight: 600; color: var(--text-primary, #fff); margin-bottom: 6px; }
-        .hot-comic-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-        .hot-tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; color: #fff; font-weight: 500; }
-        .hot-tag.douyin { background: linear-gradient(135deg,#000,#333); }
-        .hot-tag.hongguo { background: linear-gradient(135deg,#ff6b35,#f7931e); }
-        .hot-tag.kuaishou { background: linear-gradient(135deg,#ff4906,#ff7a00); }
-        .hot-views { font-size: 0.75rem; color: #ff6b6b; }
-        .hot-comic-desc { font-size: 0.8rem; color: var(--text-secondary, #8892b0); line-height: 1.4; }
-
-    </style>
+        /* 爆火AI漫剧推荐 - 海报卡片 */
+        .hot-comic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
+        .hot-comic-card { text-decoration: none; color: inherit; transition: all 0.4s cubic-bezier(0.4,0,0.2,1); }
+        .hot-comic-card:hover { transform: translateY(-8px); }
+        .hot-comic-poster { position: relative; width: 100%; aspect-ratio: 3/4.2; border-radius: 12px; overflow: hidden; margin-bottom: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.4s; }
+        .hot-comic-card:hover .hot-comic-poster { box-shadow: 0 12px 30px rgba(165,94,234,0.3); }
+        .hot-comic-poster img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .hot-comic-card:hover .hot-comic-poster img { transform: scale(1.08); }
+        .hot-comic-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 30px 10px 8px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .hot-comic-tag { font-size: 0.65rem; padding: 2px 7px; border-radius: 4px; color: #fff; font-weight: 600; backdrop-filter: blur(4px); }
+        .hot-comic-tag.douyin { background: rgba(0,0,0,0.7); }
+        .hot-comic-tag.hongguo { background: rgba(255,107,53,0.85); }
+        .hot-comic-tag.kuaishou { background: rgba(255,73,6,0.85); }
+        .hot-comic-views { font-size: 0.7rem; color: #ff6b6b; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+        .hot-comic-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 44px; height: 44px; background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1rem; opacity: 0; transition: all 0.3s; border: 1px solid rgba(255,255,255,0.3); }
+        .hot-comic-card:hover .hot-comic-play { opacity: 1; background: rgba(165,94,234,0.6); }
+        .hot-comic-info { padding: 0 4px; }
+        .hot-comic-title { font-size: 0.95rem; font-weight: 700; color: var(--text-primary, #fff); margin-bottom: 2px; }
+        .hot-comic-sub { font-size: 0.72rem; color: #a55eea; margin-bottom: 4px; font-weight: 500; }
+        .hot-comic-desc { font-size: 0.75rem; color: var(--text-secondary, #8892b0); line-height: 1.3; }
+        @media (max-width: 768px) { .hot-comic-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; } }
+</style>
 </head>
 <body>
     <div class="loading-box" id="loadingBox">
@@ -150,7 +156,6 @@
         <nav class="sidebar-nav">
             <ul>
                 <li><a href="index.html"><span class="nav-icon">⌂</span>首页</a></li>
-                <li><a href="about.html"><span class="nav-icon">◉</span>关于我</a></li>
                 <li class="has-submenu">
                     <a href="javascript:void(0)" class="submenu-toggle">
                         <span class="nav-icon">▤</span>工作<span class="submenu-arrow">▶</span>
@@ -158,7 +163,6 @@
                     <ul class="submenu">
                         <li><a href="blog.html">实用工具</a></li>
                         <li><a href="finance-news.html">新闻大事</a></li>
-                        
                     </ul>
                 </li>
                 <li class="has-submenu">
@@ -177,13 +181,13 @@
                         <span class="nav-icon">⚡</span>AI工具<span class="submenu-arrow">▶</span>
                     </a>
                     <ul class="submenu">
-                        <li><a href="ecommerce-rpa.html">电商RPA自动化</a></li>
+                        <li><a href="ecommerce-rpa.html">RPA工具集</a></li>
                         <li class="active"><a href="ai-comic.html">AI漫剧工坊</a></li>
                     </ul>
                 </li>
                 <li><a href="works.html"><span class="nav-icon">◆</span>项目作品</a></li>
                 <li><a href="album.html"><span class="nav-icon">▣</span>相册</a></li>
-
+                <li><a href="about.html"><span class="nav-icon">◉</span>关于我</a></li>
             </ul>
         </nav>
     </aside>
@@ -237,7 +241,127 @@
             <div class="section">
                 <div class="section-title">🔥 爆火AI漫剧推荐</div>
                 <div class="hot-comic-grid">
-                    <a href="https://www.douyin.com/" target="_blank" class="hot-comic-card"><div class="hot-comic-cover" style="background:linear-gradient(135deg,#667eea,#764ba2);">⚔️</div><div class="hot-comic-info"><div class="hot-comic-title">剑来 · AI动态漫</div><div class="hot-comic-meta"><span class="hot-tag douyin">抖音</span><span class="hot-views">▶ 2.3亿</span></div><div class="hot-comic-desc">陈平安修仙之路，水墨国风AI渲染</div></div></a>
+                    <a href="https://www.douyin.com/" target="_blank" class="hot-comic-card">
+                        <div class="hot-comic-poster">
+                            <img src="https://picsum.photos/seed/jianlai/300/420" alt="剑来" loading="lazy" decoding="async">
+                            <div class="hot-comic-overlay" style="background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.85));">
+                                <span class="hot-comic-tag douyin">抖音</span>
+                                <span class="hot-comic-views">▶ 2.3亿</span>
+                            </div>
+                            <div class="hot-comic-play">▶</div>
+                        </div>
+                        <div class="hot-comic-info">
+                            <div class="hot-comic-title">剑来</div>
+                            <div class="hot-comic-sub">AI动态漫</div>
+                            <div class="hot-comic-desc">陈平安修仙之路</div>
+                        </div>
+                    </a>
+                    <a href="https://www.douyin.com/" target="_blank" class="hot-comic-card">
+                        <div class="hot-comic-poster">
+                            <img src="https://picsum.photos/seed/shennv/300/420" alt="神女杂货铺" loading="lazy" decoding="async">
+                            <div class="hot-comic-overlay" style="background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.85));">
+                                <span class="hot-comic-tag douyin">抖音</span>
+                                <span class="hot-comic-views">▶ 1.8亿</span>
+                            </div>
+                            <div class="hot-comic-play">▶</div>
+                        </div>
+                        <div class="hot-comic-info">
+                            <div class="hot-comic-title">神女杂货铺</div>
+                            <div class="hot-comic-sub">穿越甜宠</div>
+                            <div class="hot-comic-desc">古代开店日常</div>
+                        </div>
+                    </a>
+                    <a href="https://www.hongguo.com/" target="_blank" class="hot-comic-card">
+                        <div class="hot-comic-poster">
+                            <img src="https://picsum.photos/seed/mori/300/420" alt="末日重生" loading="lazy" decoding="async">
+                            <div class="hot-comic-overlay" style="background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.85));">
+                                <span class="hot-comic-tag hongguo">红果</span>
+                                <span class="hot-comic-views">▶ 1.5亿</span>
+                            </div>
+                            <div class="hot-comic-play">▶</div>
+                        </div>
+                        <div class="hot-comic-info">
+                            <div class="hot-comic-title">末日重生</div>
+                            <div class="hot-comic-sub">囤货求生</div>
+                            <div class="hot-comic-desc">末世废墟生存</div>
+                        </div>
+                    </a>
+                    <a href="https://www.douyin.com/" target="_blank" class="hot-comic-card">
+                        <div class="hot-comic-poster">
+                            <img src="https://picsum.photos/seed/hougong/300/420" alt="后宫卷王" loading="lazy" decoding="async">
+                            <div class="hot-comic-overlay" style="background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.85));">
+                                <span class="hot-comic-tag douyin">抖音</span>
+                                <span class="hot-comic-views">▶ 9800万</span>
+                            </div>
+                            <div class="hot-comic-play">▶</div>
+                        </div>
+                        <div class="hot-comic-info">
+                            <div class="hot-comic-title">后宫卷王</div>
+                            <div class="hot-comic-sub">宫斗爽剧</div>
+                            <div class="hot-comic-desc">古风宫斗逆袭</div>
+                        </div>
+                    </a>
+                    <a href="https://www.hongguo.com/" target="_blank" class="hot-comic-card">
+                        <div class="hot-comic-poster">
+                            <img src="https://picsum.photos/seed/longwang/300/420" alt="龙王殿" loading="lazy" decoding="async">
+                            <div class="hot-comic-overlay" style="background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.85));">
+                                <span class="hot-comic-tag hongguo">红果</span>
+                                <span class="hot-comic-views">▶ 8600万</span>
+                            </div>
+                            <div class="hot-comic-play">▶</div>
+                        </div>
+                        <div class="hot-comic-info">
+                            <div class="hot-comic-title">龙王殿</div>
+                            <div class="hot-comic-sub">战神回归</div>
+                            <div class="hot-comic-desc">都市燃血战斗</div>
+                        </div>
+                    </a>
+                    <a href="https://www.kuaishou.com/" target="_blank" class="hot-comic-card">
+                        <div class="hot-comic-poster">
+                            <img src="https://picsum.photos/seed/wuxian/300/420" alt="无限恐怖" loading="lazy" decoding="async">
+                            <div class="hot-comic-overlay" style="background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.85));">
+                                <span class="hot-comic-tag kuaishou">快手</span>
+                                <span class="hot-comic-views">▶ 7200万</span>
+                            </div>
+                            <div class="hot-comic-play">▶</div>
+                        </div>
+                        <div class="hot-comic-info">
+                            <div class="hot-comic-title">无限恐怖</div>
+                            <div class="hot-comic-sub">AI重制版</div>
+                            <div class="hot-comic-desc">无限流恐怖氛围</div>
+                        </div>
+                    </a>
+                    <a href="https://www.douyin.com/" target="_blank" class="hot-comic-card">
+                        <div class="hot-comic-poster">
+                            <img src="https://picsum.photos/seed/fashi/300/420" alt="全职法师" loading="lazy" decoding="async">
+                            <div class="hot-comic-overlay" style="background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.85));">
+                                <span class="hot-comic-tag douyin">抖音</span>
+                                <span class="hot-comic-views">▶ 6500万</span>
+                            </div>
+                            <div class="hot-comic-play">▶</div>
+                        </div>
+                        <div class="hot-comic-info">
+                            <div class="hot-comic-title">全职法师</div>
+                            <div class="hot-comic-sub">动态漫</div>
+                            <div class="hot-comic-desc">魔法校园热血</div>
+                        </div>
+                    </a>
+                    <a href="https://www.hongguo.com/" target="_blank" class="hot-comic-card">
+                        <div class="hot-comic-poster">
+                            <img src="https://picsum.photos/seed/daomu/300/420" alt="盗墓笔记" loading="lazy" decoding="async">
+                            <div class="hot-comic-overlay" style="background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.85));">
+                                <span class="hot-comic-tag hongguo">红果</span>
+                                <span class="hot-comic-views">▶ 5800万</span>
+                            </div>
+                            <div class="hot-comic-play">▶</div>
+                        </div>
+                        <div class="hot-comic-info">
+                            <div class="hot-comic-title">盗墓笔记</div>
+                            <div class="hot-comic-sub">AI重启</div>
+                            <div class="hot-comic-desc">古墓探险解谜</div>
+                        </div>
+                    </a>
+                </div><div class="hot-comic-info"><div class="hot-comic-title">剑来 · AI动态漫</div><div class="hot-comic-meta"><span class="hot-tag douyin">抖音</span><span class="hot-views">▶ 2.3亿</span></div><div class="hot-comic-desc">陈平安修仙之路，水墨国风AI渲染</div></div></a>
                     <a href="https://www.douyin.com/" target="_blank" class="hot-comic-card"><div class="hot-comic-cover" style="background:linear-gradient(135deg,#f093fb,#f5576c);">🌸</div><div class="hot-comic-info"><div class="hot-comic-title">神女杂货铺</div><div class="hot-comic-meta"><span class="hot-tag douyin">抖音</span><span class="hot-views">▶ 1.8亿</span></div><div class="hot-comic-desc">穿越古代开杂货铺，甜宠搞笑</div></div></a>
                     <a href="https://www.hongguo.com/" target="_blank" class="hot-comic-card"><div class="hot-comic-cover" style="background:linear-gradient(135deg,#4facfe,#00f2fe);">🧟</div><div class="hot-comic-info"><div class="hot-comic-title">末日重生之我有超市</div><div class="hot-comic-meta"><span class="hot-tag hongguo">红果</span><span class="hot-views">▶ 1.5亿</span></div><div class="hot-comic-desc">末日囤货流，AI生成末世废墟</div></div></a>
                     <a href="https://www.douyin.com/" target="_blank" class="hot-comic-card"><div class="hot-comic-cover" style="background:linear-gradient(135deg,#fa709a,#fee140);">👑</div><div class="hot-comic-info"><div class="hot-comic-title">我在后宫当卷王</div><div class="hot-comic-meta"><span class="hot-tag douyin">抖音</span><span class="hot-views">▶ 9800万</span></div><div class="hot-comic-desc">宫斗爽剧，AI古风人物一致性高</div></div></a>
@@ -248,325 +372,7 @@
                     
                 </div>
             </div>
-            <div class="section">
-                <div class="section-title">剧本生成器</div>
-                <div class="generator-panel">
-                    <textarea class="input-area" id="scriptInput" placeholder="输入你的故事文案或剧本大纲...&#10;&#10;示例：少年林辰意外获得上古神剑，踏上修仙之路，在宗门大比中一鸣惊人，却发现背后隐藏着惊天秘密..."></textarea>
-                    <div class="param-grid">
-                        <div class="param-group"><label>画风风格</label><select id="artStyle"><option value="anime">日系动漫</option><option value="realistic">写实厚涂</option><option value="ink">国风水墨</option><option value="3d">3D渲染</option><option value="pixel">像素风</option></select></div>
-                        <div class="param-group"><label>镜头节奏</label><select id="camera"><option value="fast">快节奏（动作片）</option><option value="normal" selected>标准叙事</option><option value="slow">慢节奏（文艺片）</option></select></div>
-                        <div class="param-group"><label>分镜数量</label><select id="shotCount"><option value="4">4镜（短篇）</option><option value="6" selected>6镜（标准）</option><option value="8">8镜（详细）</option><option value="10">10镜（长篇）</option></select></div>
-                        <div class="param-group"><label>角色数量</label><select id="charCount"><option value="2">2人</option><option value="3" selected>3人</option><option value="4">4人</option><option value="5">5人</option></select></div>
-                        <div class="param-group"><label>画面比例</label><select id="ratio"><option value="16:9" selected>16:9 横屏</option><option value="9:16">9:16 竖屏</option><option value="1:1">1:1 方形</option></select></div>
-                        <div class="param-group"><label>色调氛围</label><select id="mood"><option value="warm">暖色（热血/温馨）</option><option value="cool" selected>冷色（悬疑/科幻）</option><option value="dark">暗色（暗黑/恐怖）</option><option value="bright">亮色（治愈/日常）</option></select></div>
-                    </div>
-                    <button class="generate-btn" id="genBtn" onclick="generateComic()">✨ 生成漫剧脚本</button>
-                </div>
-            </div>
-
-            <div class="result-panel" id="resultPanel">
-                <div class="result-toolbar">
-                    <div class="result-tabs">
-                        <div class="result-tab active" data-tab="storyboard" onclick="switchTab('storyboard')">分镜提示词</div>
-                        <div class="result-tab" data-tab="characters" onclick="switchTab('characters')">角色设定</div>
-                        <div class="result-tab" data-tab="script" onclick="switchTab('script')">漫剧脚本</div>
-                    </div>
-                    <div class="result-actions">
-                        <button class="result-action-btn" onclick="copyAllResult()" title="复制全部">📋 复制</button>
-                        <button class="result-action-btn" onclick="exportResult()" title="导出TXT">⬇️ 导出</button>
-                        <button class="result-action-btn" onclick="showHistory()" title="历史记录">🕐 历史</button>
-                    </div>
-                </div>
-                <div class="result-content" id="resultContent"></div>
-            </div>
-
-            <div class="section">
-                <div class="section-title">样例作品</div>
-                <div class="sample-grid">
-                    <div class="sample-card" onclick="loadSample(0)"><div class="sample-thumb">⚔️</div><div class="sample-title">修仙少年逆袭记</div><div class="sample-desc">古风修仙 · 6镜 · 国风水墨</div></div>
-                    <div class="sample-card" onclick="loadSample(1)"><div class="sample-thumb">🚀</div><div class="sample-title">星际迷途</div><div class="sample-desc">科幻冒险 · 8镜 · 3D渲染</div></div>
-                    <div class="sample-card" onclick="loadSample(2)"><div class="sample-thumb">🌸</div><div class="sample-title">校园青春日记</div><div class="sample-desc">日常治愈 · 4镜 · 日系动漫</div></div>
-                </div>
-            </div>
-        </div>
+            
     </main>
 
-    <!-- 历史记录弹窗 -->
-    <div class="history-modal" id="historyModal">
-        <div class="history-modal-mask" onclick="hideHistory()"></div>
-        <div class="history-modal-box">
-            <div class="history-modal-header">
-                <span>🕐 生成历史记录</span>
-                <button class="history-close" onclick="hideHistory()">✕</button>
-            </div>
-            <div class="history-modal-body" id="historyList">
-                <div class="history-empty">暂无历史记录</div>
-            </div>
-        </div>
-    </div>
-
-    <footer class="footer"><div class="footer-content"><p>© 2026 LengMeng · All Rights Reserved</p><p class="footer-link"><a href="https://lengmeng.online" target="_blank">lengmeng.online</a><span>·</span><span>Powered by Vercel</span></p></div></footer>
-
-    <script src="./js/theme.js"></script>
-    <script src="./js/animate.js"></script>
-    <script src="./js/weather.js"></script>
-    <script src="./js/darkmode.js"></script>
-    <script src="./js/main.js"></script>
-    <script>
-        let currentResult = null;
-
-        function generateComic() {
-            const input = document.getElementById('scriptInput').value.trim();
-            if (!input) { alert('请输入剧本内容'); return; }
-
-            const btn = document.getElementById('genBtn');
-            btn.disabled = true;
-            btn.textContent = '生成中...';
-
-            const panel = document.getElementById('resultPanel');
-            const content = document.getElementById('resultContent');
-            panel.classList.add('show');
-            content.innerHTML = '<div class="loading-text"><span class="loading-spinner"></span>AI正在分析剧本，生成分镜...</div>';
-
-            setTimeout(() => {
-                const style = document.getElementById('artStyle').value;
-                const shots = parseInt(document.getElementById('shotCount').value);
-                const chars = parseInt(document.getElementById('charCount').value);
-                const mood = document.getElementById('mood').value;
-                const ratio = document.getElementById('ratio').value;
-
-                currentResult = generateMockResult(input, style, shots, chars, mood, ratio);
-                // 保存到历史记录
-                saveToHistory(input, style, shots, chars, mood, ratio, currentResult);
-                switchTab('storyboard');
-                btn.disabled = false;
-                btn.textContent = '✨ 生成漫剧脚本';
-            }, 1500);
-        }
-
-        function generateMockResult(input, style, shotCount, charCount, mood, ratio) {
-            const styleNames = { anime: '日系动漫', realistic: '写实厚涂', ink: '国风水墨', '3d': '3D渲染', pixel: '像素风' };
-            const moodNames = { warm: '暖色调', cool: '冷色调', dark: '暗色调', bright: '亮色调' };
-            const charNames = ['主角', '导师', '对手', '伙伴', '神秘人'];
-            const scenes = ['开场铺垫', '冲突爆发', '关键转折', '高潮对决', '结局收束', '彩蛋伏笔', '回忆杀', '新征程', '内心挣扎', '真相大白'];
-            const prompts = [
-                'wide shot, dramatic lighting, cinematic composition, detailed background',
-                'close-up portrait, intense expression, emotional depth, soft focus background',
-                'dynamic action pose, motion blur, speed lines, impact frames',
-                'establishing shot, epic landscape, atmospheric perspective, volumetric light',
-                'medium shot, character interaction, dialogue scene, natural lighting',
-                'low angle shot, power stance, dramatic shadows, hero composition',
-                'aerial view, vast scenery, scale comparison, golden hour',
-                'over-the-shoulder, tense conversation, shallow depth of field',
-                'split screen, parallel narrative, contrasting colors, symbolic framing',
-                'silhouette shot, backlighting, mysterious atmosphere, rim light'
-            ];
-
-            const storyboard = [];
-            for (let i = 0; i < shotCount; i++) {
-                storyboard.push({
-                    num: i + 1,
-                    scene: scenes[i % scenes.length],
-                    desc: `镜头${i + 1}：${input.substring(0, 20)}... - ${scenes[i % scenes.length]}`,
-                    prompt: `${styleNames[style]} style, ${moodNames[mood]}, ${ratio}, ${prompts[i % prompts.length]}`
-                });
-            }
-
-            const characters = [];
-            for (let i = 0; i < charCount; i++) {
-                characters.push({
-                    name: charNames[i],
-                    desc: `${styleNames[style]}风格角色，${moodNames[mood]}氛围，独特服饰设计，鲜明性格特征`,
-                    prompt: `character design, ${styleNames[style]} style, full body, ${moodNames[mood]}, detailed costume, reference sheet`
-                });
-            }
-
-            const script = [];
-            for (let i = 0; i < shotCount; i++) {
-                script.push({ type: 'action', text: `【${scenes[i % scenes.length]}】画面渐入，镜头推进...` });
-                if (i % 2 === 0) script.push({ type: 'dialogue', speaker: charNames[i % charCount], text: '（角色台词，根据剧情填充）' });
-            }
-
-            return { storyboard, characters, script };
-        }
-
-        function switchTab(tab) {
-            document.querySelectorAll('.result-tab').forEach(t => t.classList.remove('active'));
-            document.querySelector(`.result-tab[data-tab="${tab}"]`).classList.add('active');
-            const content = document.getElementById('resultContent');
-            if (!currentResult) return;
-
-            if (tab === 'storyboard') {
-                content.innerHTML = currentResult.storyboard.map(s => `
-                    <div class="storyboard-item">
-                        <div class="storyboard-num">分镜 ${s.num}</div>
-                        <div class="storyboard-scene">${s.scene}</div>
-                        <div class="storyboard-prompt">${s.prompt}</div>
-                    </div>
-                `).join('');
-            } else if (tab === 'characters') {
-                content.innerHTML = currentResult.characters.map(c => `
-                    <div class="character-card">
-                        <div class="char-name">${c.name}</div>
-                        <div class="char-desc">${c.desc}</div>
-                        <div class="char-desc" style="margin-top:6px;font-style:italic;">提示词：${c.prompt}</div>
-                    </div>
-                `).join('');
-            } else if (tab === 'script') {
-                content.innerHTML = currentResult.script.map(s => {
-                    if (s.type === 'action') return `<div class="script-line"><span class="script-action">${s.text}</span></div>`;
-                    return `<div class="script-line"><span class="script-speaker">${s.speaker}：</span><span class="script-dialogue">${s.text}</span></div>`;
-                }).join('');
-            }
-        }
-
-        function loadSample(idx) {
-            const samples = [
-                '少年林辰意外获得上古神剑，踏上修仙之路，在宗门大比中一鸣惊人，却发现背后隐藏着惊天秘密',
-                '公元2387年，星际探险家在废弃空间站发现了人类起源的线索，却被神秘组织追杀',
-                '转学生苏小雨来到新学校，在樱花飘落的季节，遇见了改变她一生的人'
-            ];
-            document.getElementById('scriptInput').value = samples[idx];
-            generateComic();
-        }
-
-        // ========== 历史记录功能 ==========
-        const HISTORY_KEY = 'ai_comic_history';
-        const MAX_HISTORY = 10;
-
-        function saveToHistory(input, style, shots, chars, mood, ratio, result) {
-            try {
-                const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-                const styleNames = { anime: '日系动漫', realistic: '写实厚涂', ink: '国风水墨', '3d': '3D渲染', pixel: '像素风' };
-                const record = {
-                    id: Date.now(),
-                    time: new Date().toLocaleString('zh-CN'),
-                    input: input.substring(0, 50) + (input.length > 50 ? '...' : ''),
-                    fullInput: input,
-                    style: styleNames[style] || style,
-                    shots: shots,
-                    chars: chars,
-                    mood: mood,
-                    ratio: ratio,
-                    result: result
-                };
-                history.unshift(record);
-                if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
-                localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-            } catch (e) { console.error('保存历史失败', e); }
-        }
-
-        function showHistory() {
-            const modal = document.getElementById('historyModal');
-            const list = document.getElementById('historyList');
-            try {
-                const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-                if (history.length === 0) {
-                    list.innerHTML = '<div class="history-empty">暂无历史记录</div>';
-                } else {
-                    list.innerHTML = history.map(r => `
-                        <div class="history-item" onclick="loadHistoryItem(${r.id})">
-                            <span class="history-item-del" onclick="event.stopPropagation();deleteHistoryItem(${r.id})">删除</span>
-                            <div class="history-item-title">${r.input}</div>
-                            <div class="history-item-meta">
-                                <span>🕐 ${r.time}</span>
-                                <span>🎨 ${r.style}</span>
-                                <span>🎬 ${r.shots}镜</span>
-                                <span>👤 ${r.chars}人</span>
-                            </div>
-                        </div>
-                    `).join('');
-                }
-            } catch (e) {
-                list.innerHTML = '<div class="history-empty">历史记录加载失败</div>';
-            }
-            modal.classList.add('show');
-        }
-
-        function hideHistory() {
-            document.getElementById('historyModal').classList.remove('show');
-        }
-
-        function loadHistoryItem(id) {
-            try {
-                const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-                const record = history.find(r => r.id === id);
-                if (record) {
-                    document.getElementById('scriptInput').value = record.fullInput;
-                    currentResult = record.result;
-                    document.getElementById('resultPanel').classList.add('show');
-                    switchTab('storyboard');
-                    hideHistory();
-                }
-            } catch (e) { console.error('加载历史失败', e); }
-        }
-
-        function deleteHistoryItem(id) {
-            try {
-                let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-                history = history.filter(r => r.id !== id);
-                localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-                showHistory();
-            } catch (e) { console.error('删除历史失败', e); }
-        }
-
-        // ========== 导出功能 ==========
-        function copyAllResult() {
-            if (!currentResult) { alert('请先生成漫剧脚本'); return; }
-            const styleNames = { anime: '日系动漫', realistic: '写实厚涂', ink: '国风水墨', '3d': '3D渲染', pixel: '像素风' };
-            let text = '===== AI漫剧脚本 =====\n\n';
-            text += '【分镜提示词】\n';
-            currentResult.storyboard.forEach(s => {
-                text += `第${s.num}镜 - ${s.scene}\n${s.prompt}\n\n`;
-            });
-            text += '【角色设定】\n';
-            currentResult.characters.forEach(c => {
-                text += `${c.name}：${c.desc}\n提示词：${c.prompt}\n\n`;
-            });
-            text += '【漫剧脚本】\n';
-            currentResult.script.forEach(s => {
-                if (s.type === 'action') text += `${s.text}\n`;
-                else text += `${s.speaker}：${s.text}\n`;
-            });
-            navigator.clipboard.writeText(text).then(() => {
-                alert('✓ 已复制全部内容到剪贴板');
-            }).catch(() => {
-                const ta = document.createElement('textarea');
-                ta.value = text;
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                alert('✓ 已复制全部内容到剪贴板');
-            });
-        }
-
-        function exportResult() {
-            if (!currentResult) { alert('请先生成漫剧脚本'); return; }
-            let text = '===== AI漫剧脚本 =====\n生成时间：' + new Date().toLocaleString('zh-CN') + '\n\n';
-            text += '【分镜提示词】\n';
-            currentResult.storyboard.forEach(s => {
-                text += `第${s.num}镜 - ${s.scene}\n${s.prompt}\n\n`;
-            });
-            text += '【角色设定】\n';
-            currentResult.characters.forEach(c => {
-                text += `${c.name}：${c.desc}\n提示词：${c.prompt}\n\n`;
-            });
-            text += '【漫剧脚本】\n';
-            currentResult.script.forEach(s => {
-                if (s.type === 'action') text += `${s.text}\n`;
-                else text += `${s.speaker}：${s.text}\n`;
-            });
-            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'AI漫剧脚本_' + new Date().toISOString().slice(0,10) + '.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-    </script>
-</body>
-</html>
+    
