@@ -2,8 +2,39 @@
 <html lang="zh-CN" data-theme="night" data-dark="false">
 <head>
     <meta charset="UTF-8">
+    <!-- 夜间模式防闪白：渲染前读取偏好 -->
+    <script>
+    (function(){try{var d=localStorage.getItem('lengmeng_dark_mode')==='true';document.documentElement.setAttribute('data-dark',d?'true':'false');if(localStorage.getItem('lengmeng_visited'))document.documentElement.classList.add('skip-loading');}catch(e){}})();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="LengMeng 个人科技风主页 - 四时动态主题，赛博光影">
+    <meta name="description" content="LengMeng 个人科技风主页 - 跨境电商运营、AI工具、股票行情、动漫音乐，四时动态主题，赛博光影">
+    <meta name="keywords" content="LengMeng,个人网站,跨境电商,亚马逊运营,AI工具,股票行情,科技风主页">
+    <meta name="author" content="LengMeng">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://lengmeng.online/">
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="LengMeng | 个人科技风主页">
+    <meta property="og:description" content="跨境电商运营、AI工具、股票行情、动漫音乐，四时动态主题">
+    <meta property="og:url" content="https://lengmeng.online/">
+    <meta property="og:site_name" content="LengMeng">
+    <meta property="og:locale" content="zh_CN">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="LengMeng | 个人科技风主页">
+    <meta name="twitter:description" content="跨境电商运营、AI工具、股票行情、动漫音乐">
+    <!-- 结构化数据 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "LengMeng",
+        "url": "https://lengmeng.online/",
+        "jobTitle": "跨境电商运营",
+        "knowsAbout": ["亚马逊运营", "跨境电商", "AI工具", "数据分析", "Python"],
+        "sameAs": []
+    }
+    </script>
     <title>LengMeng | 个人科技风主页</title>
     <link rel="stylesheet" href="./css/common.css">
     <link rel="stylesheet" href="./css/animate.css">

@@ -1,7 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN" data-theme="night">
 <head>
     <meta charset="UTF-8">
+    <!-- 夜间模式防闪白 -->
+    <script>
+    (function(){try{var d=localStorage.getItem('lengmeng_dark_mode')==='true';document.documentElement.setAttribute('data-dark',d?'true':'false');if(localStorage.getItem('lengmeng_visited'))document.documentElement.classList.add('skip-loading');}catch(e){}})();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>店铺管理 - 亚马逊异常监控 | LengMeng</title>
     <link rel="stylesheet" href="./css/common.css">

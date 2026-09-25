@@ -1,4 +1,4 @@
-/* ===== 加载动画 ===== */
+﻿/* ===== 加载动画 ===== */
 .loading-box {
     position: fixed;
     top: 0;
@@ -12,6 +12,9 @@
     justify-content: center;
     transition: opacity 0.8s ease, visibility 0.8s ease;
 }
+
+/* 老用户直接隐藏loading */
+html.skip-loading .loading-box { display: none !important; }
 
 .loading-box.hide {
     opacity: 0;

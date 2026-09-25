@@ -1,4 +1,4 @@
-/**
+﻿/**
  * main.js - 全局初始化与统一逻辑
  * 包含：加载动画、实时时钟、页面统一初始化
  * 所有其他模块已在各自文件中自执行，这里做最后的统一收尾
@@ -14,7 +14,16 @@
         const loadingBox = document.getElementById('loadingBox');
         if (!loadingBox) return;
 
-        // 页面资源加载完成后隐藏
+        // 老用户直接跳过开机动画
+        const visited = localStorage.getItem('lengmeng_visited');
+        if (visited) {
+            loadingBox.classList.add('hide');
+            setTimeout(() => { if (loadingBox.parentNode) loadingBox.parentNode.removeChild(loadingBox); }, 100);
+            return;
+        }
+        localStorage.setItem('lengmeng_visited', '1');
+
+        // 首次访问：页面资源加载完成后隐藏
         window.addEventListener('load', () => {
             setTimeout(() => {
                 loadingBox.classList.add('hide');
