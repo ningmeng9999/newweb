@@ -1,0 +1,386 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night" data-dark="false">
+<head>
+    <meta charset="UTF-8">
+    <!-- 夜间模式防闪白 -->
+    <script>
+    (function(){try{var d=localStorage.getItem('lengmeng_dark_mode')==='true';document.documentElement.setAttribute('data-dark',d?'true':'false');if(localStorage.getItem('lengmeng_visited'))document.documentElement.classList.add('skip-loading');}catch(e){}})();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目作品 | LengMeng</title>
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/animate.css">
+    <link rel="stylesheet" href="./css/theme.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <style>
+        .work-cover-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .work-cover:hover .work-cover-img {
+            transform: scale(1.05);
+        }
+        .work-cover {
+            position: relative;
+            overflow: hidden;
+        }
+    
+        /* 项目作品编辑 */
+        .works-loading { text-align: center; padding: 3rem; color: var(--text-muted); grid-column: 1/-1; }
+        .add-work-btn { padding: 0.8rem 2rem; background: linear-gradient(135deg, var(--accent), var(--accent-secondary)); color: #fff; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .add-work-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,212,255,0.3); }
+        .edit-hint { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem; opacity: 0.7; }
+        .work-delete-btn { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; background: rgba(255,107,107,0.9); color: #fff; border: none; border-radius: 50%; font-size: 1rem; cursor: pointer; z-index: 10; opacity: 0; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; }
+        .work-card:hover .work-delete-btn { opacity: 1; }
+        .work-delete-btn:hover { background: #ff4757; transform: scale(1.1); }
+        .work-card { position: relative; }
+        
+        /* 弹窗 */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; }
+        .modal-overlay.show { display: flex; }
+        .modal-box { background: var(--card-bg, #0d1b2a); border: 1px solid var(--border); border-radius: 16px; width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 1.5rem; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; }
+        .modal-title { font-size: 1.1rem; font-weight: 600; color: var(--accent); }
+        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; padding: 4px 8px; border-radius: 6px; }
+        .modal-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.6rem 0.8rem; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 0.85rem; box-sizing: border-box; }
+        .form-group textarea { min-height: 80px; resize: vertical; font-family: inherit; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+        .modal-submit { width: 100%; padding: 0.8rem; background: linear-gradient(135deg, var(--accent), var(--accent-secondary)); color: #fff; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 0.5rem; }
+        .modal-submit:hover { opacity: 0.9; }
+        @media (max-width: 768px) {
+            .form-row { grid-template-columns: 1fr; }
+            .work-delete-btn { opacity: 1; }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="loading-box" id="loadingBox">
+        <div class="loading-core">
+            <div class="loading-ring"></div>
+            <div class="loading-ring ring2"></div>
+            <div class="loading-text">LOADING</div>
+            <div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div>
+        </div>
+    </div>
+
+    <div class="bg-layer" id="bgLayer">
+        <div class="bg-wallpaper"></div>
+        <canvas id="particleCanvas"></canvas>
+        <div class="grid-overlay" id="gridOverlay"></div>
+        <div class="glow-orb orb1"></div>
+        <div class="glow-orb orb2"></div>
+    </div>
+
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="sidebar-mask" id="sidebarMask"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">◆</span>
+            <span class="logo-text">LengMeng</span>
+            <button class="icon-btn dark-btn logo-dark-btn" id="darkBtn" title="切换暗黑模式">
+                <span class="icon-sun">☀</span>
+                <span class="icon-moon">☾</span>
+            </button>
+        </div>
+        <div class="sidebar-tool">
+            <span class="weather-info" id="weatherInfo">
+                <span class="weather-icon">◌</span>
+                <span class="weather-text">加载中...</span>
+            </span>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="index.html"><span class="nav-icon">⌂</span>首页</a></li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle">
+                        <span class="nav-icon">▤</span>工作<span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="blog.html">实用工具</a></li>
+                        <li><a href="finance-news.html">新闻大事</a></li>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle">
+                        <span class="nav-icon">◈</span>生活<span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="cook.html">菜谱</a></li>
+                        <li><a href="stock.html">股票走势</a></li>
+                        <li><a href="anime.html">动漫</a></li>
+                        <li><a href="music.html">在线音乐</a></li>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle">
+                        <span class="nav-icon">⚡</span>AI工具<span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="ecommerce-rpa.html">RPA工具集</a></li>
+                        <li><a href="ai-comic.html">AI漫剧工坊</a></li>
+                    </ul>
+                </li>
+                <li class="active"><a href="works.html"><span class="nav-icon">◆</span>项目作品</a></li>
+                <li><a href="album.html"><span class="nav-icon">▣</span>相册</a></li>
+                <li><a href="about.html"><span class="nav-icon">◉</span>关于我</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-container page-container">
+        <div class="page-header animate-fade-up">
+            <h1 class="page-title">项目作品</h1>
+            <p class="page-subtitle">Works · 精选项目案例</p>
+        </div>
+
+        <div class="filter-bar animate-on-scroll">
+            <button class="filter-btn active" data-filter="all">全部</button>
+            <button class="filter-btn" data-filter="data">数据分析</button>
+            <button class="filter-btn" data-filter="shop">店铺管理</button>
+            <button class="filter-btn" data-filter="web">Web应用</button>
+            <button class="filter-btn" data-filter="ecom">跨境电商</button>
+            <button class="filter-btn" data-filter="ai">AI工具</button>
+        </div>
+
+        <div class="works-grid" id="worksGrid">
+                <div class="works-loading">加载中...</div>
+            </div>
+            
+            <!-- 添加项目按钮 -->
+            <div style="text-align:center;margin-top:2rem">
+                <button class="add-work-btn" onclick="showAddWorkModal()">+ 添加项目</button>
+            </div>/div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2026 LengMeng · All Rights Reserved</p>
+            <p class="footer-link">
+                <a href="https://lengmeng.online" target="_blank">lengmeng.online</a>
+                <span>·</span>
+                <span>Powered by Vercel</span>
+            </p>
+        </div>
+    </footer>
+
+    <audio id="bgMusic" loop muted preload="auto">
+        <source src="./music/bgm.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="./js/theme.js"></script>
+    <script src="./js/animate.js"></script>
+    <script src="./js/weather.js"></script>
+    <script src="./js/music.js"></script>
+    <script src="./js/sentence.js"></script>
+    <script src="./js/visitor.js"></script>
+    <script src="./js/darkmode.js"></script>
+    <script src="./js/main.js"></script>
+
+    <!-- 添加项目弹窗 -->
+    <div class="modal-overlay" id="addWorkModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span class="modal-title">➕ 添加项目</span>
+                <button class="modal-close" onclick="hideAddWorkModal()">✕</button>
+            </div>
+            <div class="form-group">
+                <label>项目名称</label>
+                <input type="text" id="workTitle" placeholder="例如：四时动态个人网站">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>分类</label>
+                    <select id="workCategory">
+                        <option value="data">数据分析</option>
+                        <option value="web">Web应用</option>
+                        <option value="ecom">跨境电商</option>
+                        <option value="ai">AI工具</option>
+                        <option value="shop">店铺管理</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>时间</label>
+                    <input type="text" id="workDate" placeholder="例如：2026.09">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>角色/职位</label>
+                <input type="text" id="workRole" placeholder="例如：独立开发 / 项目负责人">
+            </div>
+            <div class="form-group">
+                <label>项目描述</label>
+                <textarea id="workDesc" placeholder="简要描述项目内容、技术栈、成果..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>技术标签（逗号分隔）</label>
+                <input type="text" id="workTags" placeholder="例如：HTML5,CSS3,JavaScript,Vercel">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>封面图URL</label>
+                    <input type="text" id="workImage" placeholder="留空使用默认图">
+                </div>
+                <div class="form-group">
+                    <label>跳转链接</label>
+                    <input type="text" id="workLink" placeholder="例如：stock.html 或 https://...">
+                </div>
+            </div>
+            <button class="modal-submit" onclick="submitWork()">确认添加</button>
+        </div>
+    </div>
+    
+    <!-- 删除确认弹窗 -->
+    <div class="modal-overlay" id="deleteWorkModal">
+        <div class="modal-box" style="max-width:380px">
+            <div class="modal-header">
+                <span class="modal-title">🗑 删除项目</span>
+                <button class="modal-close" onclick="hideDeleteWorkModal()">✕</button>
+            </div>
+            <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:1rem">请输入删除密码以确认删除此项目：</p>
+            <div class="form-group">
+                <input type="password" id="deletePassword" placeholder="输入删除密码">
+            </div>
+            <button class="modal-submit" style="background:linear-gradient(135deg,#ff6b6b,#ee5a24)" onclick="confirmDelete()">确认删除</button>
+        </div>
+    </div>
+
+
+    <script>
+    let currentWorks = [];
+    let deleteTargetId = null;
+    let currentFilter = 'all';
+    
+    // 加载项目列表
+    async function loadWorks() {
+        const grid = document.getElementById('worksGrid');
+        grid.innerHTML = '<div class="works-loading">加载中...</div>';
+        try {
+            const res = await fetch('./api/works.js');
+            const data = await res.json();
+            currentWorks = data.works || [];
+            renderWorks();
+        } catch(e) {
+            grid.innerHTML = '<div class="works-loading">加载失败，使用默认数据</div>';
+        }
+    }
+    
+    // 渲染项目
+    function renderWorks() {
+        const grid = document.getElementById('worksGrid');
+        const filtered = currentFilter === 'all' ? currentWorks : currentWorks.filter(w => w.category === currentFilter);
+        if (!filtered.length) {
+            grid.innerHTML = '<div class="works-loading">暂无项目</div>';
+            return;
+        }
+        grid.innerHTML = filtered.map(w => {
+            const tags = (w.tags || []).map(t => '<span>' + t + '</span>').join('');
+            const link = w.link ? '<a href="' + w.link + '" class="work-link">查看详情 →</a>' : '<span class="work-link">项目案例</span>';
+            const img = w.image || 'https://picsum.photos/seed/work' + w.id + '/400/200';
+            return '<article class="work-card animate-on-scroll" data-category="' + (w.category||'') + '">' +
+                '<button class="work-delete-btn" onclick="event.preventDefault();showDeleteWorkModal(' + w.id + ')">×</button>' +
+                '<div class="work-cover"><img src="' + img + '" alt="' + (w.title||'') + '" class="work-cover-img" loading="lazy"><div class="work-overlay">' + link + '</div></div>' +
+                '<div class="work-info"><h3 class="work-title">' + (w.title||'') + '</h3>' +
+                '<p class="work-meta">' + (w.date||'') + ' · ' + (w.role||'') + '</p>' +
+                '<p class="work-desc">' + (w.desc||'') + '</p>' +
+                '<div class="work-tags">' + tags + '</div></div></article>';
+        }).join('');
+    }
+    
+    // 筛选
+    document.addEventListener('DOMContentLoaded', function() {
+        loadWorks();
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                renderWorks();
+            });
+        });
+    });
+    
+    // 添加项目弹窗
+    function showAddWorkModal() { document.getElementById('addWorkModal').classList.add('show'); }
+    function hideAddWorkModal() { document.getElementById('addWorkModal').classList.remove('show'); }
+    
+    async function submitWork() {
+        const title = document.getElementById('workTitle').value.trim();
+        if (!title) { alert('请输入项目名称'); return; }
+        const item = {
+            title: title,
+            category: document.getElementById('workCategory').value,
+            date: document.getElementById('workDate').value.trim(),
+            role: document.getElementById('workRole').value.trim(),
+            desc: document.getElementById('workDesc').value.trim(),
+            tags: document.getElementById('workTags').value.split(',').map(t => t.trim()).filter(t => t),
+            image: document.getElementById('workImage').value.trim(),
+            link: document.getElementById('workLink').value.trim()
+        };
+        try {
+            const res = await fetch('./api/works.js', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(item)
+            });
+            const data = await res.json();
+            if (data.ok) {
+                currentWorks = data.works;
+                renderWorks();
+                hideAddWorkModal();
+                // 清空表单
+                ['workTitle','workDate','workRole','workDesc','workTags','workImage','workLink'].forEach(id => document.getElementById(id).value = '');
+                alert('添加成功！');
+            } else {
+                alert('添加失败：' + (data.message || data.error || '未知错误'));
+            }
+        } catch(e) {
+            alert('添加失败：' + e.message);
+        }
+    }
+    
+    // 删除项目弹窗
+    function showDeleteWorkModal(id) { deleteTargetId = id; document.getElementById('deleteWorkModal').classList.add('show'); }
+    function hideDeleteWorkModal() { deleteTargetId = null; document.getElementById('deleteWorkModal').classList.remove('show'); document.getElementById('deletePassword').value = ''; }
+    
+    async function confirmDelete() {
+        const pwd = document.getElementById('deletePassword').value;
+        if (!pwd) { alert('请输入密码'); return; }
+        try {
+            const res = await fetch('./api/works.js', {
+                method: 'DELETE',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({id: deleteTargetId, password: pwd})
+            });
+            const data = await res.json();
+            if (data.ok) {
+                currentWorks = data.works;
+                renderWorks();
+                hideDeleteWorkModal();
+                alert('删除成功！');
+            } else {
+                alert('删除失败：' + (data.error || '密码错误'));
+            }
+        } catch(e) {
+            alert('删除失败：' + e.message);
+        }
+    }
+    
+    // 点击遮罩关闭弹窗
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('show');
+        });
+    });
+    </script>
+
+</body>
+</html>

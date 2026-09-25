@@ -1,0 +1,10 @@
+{
+  "name": "lengmeng-site",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "nodemailer": "^6.9.7",
+    "aws4": "^1.12.0",
+    "axios": "^1.6.0"
+  }
+}

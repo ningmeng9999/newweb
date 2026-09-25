@@ -1,0 +1,305 @@
+/* ===== 全局重置 ===== */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+    transition: background 0.8s ease, color 0.5s ease;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.3s ease;
+}
+
+ul, ol, li {
+    list-style: none;
+}
+
+button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: inherit;
+    color: inherit;
+}
+
+input, textarea {
+    font-family: inherit;
+    outline: none;
+    border: none;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+/* ===== CSS 变量（默认） ===== */
+:root {
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --text-muted: rgba(255, 255, 255, 0.45);
+    --accent: #00d4ff;
+    --accent-secondary: #7b2cbf;
+    --accent-glow: rgba(0, 212, 255, 0.4);
+    --border: rgba(255, 255, 255, 0.12);
+    --border-hover: rgba(0, 212, 255, 0.5);
+    --card-bg: rgba(255, 255, 255, 0.04);
+    --card-bg-hover: rgba(255, 255, 255, 0.08);
+    --navbar-bg: rgba(10, 10, 26, 0.6);
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --radius: 12px;
+    --radius-sm: 8px;
+}
+
+/* ===== 通用布局 ===== */
+.main-container {
+    width: calc(100% - 220px);
+    margin-left: 220px;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+}
+
+.page-container {
+    padding: 3rem 2rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* 内容页：在侧边栏右侧空间内居中，避免重叠 */
+.main-container.page-container {
+    margin-left: 220px;
+    margin-right: 0;
+    max-width: none;
+    width: auto;
+    padding-left: max(2rem, calc((100vw - 220px - 1200px) / 2));
+    padding-right: max(2rem, calc((100vw - 220px - 1200px) / 2));
+}
+
+.index-main {
+    padding-top: 0;
+}
+
+/* ===== 页面头部 ===== */
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+}
+
+/* ===== 卡片通用 ===== */
+.content-card, .profile-card, .info-card, .sidebar-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.8rem;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.content-card:hover, .profile-card:hover, .info-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 0 24px var(--accent-glow);
+    transform: translateY(-2px);
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-left: 0.8rem;
+    border-left: 3px solid var(--accent);
+    color: var(--text-primary);
+}
+
+.card-content {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.8;
+}
+
+.card-content p {
+    margin-bottom: 0.8rem;
+}
+
+.card-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* ===== 科技风按钮 ===== */
+.tech-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.8rem;
+    border-radius: 30px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    border: none;
+}
+
+.tech-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.tech-btn:hover::before {
+    left: 100%;
+}
+
+.tech-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--accent-glow);
+}
+
+.tech-btn.outline {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+}
+
+.tech-btn.outline:hover {
+    background: var(--accent);
+    color: #fff;
+}
+
+.btn-arrow {
+    transition: transform 0.3s ease;
+}
+
+.tech-btn:hover .btn-arrow {
+    transform: translateX(4px);
+}
+
+/* ===== 图标按钮 ===== */
+.icon-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.icon-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 12px var(--accent-glow);
+    transform: scale(1.05);
+}
+
+/* ===== 页脚 ===== */
+.footer {
+    position: relative;
+    z-index: 1;
+    margin-left: 220px;
+    padding: 2rem;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    background: var(--card-bg);
+    backdrop-filter: blur(8px);
+}
+
+.footer-content p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 0.3rem;
+}
+
+.footer-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.footer-link a {
+    color: var(--accent);
+}
+
+.footer-link a:hover {
+    text-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 992px) {
+    html { font-size: 15px; }
+    .main-container,
+    .main-container.page-container {
+        width: 100%;
+        margin-left: 0;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+    .page-container { padding-top: 5rem; }
+    .footer { margin-left: 0; }
+}
+
+@media (max-width: 768px) {
+    html { font-size: 14px; }
+    .page-title { font-size: 2rem; }
+    .main-container,
+    .main-container.page-container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    .content-card, .profile-card, .info-card, .sidebar-card { padding: 1.3rem; }
+}
+
+@media (max-width: 480px) {
+    html { font-size: 13px; }
+}
