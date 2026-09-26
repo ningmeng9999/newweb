@@ -516,16 +516,39 @@
     }
 
     // ===== 历史交易记录渲染 =====
+    let currentMonthFilter = '';
+    
     function renderHistory() {
         const tbody = document.getElementById('historyTbody');
         if (!tbody) return;
-        if (!history.length) {
-            tbody.innerHTML = '<tr class="empty-row"><td colspan="9">暂无历史交易记录</td></tr>';
+        
+        // 更新月份筛选选项
+        const monthFilter = document.getElementById('historyMonthFilter');
+        if (monthFilter) {
+            const months = [...new Set(history.map(h => h.removeDate ? h.removeDate.slice(0,7) : ''))].sort().reverse();
+            const currentVal = monthFilter.value;
+            monthFilter.innerHTML = '<option value="">全部月份</option>' + 
+                months.map(m => '<option value="' + m + '"' + (m === currentVal ? ' selected' : '') + '>' + m + '</option>').join('');
+        }
+        
+        // 筛选
+        let filtered = history;
+        if (currentMonthFilter) {
+            filtered = history.filter(h => h.removeDate && h.removeDate.startsWith(currentMonthFilter));
+        }
+        
+        if (!filtered.length) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="13">暂无历史交易记录</td></tr>';
+            updateHistoryStats(filtered);
             return;
         }
         tbody.innerHTML = '';
-        history.forEach(h => {
+        filtered.forEach(h => {
             const dir = h.pnl > 0.01 ? 'up' : (h.pnl < -0.01 ? 'down' : 'flat');
+            const holdDays = h.holdDays || '--';
+            const addCount = h.addCount || 1;
+            const judgment = h.judgment || '--';
+            const note = h.note || '--';
             const tr = document.createElement('tr');
             tr.innerHTML =
                 '<td><strong>' + h.name + '</strong></td>' +
@@ -536,16 +559,50 @@
                 '<td>¥' + h.sellPrice.toFixed(2) + '</td>' +
                 '<td>' + h.shares + '</td>' +
                 '<td class="pnl-' + dir + '">' + (h.pnl >= 0 ? '+' : '') + '¥' + h.pnl.toFixed(2) + '</td>' +
-                '<td class="pnl-' + dir + '">' + (h.pnlRate >= 0 ? '+' : '') + h.pnlRate.toFixed(2) + '%</td>';
+                '<td class="pnl-' + dir + '">' + (h.pnlRate >= 0 ? '+' : '') + h.pnlRate.toFixed(2) + '%</td>' +
+                '<td>' + holdDays + '天</td>' +
+                '<td>' + addCount + '次</td>' +
+                '<td style="font-size:0.85rem">' + judgment + '</td>' +
+                '<td style="font-size:0.85rem;max-width:120px;overflow:hidden;text-overflow:ellipsis" title="' + note + '">' + note + '</td>';
             tbody.appendChild(tr);
         });
-        // 历史统计
-        const totalPnl = history.reduce((s, h) => s + h.pnl, 0);
-        const winCount = history.filter(h => h.pnl > 0).length;
+        updateHistoryStats(filtered);
+    }
+    
+    function updateHistoryStats(filtered) {
+        const hist = filtered || history;
+        const totalPnl = hist.reduce((s, h) => s + h.pnl, 0);
+        const winCount = hist.filter(h => h.pnl > 0).length;
         const statEl = document.getElementById('historyStat');
         if (statEl) {
             const dir = totalPnl >= 0 ? 'up' : 'down';
-            statEl.innerHTML = '共 <strong>' + history.length + '</strong> 笔 | 盈利 <strong class="pnl-up">' + winCount + '</strong>  | 总盈亏 <strong class="pnl-' + dir + '">' + (totalPnl >= 0 ? '+' : '') + '' + totalPnl.toFixed(2) + '</strong>';
+            statEl.innerHTML = '共 <strong>' + hist.length + '</strong> 笔 | 盈利 <strong class="pnl-up">' + winCount + '</strong>  | 总盈亏 <strong class="pnl-' + dir + '">' + (totalPnl >= 0 ? '+' : '') + '' + totalPnl.toFixed(2) + '</strong>';
+        }
+        
+        // 计算总资产
+        const INITIAL_CAPITAL = 50000;
+        const realizedPnl = history.reduce((s, h) => s + h.pnl, 0);
+        const unrealizedPnl = quotes && favorites.length ? favorites.reduce((s, f) => {
+            const q = quotes[f.code];
+            if (!q || !f.buyPrice) return s;
+            return s + (q.price - f.buyPrice) * SHARES;
+        }, 0) : 0;
+        const totalAssets = INITIAL_CAPITAL + realizedPnl + unrealizedPnl;
+        const totalProfit = realizedPnl + unrealizedPnl;
+        const totalRate = INITIAL_CAPITAL ? (totalProfit / INITIAL_CAPITAL * 100) : 0;
+        
+        const assetsEl = document.getElementById('totalAssets');
+        const profitEl = document.getElementById('totalProfit');
+        const rateEl = document.getElementById('totalProfitRate');
+        
+        if (assetsEl) assetsEl.textContent = '¥' + totalAssets.toFixed(2);
+        if (profitEl) {
+            profitEl.textContent = (totalProfit >= 0 ? '+' : '') + '¥' + totalProfit.toFixed(2);
+            profitEl.className = totalProfit >= 0 ? 'pnl-up' : 'pnl-down';
+        }
+        if (rateEl) {
+            rateEl.textContent = (totalRate >= 0 ? '+' : '') + totalRate.toFixed(2) + '%';
+            rateEl.className = totalRate >= 0 ? 'pnl-up' : 'pnl-down';
         }
     }
 
@@ -3142,11 +3199,30 @@
             const sellPrice = (quote && quote.price > 0) ? quote.price : fav.buyPrice;
             const pnl = (sellPrice - fav.buyPrice) * SHARES;
             const pnlRate = fav.buyPrice ? ((sellPrice - fav.buyPrice) / fav.buyPrice) * 100 : 0;
+            
+            // 计算持股天数
+            const buyDate = new Date(fav.addDate);
+            const sellDate = new Date();
+            const holdDays = Math.max(1, Math.ceil((sellDate - buyDate) / (1000 * 60 * 60 * 24)));
+            
+            // 加仓笔数（默认1，可后续扩展）
+            const addCount = fav.addCount || 1;
+            
+            // 弹出备注输入
+            let note = '';
+            let judgment = '';
+            try {
+                judgment = prompt('卖出判断（感性/理性）：') || '';
+                note = prompt('备注（可选）：') || '';
+            } catch(e) {}
+            
             history.unshift({
                 code: fav.code, name: fav.name,
                 buyPrice: fav.buyPrice, sellPrice: sellPrice,
                 addDate: fav.addDate, removeDate: new Date().toISOString().slice(0, 10),
-                pnl: Math.round(pnl * 100) / 100, pnlRate: Math.round(pnlRate * 100) / 100, shares: SHARES
+                pnl: Math.round(pnl * 100) / 100, pnlRate: Math.round(pnlRate * 100) / 100, 
+                shares: SHARES, holdDays: holdDays, addCount: addCount,
+                judgment: judgment, note: note
             });
             if (history.length > 200) history = history.slice(0, 200);
             saveHistory();
@@ -3289,7 +3365,8 @@
 
 
     // ===== 盈利云图 =====
-
+    let cloudSourceType = 'current'; // current | history
+    
     function renderCloud() {
 
         if (!cloudCanvas) return;
@@ -3308,18 +3385,30 @@
 
         ctx.clearRect(0, 0, W, H);
 
-        if (!favorites.length) {
-
+        // 根据数据源类型选择数据
+        let cloudData;
+        if (cloudSourceType === 'history') {
+            cloudData = history.map(h => ({
+                name: h.name, code: h.code,
+                rate: h.pnlRate || 0,
+                value: Math.abs(h.pnl) || 1
+            }));
+        } else {
+            cloudData = favorites.map(fav => {
+                const quote = quotes[fav.code];
+                const price = quote ? quote.price : fav.buyPrice;
+                const rate = fav.buyPrice ? ((price - fav.buyPrice) / fav.buyPrice) * 100 : 0;
+                const value = price * SHARES;
+                return { ...fav, price, rate, value };
+            });
+        }
+        
+        if (!cloudData.length) {
             ctx.fillStyle = 'rgba(255,255,255,0.3)';
-
             ctx.font = '16px sans-serif';
-
             ctx.textAlign = 'center';
-
-            ctx.fillText('添加自选股后显示盈利云图', W / 2, H / 2);
-
+            ctx.fillText(cloudSourceType === 'history' ? '暂无历史交易数据' : '添加自选股后显示盈利云图', W / 2, H / 2);
             return;
-
         }
 
         const padL = 60, padR = 30, padT = 30, padB = 50;
@@ -4539,6 +4628,38 @@
     if (clearHistoryBtn) clearHistoryBtn.addEventListener('click', () => {
 
         if (confirm('clear all history?')) { history = []; saveHistory(); renderHistory(); }
+        
+        // 月份筛选
+        const monthFilter = document.getElementById('historyMonthFilter');
+        if (monthFilter) {
+            monthFilter.addEventListener('change', function() {
+                currentMonthFilter = this.value;
+                renderHistory();
+            });
+        }
+        
+        // 重置资金按钮
+        const resetBtn = document.getElementById('resetCapitalBtn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function() {
+                if (confirm('确定重置资金为5万元？\n当前历史交易记录将保留，但盈亏计算将从重置后重新开始。')) {
+                    history = [];
+                    saveHistory();
+                    renderHistory();
+                    updateHistoryStats();
+                }
+            });
+        }
+        
+        // 云图数据源切换
+        document.querySelectorAll('[data-source-type]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-source-type]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                cloudSourceType = this.dataset.sourceType;
+                renderCloud();
+            });
+        });
 
     });
 

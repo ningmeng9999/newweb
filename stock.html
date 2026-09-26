@@ -220,17 +220,28 @@
             <div class="section-header">
                 <h2 class="section-h2">历史交易记录</h2>
                 <div class="section-actions">
+                    <select id="historyMonthFilter" style="font-size:0.8rem;padding:0.3rem 0.6rem;border-radius:6px;background:var(--bg-card);color:var(--text);border:1px solid var(--border)">
+                        <option value="">全部月份</option>
+                    </select>
                     <span class="section-tip" id="historyStat" style="font-size:0.85rem;color:var(--text-muted)"></span>
+                    <button class="stock-btn outline" id="resetCapitalBtn" style="font-size:0.8rem;padding:0.3rem 0.8rem">重置资金(5万)</button>
                     <button class="stock-btn outline" id="clearHistoryBtn" style="font-size:0.8rem;padding:0.3rem 0.8rem">清空记录</button>
                 </div>
+            </div>
+            <div style="margin-bottom:1rem;padding:0.8rem 1rem;background:var(--bg-card);border-radius:10px;border:1px solid var(--border);display:flex;gap:2rem;flex-wrap:wrap;font-size:0.9rem">
+                <span>初始资金：<strong style="color:var(--text)">¥50,000</strong></span>
+                <span>当前总资产：<strong id="totalAssets" style="color:var(--text)">¥50,000</strong></span>
+                <span>累计收益：<strong id="totalProfit" class="pnl-up">¥0</strong></span>
+                <span>累计收益率：<strong id="totalProfitRate" class="pnl-up">0%</strong></span>
             </div>
             <div class="table-wrap">
                 <table class="stock-table">
                     <thead><tr>
                         <th>股票名称</th><th>代码</th><th>买入日期</th><th>卖出日期</th>
                         <th>买入价</th><th>卖出价</th><th>股数</th><th>盈亏</th><th>收益率</th>
+                        <th>持股天数</th><th>加仓笔数</th><th>判断</th><th>备注</th>
                     </tr></thead>
-                    <tbody id="historyTbody"><tr class="empty-row"><td colspan="9">暂无历史交易记录</td></tr></tbody>
+                    <tbody id="historyTbody"><tr class="empty-row"><td colspan="13">暂无历史交易记录</td></tr></tbody>
                 </table>
             </div>
         </section>
@@ -264,6 +275,10 @@
                 <h2 class="section-h2">持仓分析</h2>
                 <div class="section-actions">
                     <div class="view-toggle">
+                        <button class="view-btn active" data-source-type="current">自选收益</button>
+                        <button class="view-btn" data-source-type="history">历史收益</button>
+                    </div>
+                    <div class="view-toggle" style="margin-left:0.5rem">
                         <button class="view-btn active" data-view="bubble">气泡云图</button>
                         <button class="view-btn" data-view="heatmap">热力矩形图</button>
                     </div>
@@ -354,6 +369,6 @@
     <script src="./js/visitor.js"></script>
     <script src="./js/darkmode.js"></script>
     <script src="./js/main.js?v=2"></script>
-    <script src="./js/stock.js?v=2"></script>
+    <script src="./js/stock.js?v=3"></script>
 </body>
 </html>
