@@ -515,12 +515,52 @@
         }
     }
 
+    // ===== 当前持仓汇总 =====
+    function updateCurrentPositionSummary() {
+        const INITIAL_CAPITAL = 50000;
+        const realizedPnl = history.reduce((s, h) => s + h.pnl, 0);
+        
+        let unrealizedPnl = 0;
+        let positionValue = 0;
+        let positionCost = 0;
+        
+        favorites.forEach(fav => {
+            const q = quotes[fav.code];
+            const price = q ? q.price : fav.buyPrice;
+            const shares = fav.shares || SHARES;
+            unrealizedPnl += (price - fav.buyPrice) * shares;
+            positionValue += price * shares;
+            positionCost += fav.buyPrice * shares;
+        });
+        
+        const totalAssets = INITIAL_CAPITAL + realizedPnl + unrealizedPnl;
+        const totalProfit = realizedPnl + unrealizedPnl;
+        const totalRate = INITIAL_CAPITAL ? (totalProfit / INITIAL_CAPITAL * 100) : 0;
+        
+        const assetsEl = document.getElementById('totalAssets');
+        const profitEl = document.getElementById('totalProfit');
+        const rateEl = document.getElementById('totalProfitRate');
+        
+        if (assetsEl) assetsEl.textContent = '¥' + totalAssets.toFixed(2);
+        if (profitEl) {
+            profitEl.textContent = (totalProfit >= 0 ? '+' : '') + '¥' + totalProfit.toFixed(2);
+            profitEl.className = totalProfit >= 0 ? 'pnl-up' : 'pnl-down';
+        }
+        if (rateEl) {
+            rateEl.textContent = (totalRate >= 0 ? '+' : '') + totalRate.toFixed(2) + '%';
+            rateEl.className = totalRate >= 0 ? 'pnl-up' : 'pnl-down';
+        }
+    }
+
     // ===== 历史交易记录渲染 =====
     let currentMonthFilter = '';
     
     function renderHistory() {
         const tbody = document.getElementById('historyTbody');
         if (!tbody) return;
+        
+        // 显示当前持仓汇总
+        updateCurrentPositionSummary();
         
         // 更新月份筛选选项
         const monthFilter = document.getElementById('historyMonthFilter');
@@ -585,7 +625,8 @@
         const unrealizedPnl = quotes && favorites.length ? favorites.reduce((s, f) => {
             const q = quotes[f.code];
             if (!q || !f.buyPrice) return s;
-            return s + (q.price - f.buyPrice) * SHARES;
+            const shares = f.shares || SHARES;
+            return s + (q.price - f.buyPrice) * shares;
         }, 0) : 0;
         const totalAssets = INITIAL_CAPITAL + realizedPnl + unrealizedPnl;
         const totalProfit = realizedPnl + unrealizedPnl;
@@ -3191,13 +3232,40 @@
 
 
 
+    function addPosition(code) {
+        const fav = favorites.find(f => f.code === code);
+        if (!fav) return;
+        
+        const quote = quotes[code];
+        const addPrice = (quote && quote.price > 0) ? quote.price : fav.buyPrice;
+        
+        // 计算新均价
+        const oldShares = fav.shares || SHARES;
+        const oldCost = fav.buyPrice * oldShares;
+        const addCost = addPrice * SHARES;
+        const newShares = oldShares + SHARES;
+        const newAvgPrice = (oldCost + addCost) / newShares;
+        
+        if (confirm('确定加仓 ' + fav.name + ' 100股？\n加仓价：¥' + addPrice.toFixed(2) + '\n原均价：¥' + fav.buyPrice.toFixed(2) + '\n新均价：¥' + newAvgPrice.toFixed(2))) {
+            fav.buyPrice = Math.round(newAvgPrice * 100) / 100;
+            fav.shares = newShares;
+            fav.addCount = (fav.addCount || 1) + 1;
+            fav.lastAddDate = new Date().toISOString().slice(0, 10);
+            
+            saveFavorites();
+            syncToServer();
+            renderAll();
+        }
+    }
+
     function removeFromFavorites(code) {
 
         const fav = favorites.find(f => f.code === code);
         if (fav) {
             const quote = quotes[code];
             const sellPrice = (quote && quote.price > 0) ? quote.price : fav.buyPrice;
-            const pnl = (sellPrice - fav.buyPrice) * SHARES;
+            const totalShares = fav.shares || SHARES;
+            const pnl = (sellPrice - fav.buyPrice) * totalShares;
             const pnlRate = fav.buyPrice ? ((sellPrice - fav.buyPrice) / fav.buyPrice) * 100 : 0;
             
             // 计算持股天数
@@ -3221,7 +3289,7 @@
                 buyPrice: fav.buyPrice, sellPrice: sellPrice,
                 addDate: fav.addDate, removeDate: new Date().toISOString().slice(0, 10),
                 pnl: Math.round(pnl * 100) / 100, pnlRate: Math.round(pnlRate * 100) / 100, 
-                shares: SHARES, holdDays: holdDays, addCount: addCount,
+                shares: totalShares, holdDays: holdDays, addCount: addCount,
                 judgment: judgment, note: note
             });
             if (history.length > 200) history = history.slice(0, 200);
@@ -3268,6 +3336,9 @@
 
             const tr = document.createElement('tr');
 
+            const totalShares = (fav.shares || SHARES);
+            const addCount = fav.addCount || 1;
+            
             tr.innerHTML = `
 
                 <td><strong class="stock-name-link" data-code="${fav.code}" data-name="${fav.name}" style="cursor:pointer;color:var(--accent,#00d4ff);text-decoration:underline">${fav.name}</strong></td>
@@ -3276,19 +3347,22 @@
 
                 <td>${fav.addDate}</td>
 
-                <td>¥${fav.buyPrice.toFixed(2)}</td>
+                <td>¥${fav.buyPrice.toFixed(2)}<br><small style="color:var(--text-muted);font-size:0.75rem">加仓${addCount}次</small></td>
 
                 <td>¥${price.toFixed(2)}${hasQuote ? '' : ' (成本)'}</td>
 
                 <td class="pnl-${dir}">${hasQuote ? (dir === 'up'  ? '+' : '') + rate.toFixed(2) + '%' : '--'}</td>
 
-                <td>${SHARES}</td>
+                <td>${totalShares}</td>
 
                 <td class="pnl-${pnlDir}">${pnl >= 0 ? '+' : ''}¥${pnl.toFixed(2)}</td>
 
                 <td class="pnl-${pnlDir}">${pnl >= 0 ? '+' : ''}${pnlRate.toFixed(2)}%</td>
 
-                <td><button class="kline-btn" data-code="${fav.code}" data-name="${fav.name}">📈 走势</button></td>
+                <td>
+                    <button class="kline-btn" data-code="${fav.code}" data-name="${fav.name}">📈 走势</button>
+                    <button class="add-btn" data-code="${fav.code}" style="margin-top:0.3rem;font-size:0.75rem;padding:0.2rem 0.5rem">➕ 加仓</button>
+                </td>
 
                 <td><button class="del-btn" data-code="${fav.code}">移除</button></td>
 
@@ -3306,6 +3380,11 @@
 
             });
 
+        });
+
+        // 加仓按钮
+        stockTbody.querySelectorAll('.add-btn').forEach(btn => {
+            btn.addEventListener('click', () => addPosition(btn.dataset.code));
         });
 
         stockTbody.querySelectorAll('.kline-btn, .stock-name-link').forEach(btn => {

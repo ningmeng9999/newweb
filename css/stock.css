@@ -1247,3 +1247,44 @@
         grid-auto-flow: row;
     }
 }
+
+/* ===== 历史交易表格优化 ===== */
+#historyTbody td {
+    padding: 0.55rem 0.7rem;
+    font-size: 0.82rem;
+}
+#historyTbody td:nth-child(12) {
+    max-width: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#historyTbody td:nth-child(13) {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 加仓按钮样式 */
+.add-btn {
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 212, 255, 0.4);
+    background: transparent;
+    color: #00d4ff;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+}
+.add-btn:hover {
+    background: rgba(0, 212, 255, 0.15);
+}
+
+/* 月份筛选下拉框 */
+#historyMonthFilter {
+    outline: none;
+    cursor: pointer;
+}
+#historyMonthFilter option {
+    background: var(--card-bg);
+    color: var(--text-primary);
+}
