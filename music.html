@@ -198,7 +198,8 @@
 </head>
 <body>
     <div class="loading-box" id="loadingBox"><div class="loading-core"><div class="loading-ring"></div><div class="loading-ring ring2"></div><div class="loading-text">LOADING</div><div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div></div></div>
-    <div class="bg-layer" id="bgLayer"><div class="bg-wallpaper"></div><canvas id="particleCanvas"></canvas><div class="grid-overlay" id="gridOverlay"></div><div class="glow-orb orb1"></div><div class="glow-orb orb2"></div></div>
+    <div class="bg-layer" id="bgLayer"><div class="bg-wallpaper"></div><canvas id="particleCanvas"></canvas><div class="grid-overlay" id="gridOverlay"></div><div class="glow-orb orb1"></div><div class="glow-orb orb2"></div>
+        <div class="glow-orb orb3"></div></div>
     <button class="sidebar-toggle" id="sidebarToggle">☰</button>
     <div class="sidebar-mask" id="sidebarMask"></div>
     <aside class="sidebar" id="sidebar">
@@ -264,12 +265,6 @@
                     </div>
                 </div>
             </div>
-                <div class="vis-mode-bar">
-                    <div class="vis-mode-btn active" data-mode="bars" onclick="setVisMode('bars')">柱状</div>
-                    <div class="vis-mode-btn" data-mode="circle" onclick="setVisMode('circle')">环形</div>
-                    <div class="vis-mode-btn" data-mode="wave" onclick="setVisMode('wave')">波形</div>
-                    <div class="vis-mode-btn" data-mode="particles" onclick="setVisMode('particles')">粒子</div>
-                </div>
             </div>
 
             <!-- 模式切换 -->

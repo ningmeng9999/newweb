@@ -310,6 +310,10 @@
                 e.preventDefault();
                 const parent = toggle.closest('.has-submenu');
                 if (parent) {
+                    // 手风琴模式：关闭其他展开的菜单
+                    document.querySelectorAll('.has-submenu.open').forEach(item => {
+                        if (item !== parent) item.classList.remove('open');
+                    });
                     parent.classList.toggle('open');
                 }
             });

@@ -4707,39 +4707,39 @@
     if (clearHistoryBtn) clearHistoryBtn.addEventListener('click', () => {
 
         if (confirm('clear all history?')) { history = []; saveHistory(); renderHistory(); }
-        
-        // 月份筛选
-        const monthFilter = document.getElementById('historyMonthFilter');
-        if (monthFilter) {
-            monthFilter.addEventListener('change', function() {
-                currentMonthFilter = this.value;
-                renderHistory();
-            });
-        }
-        
-        // 重置资金按钮
-        const resetBtn = document.getElementById('resetCapitalBtn');
-        if (resetBtn) {
-            resetBtn.addEventListener('click', function() {
-                if (confirm('确定重置资金为5万元？\n当前历史交易记录将保留，但盈亏计算将从重置后重新开始。')) {
-                    history = [];
-                    saveHistory();
-                    renderHistory();
-                    updateHistoryStats();
-                }
-            });
-        }
-        
-        // 云图数据源切换
-        document.querySelectorAll('[data-source-type]').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('[data-source-type]').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                cloudSourceType = this.dataset.sourceType;
-                renderCloud();
-            });
-        });
 
+    });
+
+    // 月份筛选
+    const monthFilter = document.getElementById('historyMonthFilter');
+    if (monthFilter) {
+        monthFilter.addEventListener('change', function() {
+            currentMonthFilter = this.value;
+            renderHistory();
+        });
+    }
+    
+    // 重置资金按钮
+    const resetBtn = document.getElementById('resetCapitalBtn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+            if (confirm('确定重置资金为5万元？\n当前历史交易记录将保留，但盈亏计算将从重置后重新开始。')) {
+                history = [];
+                saveHistory();
+                renderHistory();
+                updateHistoryStats();
+            }
+        });
+    }
+    
+    // 云图数据源切换
+    document.querySelectorAll('[data-source-type]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('[data-source-type]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            cloudSourceType = this.dataset.sourceType;
+            renderCloud();
+        });
     });
 
     if (importBtn) importBtn.addEventListener('click', () => importFile.click());

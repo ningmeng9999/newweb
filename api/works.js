@@ -18,12 +18,12 @@ function sendJson(res, statusCode, data) {
 }
 
 function kvConfigured() {
-    return !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+    return !!(process.env.KV_REST_API_URL || 'https://helpful-koala-298503.upstash.io' && process.env.KV_REST_API_TOKEN || 'gQAAAAAABI4HAAIgcDE1ZjEyN2E3OGNhNjk0OTk5YWFjZmU2MDI3YTM2MmU5Mw');
 }
 
 function kvRequest(method, path, body) {
     return new Promise((resolve, reject) => {
-        const base = process.env.KV_REST_API_URL.replace(/\/$/, '');
+        const base = process.env.KV_REST_API_URL || 'https://helpful-koala-298503.upstash.io'.replace(/\/$/, '');
         const url = new URL(base + path);
         const data = body ? JSON.stringify(body) : null;
         const options = {
@@ -32,7 +32,7 @@ function kvRequest(method, path, body) {
             path: url.pathname + url.search,
             method: method,
             headers: {
-                'Authorization': 'Bearer ' + process.env.KV_REST_API_TOKEN,
+                'Authorization': 'Bearer ' + process.env.KV_REST_API_TOKEN || 'gQAAAAAABI4HAAIgcDE1ZjEyN2E3OGNhNjk0OTk5YWFjZmU2MDI3YTM2MmU5Mw',
                 'Content-Type': 'application/json'
             }
         };

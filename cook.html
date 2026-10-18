@@ -2,7 +2,6 @@
 <html lang="zh-CN" data-theme="night" data-dark="false">
 <head>
     <meta charset="UTF-8">
-    <!-- 夜间模式防闪白 -->
     <script>
     (function(){try{var d=localStorage.getItem('lengmeng_dark_mode')==='true';document.documentElement.setAttribute('data-dark',d?'true':'false');if(localStorage.getItem('lengmeng_visited'))document.documentElement.classList.add('skip-loading');}catch(e){}})();
     </script>
@@ -12,70 +11,60 @@
     <link rel="stylesheet" href="./css/animate.css">
     <link rel="stylesheet" href="./css/theme.css">
     <link rel="stylesheet" href="./css/style.css">
+    <style>
+        .cook-page { padding: 30px; max-width: 1200px; margin: 0 auto; }
+        .cook-header { text-align: center; margin-bottom: 30px; }
+        .cook-title { font-size: 2rem; font-weight: 700; background: linear-gradient(90deg, #ff6b6b, #ffa502); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+        .cook-sub { color: var(--text-secondary, #8892b0); font-size: 0.95rem; }
+        .cook-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .cook-card { background: rgba(17,34,64,.85); border: 1px solid rgba(255,165,2,.15); border-radius: 14px; overflow: hidden; transition: all 0.3s; cursor: pointer; text-decoration: none; color: inherit; display: block; }
+        .cook-card:hover { transform: translateY(-4px); border-color: rgba(255,165,2,.4); box-shadow: 0 8px 25px rgba(255,107,107,0.15); }
+        .cook-img { height: 180px; background-size: cover; background-position: center; position: relative; }
+        .cook-badge { position: absolute; top: 12px; right: 12px; padding: 4px 10px; border-radius: 10px; font-size: 0.72rem; font-weight: 600; }
+        .cook-badge.hot { background: rgba(255,107,107,0.9); color: #fff; }
+        .cook-badge.easy { background: rgba(46,213,115,0.9); color: #fff; }
+        .cook-badge.quick { background: rgba(255,165,2,0.9); color: #fff; }
+        .cook-info { padding: 16px; }
+        .cook-name { font-size: 1.1rem; font-weight: 600; margin-bottom: 6px; color: #fff; }
+        .cook-desc { font-size: 0.82rem; color: var(--text-secondary, #8892b0); line-height: 1.5; }
+        .cook-meta { display: flex; gap: 12px; margin-top: 10px; font-size: 0.75rem; color: #666; }
+        .open-btn { display: block; width: 100%; max-width: 400px; margin: 0 auto; padding: 16px; background: linear-gradient(135deg, #ff6b6b, #ffa502); color: #fff; text-align: center; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 1rem; transition: all 0.3s; }
+        .open-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,107,107,0.4); }
+    </style>
 </head>
 <body>
     <div class="loading-box" id="loadingBox">
-        <div class="loading-core">
-            <div class="loading-ring"></div>
-            <div class="loading-ring ring2"></div>
-            <div class="loading-text">LOADING</div>
-            <div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div>
-        </div>
+        <div class="loading-core"><div class="loading-ring"></div><div class="loading-ring ring2"></div><div class="loading-text">LOADING</div><div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div></div>
     </div>
-
-    <div class="bg-layer" id="bgLayer">
-        <div class="bg-wallpaper"></div>
-        <canvas id="particleCanvas"></canvas>
-        <div class="grid-overlay" id="gridOverlay"></div>
-        <div class="glow-orb orb1"></div>
-        <div class="glow-orb orb2"></div>
-    </div>
-
+    <div class="bg-layer" id="bgLayer"><div class="bg-wallpaper"></div><canvas id="particleCanvas"></canvas><div class="grid-overlay" id="gridOverlay"></div><div class="glow-orb orb1"></div><div class="glow-orb orb2"></div>
+        <div class="glow-orb orb3"></div></div>
     <button class="sidebar-toggle" id="sidebarToggle">☰</button>
     <div class="sidebar-mask" id="sidebarMask"></div>
-
     <aside class="sidebar" id="sidebar">
-        <div class="sidebar-logo">
-            <span class="logo-icon">◆</span>
-            <span class="logo-text">LengMeng</span>
-            <button class="icon-btn dark-btn logo-dark-btn" id="darkBtn" title="切换暗黑模式">
-                <span class="icon-sun">☀</span>
-                <span class="icon-moon">☾</span>
-            </button>
-        </div>
-        <div class="sidebar-tool">
-            <span class="weather-info" id="weatherInfo">
-                <span class="weather-icon">◌</span>
-                <span class="weather-text">加载中...</span>
-            </span>
-        </div>
+        <div class="sidebar-logo"><span class="logo-icon">◆</span><span class="logo-text">LengMeng</span><button class="icon-btn dark-btn logo-dark-btn" id="darkBtn"><span class="icon-sun">☀</span><span class="icon-moon">☾</span></button></div>
+        <div class="sidebar-tool"><span class="weather-info" id="weatherInfo"><span class="weather-icon">◌</span><span class="weather-text">加载中...</span></span></div>
         <nav class="sidebar-nav">
             <ul>
                 <li><a href="index.html"><span class="nav-icon">⌂</span>首页</a></li>
                 <li class="has-submenu">
-                    <a href="javascript:void(0)" class="submenu-toggle">
-                        <span class="nav-icon">▤</span>工作<span class="submenu-arrow">▶</span>
-                    </a>
+                    <a href="javascript:void(0)" class="submenu-toggle"><span class="nav-icon">▤</span>工作<span class="submenu-arrow">▶</span></a>
                     <ul class="submenu">
                         <li><a href="blog.html">实用工具</a></li>
                         <li><a href="finance-news.html">新闻大事</a></li>
                     </ul>
                 </li>
                 <li class="has-submenu open">
-                    <a href="javascript:void(0)" class="submenu-toggle">
-                        <span class="nav-icon">◈</span>生活<span class="submenu-arrow">▶</span>
-                    </a>
+                    <a href="javascript:void(0)" class="submenu-toggle"><span class="nav-icon">◈</span>生活<span class="submenu-arrow">▶</span></a>
                     <ul class="submenu">
                         <li class="active"><a href="cook.html">菜谱</a></li>
                         <li><a href="stock.html">股票走势</a></li>
+                        <li><a href="stock-note.html">持仓记事本</a></li>
                         <li><a href="anime.html">动漫</a></li>
                         <li><a href="music.html">在线音乐</a></li>
                     </ul>
                 </li>
                 <li class="has-submenu">
-                    <a href="javascript:void(0)" class="submenu-toggle">
-                        <span class="nav-icon">⚡</span>AI工具<span class="submenu-arrow">▶</span>
-                    </a>
+                    <a href="javascript:void(0)" class="submenu-toggle"><span class="nav-icon">⚡</span>AI工具<span class="submenu-arrow">▶</span></a>
                     <ul class="submenu">
                         <li><a href="ecommerce-rpa.html">RPA工具集</a></li>
                         <li><a href="ai-comic.html">AI漫剧工坊</a></li>
@@ -88,39 +77,86 @@
         </nav>
     </aside>
 
-    <main class="main-container embed-page">
-        <div class="embed-wrapper">
-            <div class="embed-header">
-                <div class="embed-title">
-                    <span class="embed-icon">🍲</span>
-                    <span>食用手册 · 今天吃什么</span>
-                </div>
-                <div class="embed-actions">
-                    <a href="https://cook.yunyoujun.cn/" target="_blank" class="embed-btn">
-                        <span>↗</span> 新窗口打开
-                    </a>
-                </div>
+    <main class="main-container">
+        <div class="cook-page">
+            <div class="cook-header">
+                <h1 class="cook-title">🍲 今天吃什么？</h1>
+                <p class="cook-sub">不知道吃什么？点击下方卡片打开完整菜谱库</p>
             </div>
-            <iframe 
-                src="https://cook.yunyoujun.cn/" 
-                title="食用手册"
-                loading="lazy"
-                referrerpolicy="no-referrer">
-            </iframe>
+
+            <div class="cook-grid">
+                <a href="https://cook.yunyoujun.cn/" target="_blank" class="cook-card">
+                    <div class="cook-img" style="background-image:url('https://picsum.photos/seed/dish1/600/400')">
+                        <span class="cook-badge hot">热门</span>
+                    </div>
+                    <div class="cook-info">
+                        <div class="cook-name">红烧肉</div>
+                        <div class="cook-desc">肥而不腻，入口即化，经典家常菜之王</div>
+                        <div class="cook-meta"><span>⏱ 60分钟</span><span>📊 中等</span></div>
+                    </div>
+                </a>
+                <a href="https://cook.yunyoujun.cn/" target="_blank" class="cook-card">
+                    <div class="cook-img" style="background-image:url('https://picsum.photos/seed/dish2/600/400')">
+                        <span class="cook-badge quick">快手</span>
+                    </div>
+                    <div class="cook-info">
+                        <div class="cook-name">番茄炒蛋</div>
+                        <div class="cook-desc">10分钟上桌，国民下饭菜，酸甜可口</div>
+                        <div class="cook-meta"><span>⏱ 10分钟</span><span>📊 简单</span></div>
+                    </div>
+                </a>
+                <a href="https://cook.yunyoujun.cn/" target="_blank" class="cook-card">
+                    <div class="cook-img" style="background-image:url('https://picsum.photos/seed/dish3/600/400')">
+                        <span class="cook-badge easy">新手友好</span>
+                    </div>
+                    <div class="cook-info">
+                        <div class="cook-name">可乐鸡翅</div>
+                        <div class="cook-desc">零失败率，甜咸入味，大人小孩都爱</div>
+                        <div class="cook-meta"><span>⏱ 30分钟</span><span>📊 简单</span></div>
+                    </div>
+                </a>
+                <a href="https://cook.yunyoujun.cn/" target="_blank" class="cook-card">
+                    <div class="cook-img" style="background-image:url('https://picsum.photos/seed/dish4/600/400')">
+                        <span class="cook-badge hot">下饭</span>
+                    </div>
+                    <div class="cook-info">
+                        <div class="cook-name">麻婆豆腐</div>
+                        <div class="cook-desc">麻辣鲜香，嫩滑入味，川味经典</div>
+                        <div class="cook-meta"><span>⏱ 15分钟</span><span>📊 中等</span></div>
+                    </div>
+                </a>
+                <a href="https://cook.yunyoujun.cn/" target="_blank" class="cook-card">
+                    <div class="cook-img" style="background-image:url('https://picsum.photos/seed/dish5/600/400')">
+                        <span class="cook-badge quick">快手</span>
+                    </div>
+                    <div class="cook-info">
+                        <div class="cook-name">蛋炒饭</div>
+                        <div class="cook-desc">剩饭神器，粒粒分明，简单又满足</div>
+                        <div class="cook-meta"><span>⏱ 10分钟</span><span>📊 简单</span></div>
+                    </div>
+                </a>
+                <a href="https://cook.yunyoujun.cn/" target="_blank" class="cook-card">
+                    <div class="cook-img" style="background-image:url('https://picsum.photos/seed/dish6/600/400')">
+                        <span class="cook-badge easy">硬菜</span>
+                    </div>
+                    <div class="cook-info">
+                        <div class="cook-name">清蒸鲈鱼</div>
+                        <div class="cook-desc">鲜嫩清淡，保留原味，宴客必备</div>
+                        <div class="cook-meta"><span>⏱ 20分钟</span><span>📊 中等</span></div>
+                    </div>
+                </a>
+            </div>
+
+            <a href="https://cook.yunyoujun.cn/" target="_blank" class="open-btn">
+                🚀 打开完整菜谱库（1000+道菜谱）
+            </a>
         </div>
     </main>
-
-    <audio id="bgMusic" loop muted preload="auto">
-        <source src="./music/bgm.mp3" type="audio/mpeg">
-    </audio>
 
     <script src="./js/theme.js"></script>
     <script src="./js/animate.js"></script>
     <script src="./js/weather.js"></script>
-    <script src="./js/music.js"></script>
-    <script src="./js/sentence.js"></script>
-    <script src="./js/visitor.js"></script>
     <script src="./js/darkmode.js"></script>
-    <script src="./js/main.js"></script>
+    <script src="./js/main.js?v=2"></script>
 </body>
 </html>

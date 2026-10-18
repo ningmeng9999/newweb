@@ -2108,3 +2108,206 @@
     .hot-topics-container { padding: 1rem; }
     .hot-topic-title { font-size: 0.82rem; }
 }
+
+/* ============================================
+   全局美化 - 月之暗面风格
+   ============================================ */
+
+/* 卡片毛玻璃升级 */
+.content-card, .quick-card, .work-card, .album-item, .summary-card {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* 卡片悬浮效果 */
+.quick-card:hover, .work-card:hover, .summary-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(0,212,255,0.3);
+    box-shadow: 0 12px 40px rgba(0,212,255,0.12);
+}
+
+/* 标题渐变色 */
+.section-title, .card-title, .cook-title {
+    background: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 50%, #ff6b9d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* 主按钮渐变 */
+.btn-primary, .tech-btn.primary, .open-btn {
+    background: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 100%);
+    border: none;
+    box-shadow: 0 4px 20px rgba(0,212,255,0.25);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover, .tech-btn.primary:hover, .open-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,212,255,0.4);
+}
+
+/* 侧边栏导航项优化 */
+.sidebar-nav a {
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin: 2px 0;
+    transition: all 0.25s ease;
+    font-size: 0.92rem;
+}
+
+.sidebar-nav a:hover {
+    background: rgba(0,212,255,0.08);
+    color: #00d4ff;
+}
+
+.sidebar-nav a.active {
+    background: linear-gradient(90deg, rgba(0,212,255,0.15), transparent);
+    color: #00d4ff;
+    border-left: 3px solid #00d4ff;
+}
+
+/* 二级菜单 */
+.submenu {
+    background: rgba(0,0,0,0.15);
+    border-radius: 10px;
+    padding: 4px;
+    margin: 4px 0;
+}
+
+.submenu a {
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    color: var(--text-secondary);
+}
+
+/* 快速导航卡片 */
+.quick-card {
+    padding: 24px;
+    background: rgba(255,255,255,0.04);
+}
+
+.quick-icon {
+    font-size: 2rem;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* 热点话题卡片 */
+.hot-topics-container {
+    background: rgba(255,255,255,0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.hot-topic-item {
+    padding: 12px 14px;
+    border-radius: 10px;
+}
+
+.hot-topic-item:hover {
+    background: rgba(0,212,255,0.06);
+}
+
+/* 页脚优化 */
+.footer {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    background: rgba(0,0,0,0.2);
+    backdrop-filter: blur(10px);
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.4); }
+
+/* 选中文字颜色 */
+::selection {
+    background: rgba(0,212,255,0.3);
+    color: #fff;
+}
+
+/* ============================================
+   全局美化 - 强制覆盖版
+   ============================================ */
+
+/* 卡片毛玻璃升级 - 强制 */
+body .content-card, body .quick-card, body .work-card, body .album-item, body .summary-card, body .hot-topics-container {
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-radius: 16px !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    background: rgba(255,255,255,0.04) !important;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+/* 卡片悬浮效果 - 强制 */
+body .quick-card:hover, body .work-card:hover, body .summary-card:hover {
+    transform: translateY(-6px) !important;
+    border-color: rgba(0,212,255,0.3) !important;
+    box-shadow: 0 12px 40px rgba(0,212,255,0.15) !important;
+}
+
+/* 标题渐变色 - 强制 */
+body .section-title, body .card-title, body .cook-title, body .note-title {
+    background: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 50%, #ff6b9d 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    font-weight: 700 !important;
+}
+
+/* 主按钮渐变 - 强制 */
+body .btn-primary, body .tech-btn.primary, body .open-btn {
+    background: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 100%) !important;
+    border: none !important;
+    box-shadow: 0 4px 20px rgba(0,212,255,0.25) !important;
+}
+
+/* 侧边栏导航 - 强制 */
+body .sidebar-nav a {
+    border-radius: 10px !important;
+    padding: 10px 14px !important;
+    margin: 2px 0 !important;
+    transition: all 0.25s ease !important;
+}
+
+body .sidebar-nav a:hover {
+    background: rgba(0,212,255,0.08) !important;
+    color: #00d4ff !important;
+}
+
+body .sidebar-nav a.active {
+    background: linear-gradient(90deg, rgba(0,212,255,0.15), transparent) !important;
+    color: #00d4ff !important;
+    border-left: 3px solid #00d4ff !important;
+}
+
+/* 二级菜单 - 强制 */
+body .submenu {
+    background: rgba(0,0,0,0.2) !important;
+    border-radius: 10px !important;
+    padding: 4px !important;
+}
+
+/* 快速导航卡片图标 - 强制 */
+body .quick-icon {
+    background: linear-gradient(135deg, #00d4ff, #7b2cbf) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+/* 背景 - 强制深色渐变 */
+body {
+    background: linear-gradient(180deg, #0a0e27 0%, #1a1a2e 50%, #16213e 100%) !important;
+}
