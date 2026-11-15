@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night" data-dark="false">
+<head>
+    <meta charset="UTF-8">
+        <!-- 主题预置：避免首帧闪白 / 闪错主题 -->
+    <script>
+    (function () {
+        try {
+            var dark = localStorage.getItem('lengmeng_dark_mode') === 'true';
+            var h = new Date().getHours();
+            var theme = h < 6 ? 'dawn' : h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'night';
+            var root = document.documentElement;
+            root.setAttribute('data-dark', dark ? 'true' : 'false');
+            root.setAttribute('data-theme', theme);
+        } catch (e) {}
+    })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>菜谱 | LengMeng</title>
+    <link rel="stylesheet" href="./assets/css/base.css">
+    <link rel="stylesheet" href="./assets/css/animations.css">
+    <link rel="stylesheet" href="./assets/css/theme.css">
+    <link rel="stylesheet" href="./assets/css/components.css">
+    <style>
+        .cook-page { padding: 20px; height: calc(100vh - 40px); display: flex; flex-direction: column; }
+        .cook-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .cook-title { font-size: 1.3rem; font-weight: 700; background: linear-gradient(90deg, #ff6b6b, #ffa502); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .open-btn { padding: 8px 16px; background: linear-gradient(135deg, #ff6b6b, #ffa502); color: #fff; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+        .cook-iframe-wrap { flex: 1; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #fff; }
+        .cook-iframe-wrap iframe { width: 100%; height: 100%; border: none; }
+    </style>
+</head>
+<body>
+    <div class="loading-box" id="loadingBox">
+        <div class="loading-core"><div class="loading-ring"></div><div class="loading-ring ring2"></div><div class="loading-text">LOADING</div><div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div></div>
+    </div>
+    <div class="bg-layer" id="bgLayer"><div class="bg-wallpaper"></div><canvas id="particleCanvas"></canvas><div class="grid-overlay" id="gridOverlay"></div><div class="glow-orb orb1"></div><div class="glow-orb orb2"></div><div class="glow-orb orb3"></div></div>
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="sidebar-mask" id="sidebarMask"></div>
+    <!-- shell:sidebar:start 由 scripts/sync-shell.mjs 维护，勿手改 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">◆</span>
+            <span class="logo-text">LengMeng</span>
+            <button class="icon-btn dark-btn logo-dark-btn" id="darkBtn" type="button" title="切换纯黑模式" aria-label="切换纯黑模式">
+                <span class="icon-sun">☀</span>
+                <span class="icon-moon">☾</span>
+            </button>
+        </div>
+    
+        <div class="sidebar-tool">
+            <div class="weather-info" id="weatherInfo">
+                <div class="weather-line">
+                    <span class="weather-city">杭州</span>
+                    <span class="weather-temp">--°</span>
+                </div>
+                <div class="weather-line-2">
+                    <span class="weather-cond">加载中</span>
+                    <span class="weather-range">--/--</span>
+                </div>
+            </div>
+        </div>
+    
+        <nav class="sidebar-nav" aria-label="主导航">
+            <ul>
+                <li><a href="index.html"><span class="nav-icon">⌂</span><span class="nav-label">首页</span></a></li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle" role="button" aria-expanded="false">
+                        <span class="nav-icon">▤</span><span class="nav-label">工作</span><span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="blog.html">实用工具</a></li>
+                        <li><a href="finance-news.html">新闻大事</a></li>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle" role="button" aria-expanded="false">
+                        <span class="nav-icon">◈</span><span class="nav-label">生活</span><span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="cook.html">菜谱</a></li>
+                        <li><a href="stock.html">股票走势</a></li>
+                        <li><a href="stock-note.html">股票笔记</a></li>
+                        <li><a href="anime.html">动漫</a></li>
+                        <li><a href="music.html">在线音乐</a></li>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle" role="button" aria-expanded="false">
+                        <span class="nav-icon">⚡</span><span class="nav-label">AI 工具</span><span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="ecommerce-rpa.html">RPA 工具集</a></li>
+                        <li><a href="ai-comic.html">AI 漫剧工坊</a></li>
+                    </ul>
+                </li>
+                <li><a href="works.html"><span class="nav-icon">◆</span><span class="nav-label">项目作品</span></a></li>
+                <li><a href="album.html"><span class="nav-icon">▣</span><span class="nav-label">相册</span></a></li>
+                <li><a href="about.html"><span class="nav-icon">◉</span><span class="nav-label">关于我</span></a></li>
+            </ul>
+        </nav>
+    
+        <div class="sidebar-actions">
+            <button class="icon-btn music-btn" id="musicBtn" type="button" title="开启背景音" aria-label="背景音开关" aria-pressed="false">
+                <span class="music-icon">♪</span>
+                <span class="music-wave"><i></i><i></i><i></i></span>
+            </button>
+            <a class="icon-btn" href="./index.html#contact" title="联系我" aria-label="联系我">✉</a>
+        </div>
+    
+        <div class="sidebar-foot">
+            <span><span class="status-dot"></span>Online</span>
+            <span data-theme-label>—</span>
+        </div>
+    </aside>
+    <!-- shell:sidebar:end -->
+
+    <main class="main-container" style="padding:0">
+        <div class="cook-page">
+            <div class="cook-header">
+                <div class="cook-title">🍲 食用手册 · 今天吃什么</div>
+                <a href="https://cook.yunyoujun.cn/" target="_blank" class="open-btn">↗ 新窗口打开</a>
+            </div>
+            <div class="cook-iframe-wrap">
+                <iframe src="https://cook.yunyoujun.cn/" title="食用手册" loading="lazy" referrerpolicy="no-referrer"></iframe>
+            </div>
+        </div>
+    </main>
+
+    <!-- 脚本 -->
+
+    <!-- shell:scripts:start 由 scripts/sync-shell.mjs 维护 -->
+    <!-- 通用脚本：顺序敏感，theme → effects → app → 模块 → 页面脚本 -->
+    <script src="./assets/js/core/theme.js"></script>
+    <script src="./assets/js/core/effects.js"></script>
+    <script src="./assets/js/core/app.js"></script>
+    <script src="./assets/js/modules/weather.js"></script>
+    <script src="./assets/js/modules/music.js"></script>
+    <script src="./assets/js/core/darkmode.js"></script>
+    <!-- shell:scripts:end -->
+</body>
+</html>

@@ -1,0 +1,162 @@
+/* ============================================================
+   四时主题 · 极简高级黑
+   四套时间色温，统一墨色骨架；不引入亮色底，
+   以保证股票/音乐等深色工具页在任意时段都可读。
+   ============================================================ */
+
+/* ---------- 凌晨 00:00–06:00 · 冷蓝 ---------- */
+html[data-theme="dawn"] {
+    --bg-primary: #06070c;
+    --bg-secondary: #0a0c13;
+    --bg-elevated: #0f1219;
+    --bg-glow: rgba(74, 92, 140, 0.16);
+
+    --card-bg: rgba(255, 255, 255, 0.022);
+    --card-bg-hover: rgba(255, 255, 255, 0.048);
+    --input-bg: rgba(255, 255, 255, 0.028);
+    --navbar-bg: rgba(6, 7, 12, 0.74);
+
+    --border: rgba(178, 194, 232, 0.095);
+    --border-hover: rgba(178, 194, 232, 0.26);
+    --line-soft: rgba(178, 194, 232, 0.05);
+
+    --text-primary: #e7ebf5;
+    --text-secondary: rgba(231, 235, 245, 0.64);
+    --text-muted: rgba(231, 235, 245, 0.36);
+
+    --accent: #d6dded;
+    --accent-secondary: #7e8ca8;
+    --accent-glow: rgba(214, 221, 237, 0.1);
+    --signal: #7ea3cf;
+    --signal-glow: rgba(126, 163, 207, 0.16);
+    --tint: 178, 194, 232;
+
+    --grid-color: rgba(178, 194, 232, 0.02);
+}
+
+/* ---------- 上午 06:00–12:00 · 石墨 ---------- */
+html[data-theme="morning"] {
+    --bg-primary: #0b0c0e;
+    --bg-secondary: #101215;
+    --bg-elevated: #16181c;
+    --bg-glow: rgba(150, 158, 170, 0.13);
+
+    --card-bg: rgba(255, 255, 255, 0.03);
+    --card-bg-hover: rgba(255, 255, 255, 0.058);
+    --input-bg: rgba(255, 255, 255, 0.034);
+    --navbar-bg: rgba(11, 12, 14, 0.74);
+
+    --border: rgba(255, 255, 255, 0.085);
+    --border-hover: rgba(255, 255, 255, 0.22);
+    --line-soft: rgba(255, 255, 255, 0.05);
+
+    --text-primary: #f0f1f3;
+    --text-secondary: rgba(240, 241, 243, 0.66);
+    --text-muted: rgba(240, 241, 243, 0.38);
+
+    --accent: #e5e7ea;
+    --accent-secondary: #949aa2;
+    --accent-glow: rgba(229, 231, 234, 0.12);
+    --signal: #8fb0a8;
+    --signal-glow: rgba(143, 176, 168, 0.16);
+    --tint: 236, 238, 241;
+
+    --grid-color: rgba(255, 255, 255, 0.022);
+}
+
+/* ---------- 下午 12:00–18:00 · 暖灰 ---------- */
+html[data-theme="afternoon"] {
+    --bg-primary: #0a0908;
+    --bg-secondary: #100e0c;
+    --bg-elevated: #17150f;
+    --bg-glow: rgba(168, 146, 108, 0.13);
+
+    --card-bg: rgba(255, 252, 245, 0.028);
+    --card-bg-hover: rgba(255, 252, 245, 0.056);
+    --input-bg: rgba(255, 252, 245, 0.032);
+    --navbar-bg: rgba(10, 9, 8, 0.76);
+
+    --border: rgba(236, 224, 203, 0.085);
+    --border-hover: rgba(236, 224, 203, 0.22);
+    --line-soft: rgba(236, 224, 203, 0.05);
+
+    --text-primary: #f4f0e8;
+    --text-secondary: rgba(244, 240, 232, 0.66);
+    --text-muted: rgba(244, 240, 232, 0.38);
+
+    --accent: #ece4d6;
+    --accent-secondary: #a2967f;
+    --accent-glow: rgba(236, 228, 214, 0.12);
+    --signal: #c0a887;
+    --signal-glow: rgba(192, 168, 135, 0.16);
+    --tint: 236, 224, 203;
+
+    --grid-color: rgba(236, 224, 203, 0.02);
+}
+
+/* ---------- 夜晚 18:00–24:00 · 墨黑（默认） ---------- */
+html[data-theme="night"] {
+    --bg-primary: #08090b;
+    --bg-secondary: #0d0f12;
+    --bg-elevated: #12151a;
+    --bg-glow: rgba(90, 112, 138, 0.14);
+
+    --card-bg: rgba(255, 255, 255, 0.024);
+    --card-bg-hover: rgba(255, 255, 255, 0.05);
+    --input-bg: rgba(255, 255, 255, 0.03);
+    --navbar-bg: rgba(8, 9, 11, 0.72);
+
+    --border: rgba(255, 255, 255, 0.075);
+    --border-hover: rgba(255, 255, 255, 0.2);
+    --line-soft: rgba(255, 255, 255, 0.045);
+
+    --text-primary: #edeff2;
+    --text-secondary: rgba(237, 239, 242, 0.66);
+    --text-muted: rgba(237, 239, 242, 0.38);
+
+    --accent: #dfe4ea;
+    --accent-secondary: #8f9aa8;
+    --accent-glow: rgba(223, 228, 234, 0.12);
+    --signal: #74b3a8;
+    --signal-glow: rgba(116, 179, 168, 0.16);
+    --tint: 237, 239, 242;
+
+    --grid-color: rgba(255, 255, 255, 0.02);
+}
+
+/* ---------- 纯黑：手动开关 ---------- */
+html[data-dark="true"] {
+    --bg-primary: #000000;
+    --bg-secondary: #050506;
+    --bg-elevated: #0a0b0d;
+    --bg-glow: rgba(120, 140, 165, 0.1);
+
+    --card-bg: rgba(255, 255, 255, 0.03);
+    --card-bg-hover: rgba(255, 255, 255, 0.06);
+    --input-bg: rgba(255, 255, 255, 0.035);
+    --navbar-bg: rgba(0, 0, 0, 0.82);
+
+    --border: rgba(255, 255, 255, 0.085);
+    --border-hover: rgba(255, 255, 255, 0.24);
+    --line-soft: rgba(255, 255, 255, 0.05);
+
+    --text-primary: #f4f5f7;
+    --text-secondary: rgba(244, 245, 247, 0.68);
+    --text-muted: rgba(244, 245, 247, 0.4);
+
+    --accent: #e9ecf0;
+    --accent-secondary: #939dab;
+    --accent-glow: rgba(233, 236, 240, 0.13);
+    --signal: #7fc0b4;
+    --signal-glow: rgba(127, 192, 180, 0.16);
+    --tint: 244, 245, 247;
+
+    color-scheme: dark;
+}
+
+/* ---------- 切换过渡 ---------- */
+body.theme-transition,
+body.theme-transition * {
+    transition: background-color 0.5s var(--ease), border-color 0.5s var(--ease),
+        color 0.35s var(--ease) !important;
+}

@@ -1,0 +1,21 @@
+# 依赖
+node_modules/
+package-lock.json
+
+# 本地环境变量（真实密钥只放在这里和 Vercel，绝不提交）
+.env
+.env.local
+
+# 构建 / 工具产物
+.vercel/
+.DS_Store
+Thumbs.db
+
+# 历史备份与临时脚本
+.archive/
+fix_*.py
+_migrate.py
+_shots/
+
+# WorkBuddy 会话数据（本地项目记忆，不入库）
+.workbuddy/

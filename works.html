@@ -1,0 +1,417 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night" data-dark="false">
+<head>
+    <meta charset="UTF-8">
+    <!-- 主题预置：避免首帧闪白 / 闪错主题 -->
+    <script>
+    (function () {
+        try {
+            var dark = localStorage.getItem('lengmeng_dark_mode') === 'true';
+            var h = new Date().getHours();
+            var theme = h < 6 ? 'dawn' : h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'night';
+            var root = document.documentElement;
+            root.setAttribute('data-dark', dark ? 'true' : 'false');
+            root.setAttribute('data-theme', theme);
+        } catch (e) {}
+    })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目作品 | LengMeng</title>
+    <link rel="stylesheet" href="./assets/css/base.css">
+    <link rel="stylesheet" href="./assets/css/animations.css">
+    <link rel="stylesheet" href="./assets/css/theme.css">
+    <link rel="stylesheet" href="./assets/css/components.css">
+</head>
+<body>
+    <div class="loading-box" id="loadingBox">
+        <div class="loading-core">
+            <div class="loading-ring"></div>
+            <div class="loading-ring ring2"></div>
+            <div class="loading-text">LOADING</div>
+            <div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div>
+        </div>
+    </div>
+
+    <div class="bg-layer" id="bgLayer">
+        <div class="bg-wallpaper"></div>
+        <canvas id="particleCanvas"></canvas>
+        <div class="grid-overlay" id="gridOverlay"></div>
+        <div class="glow-orb orb1"></div>
+        <div class="glow-orb orb2"></div>
+        <div class="glow-orb orb3"></div>
+    </div>
+
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="sidebar-mask" id="sidebarMask"></div>
+
+    <!-- shell:sidebar:start 由 scripts/sync-shell.mjs 维护，勿手改 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">◆</span>
+            <span class="logo-text">LengMeng</span>
+            <button class="icon-btn dark-btn logo-dark-btn" id="darkBtn" type="button" title="切换纯黑模式" aria-label="切换纯黑模式">
+                <span class="icon-sun">☀</span>
+                <span class="icon-moon">☾</span>
+            </button>
+        </div>
+    
+        <div class="sidebar-tool">
+            <div class="weather-info" id="weatherInfo">
+                <div class="weather-line">
+                    <span class="weather-city">杭州</span>
+                    <span class="weather-temp">--°</span>
+                </div>
+                <div class="weather-line-2">
+                    <span class="weather-cond">加载中</span>
+                    <span class="weather-range">--/--</span>
+                </div>
+            </div>
+        </div>
+    
+        <nav class="sidebar-nav" aria-label="主导航">
+            <ul>
+                <li><a href="index.html"><span class="nav-icon">⌂</span><span class="nav-label">首页</span></a></li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle" role="button" aria-expanded="false">
+                        <span class="nav-icon">▤</span><span class="nav-label">工作</span><span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="blog.html">实用工具</a></li>
+                        <li><a href="finance-news.html">新闻大事</a></li>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle" role="button" aria-expanded="false">
+                        <span class="nav-icon">◈</span><span class="nav-label">生活</span><span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="cook.html">菜谱</a></li>
+                        <li><a href="stock.html">股票走势</a></li>
+                        <li><a href="stock-note.html">股票笔记</a></li>
+                        <li><a href="anime.html">动漫</a></li>
+                        <li><a href="music.html">在线音乐</a></li>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle" role="button" aria-expanded="false">
+                        <span class="nav-icon">⚡</span><span class="nav-label">AI 工具</span><span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="ecommerce-rpa.html">RPA 工具集</a></li>
+                        <li><a href="ai-comic.html">AI 漫剧工坊</a></li>
+                    </ul>
+                </li>
+                <li><a href="works.html"><span class="nav-icon">◆</span><span class="nav-label">项目作品</span></a></li>
+                <li><a href="album.html"><span class="nav-icon">▣</span><span class="nav-label">相册</span></a></li>
+                <li><a href="about.html"><span class="nav-icon">◉</span><span class="nav-label">关于我</span></a></li>
+            </ul>
+        </nav>
+    
+        <div class="sidebar-actions">
+            <button class="icon-btn music-btn" id="musicBtn" type="button" title="开启背景音" aria-label="背景音开关" aria-pressed="false">
+                <span class="music-icon">♪</span>
+                <span class="music-wave"><i></i><i></i><i></i></span>
+            </button>
+            <a class="icon-btn" href="./index.html#contact" title="联系我" aria-label="联系我">✉</a>
+        </div>
+    
+        <div class="sidebar-foot">
+            <span><span class="status-dot"></span>Online</span>
+            <span data-theme-label>—</span>
+        </div>
+    </aside>
+    <!-- shell:sidebar:end -->
+
+    <main class="main-container page-container">
+        <div class="page-header animate-fade-up">
+            <h1 class="page-title">项目作品</h1>
+            <p class="page-subtitle">Works · 精选项目案例</p>
+        </div>
+
+        <div class="filter-bar animate-on-scroll">
+            <button class="filter-btn active" data-filter="all">全部</button>
+            <button class="filter-btn" data-filter="data">数据分析</button>
+            <button class="filter-btn" data-filter="shop">店铺管理</button>
+            <button class="filter-btn" data-filter="web">Web应用</button>
+            <button class="filter-btn" data-filter="ecom">跨境电商</button>
+            <button class="filter-btn" data-filter="ai">AI工具</button>
+        </div>
+
+        <div class="works-grid" id="worksGrid">
+            <div class="works-loading">加载中</div>
+        </div>
+
+        <div style="text-align:center;margin-top:2.6rem">
+            <button class="add-work-btn" type="button" onclick="showAddWorkModal()">+ 添加项目</button>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2026 LengMeng · All Rights Reserved</p>
+            <p class="footer-link">
+                <a href="https://lengmeng.online" target="_blank">lengmeng.online</a>
+                <span>·</span>
+                <span>Powered by Vercel</span>
+            </p>
+        </div>
+    </footer>
+
+<!-- 添加项目弹窗 -->
+    <div class="modal-overlay" id="addWorkModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span class="modal-title">➕ 添加项目</span>
+                <button class="modal-close" onclick="hideAddWorkModal()">✕</button>
+            </div>
+            <div class="form-group">
+                <label>项目名称</label>
+                <input type="text" id="workTitle" placeholder="例如：四时动态个人网站">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>分类</label>
+                    <select id="workCategory">
+                        <option value="data">数据分析</option>
+                        <option value="web">Web应用</option>
+                        <option value="ecom">跨境电商</option>
+                        <option value="ai">AI工具</option>
+                        <option value="shop">店铺管理</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>时间</label>
+                    <input type="text" id="workDate" placeholder="例如：2026.09">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>角色/职位</label>
+                <input type="text" id="workRole" placeholder="例如：独立开发 / 项目负责人">
+            </div>
+            <div class="form-group">
+                <label>项目描述</label>
+                <textarea id="workDesc" placeholder="简要描述项目内容、技术栈、成果..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>技术标签（逗号分隔）</label>
+                <input type="text" id="workTags" placeholder="例如：HTML5,CSS3,JavaScript,Vercel">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>封面图URL</label>
+                    <input type="text" id="workImage" placeholder="留空使用默认图">
+                </div>
+                <div class="form-group">
+                    <label>跳转链接</label>
+                    <input type="text" id="workLink" placeholder="例如：stock.html 或 https://...">
+                </div>
+            </div>
+            <button class="modal-submit" onclick="submitWork()">确认添加</button>
+        </div>
+    </div>
+    
+    <!-- 删除确认弹窗 -->
+    <div class="modal-overlay" id="deleteWorkModal">
+        <div class="modal-box" style="max-width:380px">
+            <div class="modal-header">
+                <span class="modal-title">🗑 删除项目</span>
+                <button class="modal-close" onclick="hideDeleteWorkModal()">✕</button>
+            </div>
+            <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:1rem">请输入删除密码以确认删除此项目：</p>
+            <div class="form-group">
+                <input type="password" id="deletePassword" placeholder="输入删除密码">
+            </div>
+            <button class="modal-submit" style="background:linear-gradient(135deg,#ff6b6b,#ee5a24)" onclick="confirmDelete()">确认删除</button>
+        </div>
+    </div>
+
+    <script>
+    /* ---------- 项目作品 ---------- */
+    var FALLBACK_WORKS = [
+        { id: 1, title: '亚太地区数学建模竞赛', category: 'data', date: '2024.09', role: '队长', desc: '使用 Python Pandas 完成 80 万+ 条数据集清洗，搭建随机森林预测模型，Matplotlib 输出多维度可视化与 18 页分析报告，获国家级三等奖。', tags: ['Python', 'Pandas', '随机森林', 'Matplotlib'], image: 'https://picsum.photos/seed/work01/800/500', link: '' },
+        { id: 2, title: '商务大数据分析竞赛', category: 'data', date: '2024.09 — 2025.02', role: '项目负责人', desc: '爬虫 + 影刀 RPA 自动化抓取 TikTok 商品评论、销量与用户画像，完成评论情感正负向分析，用 Tableau 搭建动态商业看板，获国家级三等奖。', tags: ['Python', '影刀RPA', 'Tableau', '情感分析'], image: 'https://picsum.photos/seed/work02/800/500', link: '' },
+        { id: 3, title: '四时动态个人网站', category: 'web', date: '2026', role: '独立开发', desc: '纯前端个人站点：按时间自动切换四套主题色温，尘埃粒子背景，3D 倾斜卡片与滚动叙事，部署于 Vercel。', tags: ['HTML5', 'CSS3', 'JavaScript', 'Vercel'], image: 'https://picsum.photos/seed/work03/800/500', link: 'index.html' },
+        { id: 4, title: 'A 股行情分析与选股工具', category: 'web', date: '2026', role: '独立开发', desc: '基于公开行情接口的 A 股工具，含大盘指数走势、多指标选股策略、自选池盈亏追踪、气泡云图与热力矩形图双视图。', tags: ['JavaScript', 'Canvas', 'K线分析'], image: 'https://picsum.photos/seed/work06/800/500', link: 'stock.html' },
+        { id: 5, title: '亚马逊精品店铺运营', category: 'ecom', date: '2026.04 — 2026.08', role: '运营助理', desc: '负责亚马逊欧美多站点精品店铺运营，搭建 SP 广告投放结构，独立孵化 3 款垂直类目新品，核心链接点击率提升 11.5%，店铺月度 GMV 环比提升 13%。', tags: ['亚马逊', 'SP广告', 'Listing优化', '领星ERP'], image: 'https://picsum.photos/seed/work04/800/500', link: '' },
+        { id: 6, title: '亚马逊新品孵化项目', category: 'ecom', date: '2025.11 — 2026.03', role: '运营助理', desc: '用 Python 实现竞品数据自动化采集，按月输出竞品分析与市场机会报告；策划 Coupon、限时促销、联盟推广方案，成功孵化 2 款潜力新品。', tags: ['Python', '竞品分析', '亚马逊', '短视频'], image: 'https://picsum.photos/seed/work05/800/500', link: '' }
+    ];
+
+    var currentWorks = [];
+    var deleteTargetId = null;
+    var currentFilter = 'all';
+    var editable = false;
+
+    function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+        });
+    }
+
+    function loadWorks() {
+        var grid = document.getElementById('worksGrid');
+        grid.innerHTML = '<div class="works-loading">加载中</div>';
+        fetch('/api/works', { cache: 'no-store' })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (data) {
+                if (data && data.works && data.works.length) {
+                    currentWorks = data.works;
+                    editable = data.mode !== 'default';
+                } else {
+                    currentWorks = FALLBACK_WORKS;
+                }
+                renderWorks();
+            })
+            .catch(function () {
+                currentWorks = FALLBACK_WORKS;
+                renderWorks();
+            });
+    }
+
+    function renderWorks() {
+        var grid = document.getElementById('worksGrid');
+        var list = currentFilter === 'all'
+            ? currentWorks
+            : currentWorks.filter(function (w) { return w.category === currentFilter; });
+
+        if (!list.length) {
+            grid.innerHTML = '<div class="works-loading">该分类下暂无项目</div>';
+            return;
+        }
+
+        grid.innerHTML = list.map(function (w, i) {
+            var tags = (w.tags || []).map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('');
+            var link = w.link
+                ? '<a href="' + esc(w.link) + '" class="work-link">查看详情 →</a>'
+                : '<span class="work-link">项目案例</span>';
+            var img = w.image || ('https://picsum.photos/seed/work' + w.id + '/800/500');
+
+            return '<article class="work-card tilt spotlight card-in" data-category="' + esc(w.category || '') + '" style="--i:' + i + '">' +
+                '<button class="work-delete-btn" type="button" title="删除" onclick="event.preventDefault();showDeleteWorkModal(' + w.id + ')">×</button>' +
+                '<div class="work-cover">' +
+                    '<img src="' + esc(img) + '" alt="' + esc(w.title) + '" class="work-cover-img" loading="lazy" decoding="async">' +
+                    '<div class="work-overlay">' + link + '</div>' +
+                '</div>' +
+                '<div class="work-info">' +
+                    '<h3 class="work-title">' + esc(w.title) + '</h3>' +
+                    '<p class="work-meta">' + esc(w.date || '') + (w.role ? ' · ' + esc(w.role) : '') + '</p>' +
+                    '<p class="work-desc">' + esc(w.desc) + '</p>' +
+                    '<div class="work-tags">' + tags + '</div>' +
+                '</div>' +
+            '</article>';
+        }).join('');
+
+        if (window.lmReflow) window.lmReflow();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadWorks();
+        document.querySelectorAll('.filter-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.filter-btn').forEach(function (b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderWorks();
+            });
+        });
+    });
+
+    /* ---------- 弹窗 ---------- */
+    function showAddWorkModal() { document.getElementById('addWorkModal').classList.add('show'); }
+    function hideAddWorkModal() { document.getElementById('addWorkModal').classList.remove('show'); }
+    function showDeleteWorkModal(id) {
+        deleteTargetId = id;
+        document.getElementById('deleteWorkModal').classList.add('show');
+    }
+    function hideDeleteWorkModal() {
+        deleteTargetId = null;
+        document.getElementById('deleteWorkModal').classList.remove('show');
+        document.getElementById('deletePassword').value = '';
+    }
+
+    function submitWork() {
+        var title = document.getElementById('workTitle').value.trim();
+        if (!title) {
+            if (window.lmToast) window.lmToast('先给项目起个名字');
+            return;
+        }
+        var item = {
+            title: title,
+            category: document.getElementById('workCategory').value,
+            date: document.getElementById('workDate').value.trim(),
+            role: document.getElementById('workRole').value.trim(),
+            desc: document.getElementById('workDesc').value.trim(),
+            tags: document.getElementById('workTags').value.split(',').map(function (t) { return t.trim(); }).filter(Boolean),
+            image: document.getElementById('workImage').value.trim(),
+            link: document.getElementById('workLink').value.trim()
+        };
+
+        fetch('/api/works', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(item)
+        })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data && data.ok) {
+                    currentWorks = data.works;
+                    renderWorks();
+                    hideAddWorkModal();
+                    ['workTitle', 'workDate', 'workRole', 'workDesc', 'workTags', 'workImage', 'workLink'].forEach(function (id) {
+                        document.getElementById(id).value = '';
+                    });
+                    if (window.lmToast) window.lmToast('项目已添加');
+                } else {
+                    if (window.lmToast) window.lmToast((data && (data.message || data.error)) || '添加失败');
+                }
+            })
+            .catch(function () {
+                if (window.lmToast) window.lmToast('接口不可用，当前为只读模式');
+            });
+    }
+
+    function confirmDelete() {
+        var pwd = document.getElementById('deletePassword').value;
+        if (!pwd) {
+            if (window.lmToast) window.lmToast('请输入删除密码');
+            return;
+        }
+        fetch('/api/works', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: deleteTargetId, password: pwd })
+        })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data && data.ok) {
+                    currentWorks = data.works;
+                    renderWorks();
+                    hideDeleteWorkModal();
+                    if (window.lmToast) window.lmToast('已删除');
+                } else {
+                    if (window.lmToast) window.lmToast((data && data.error) || '删除失败');
+                }
+            })
+            .catch(function () {
+                if (window.lmToast) window.lmToast('接口不可用，暂时无法删除');
+            });
+    }
+
+    document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
+        overlay.addEventListener('click', function (e) {
+            if (e.target === this) this.classList.remove('show');
+        });
+    });
+    </script>
+    <!-- 脚本 -->
+
+    <!-- shell:scripts:start 由 scripts/sync-shell.mjs 维护 -->
+    <!-- 通用脚本：顺序敏感，theme → effects → app → 模块 → 页面脚本 -->
+    <script src="./assets/js/core/theme.js"></script>
+    <script src="./assets/js/core/effects.js"></script>
+    <script src="./assets/js/core/app.js"></script>
+    <script src="./assets/js/modules/weather.js"></script>
+    <script src="./assets/js/modules/music.js"></script>
+    <script src="./assets/js/core/darkmode.js"></script>
+    <!-- shell:scripts:end -->
+</body>
+</html>

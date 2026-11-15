@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night" data-dark="false">
+<head>
+    <meta charset="UTF-8">
+    <!-- 主题预置：避免首帧闪白 / 闪错主题 -->
+    <script>
+    (function () {
+        try {
+            var dark = localStorage.getItem('lengmeng_dark_mode') === 'true';
+            var h = new Date().getHours();
+            var theme = h < 6 ? 'dawn' : h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'night';
+            var root = document.documentElement;
+            root.setAttribute('data-dark', dark ? 'true' : 'false');
+            root.setAttribute('data-theme', theme);
+        } catch (e) {}
+    })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{DESC}}">
+    <meta name="theme-color" content="#08090b">
+    <title>{{TITLE}} | LengMeng</title>
+    <link rel="stylesheet" href="./assets/css/base.css">
+    <link rel="stylesheet" href="./assets/css/animations.css">
+    <link rel="stylesheet" href="./assets/css/theme.css">
+    <link rel="stylesheet" href="./assets/css/components.css">
+    <!-- 页面专属样式（可选）：<link rel="stylesheet" href="./assets/css/pages/{{NAME}}.css"> -->
+</head>
+<body>
+    <div class="loading-box" id="loadingBox">
+        <div class="loading-core">
+            <div class="loading-ring"></div>
+            <div class="loading-text">LOADING</div>
+            <div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div>
+        </div>
+    </div>
+
+    <div class="bg-layer" id="bgLayer">
+        <canvas id="particleCanvas"></canvas>
+    </div>
+
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="sidebar-mask" id="sidebarMask"></div>
+
+    <!-- shell:sidebar:start 由 scripts/sync-shell.mjs 维护，勿手改 -->
+    <!-- shell:sidebar:end -->
+
+    <main class="main-container page-container">
+        <div class="page-header animate-fade-up">
+            <h1 class="page-title">{{TITLE}}</h1>
+            <p class="page-desc">{{DESC}}</p>
+        </div>
+
+        <!-- 页面内容 -->
+        <section class="card reveal">
+            <p>在这里写内容。</p>
+        </section>
+    </main>
+
+    <!-- shell:scripts:start 由 scripts/sync-shell.mjs 维护 -->
+    <!-- shell:scripts:end -->
+</body>
+</html>

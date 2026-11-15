@@ -1,0 +1,524 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night" data-dark="false">
+<head>
+    <meta charset="UTF-8">
+    <!-- 主题预置：避免首帧闪白 / 闪错主题 -->
+    <script>
+    (function () {
+        try {
+            var dark = localStorage.getItem('lengmeng_dark_mode') === 'true';
+            var h = new Date().getHours();
+            var theme = h < 6 ? 'dawn' : h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'night';
+            var root = document.documentElement;
+            root.setAttribute('data-dark', dark ? 'true' : 'false');
+            root.setAttribute('data-theme', theme);
+        } catch (e) {}
+    })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LengMeng 个人主页 - 跨境电商运营、AI 工具实践、数据与股票分析，四时色温，极简科技风">
+    <meta name="keywords" content="LengMeng,个人网站,跨境电商,亚马逊运营,AI工具,股票行情,数据分析">
+    <meta name="author" content="LengMeng">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://lengmeng.online/">
+    <meta name="theme-color" content="#08090b">
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="LengMeng | 个人主页">
+    <meta property="og:description" content="跨境电商运营、AI 工具实践、数据与股票分析">
+    <meta property="og:url" content="https://lengmeng.online/">
+    <meta property="og:site_name" content="LengMeng">
+    <meta property="og:locale" content="zh_CN">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="LengMeng | 个人主页">
+    <meta name="twitter:description" content="跨境电商运营、AI 工具实践、数据与股票分析">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "LengMeng",
+        "url": "https://lengmeng.online/",
+        "jobTitle": "跨境电商运营",
+        "knowsAbout": ["亚马逊运营", "跨境电商", "AI工具", "数据分析", "Python"],
+        "sameAs": []
+    }
+    </script>
+    <title>LengMeng | 个人主页</title>
+    <link rel="stylesheet" href="./assets/css/base.css">
+    <link rel="stylesheet" href="./assets/css/animations.css">
+    <link rel="stylesheet" href="./assets/css/theme.css">
+    <link rel="stylesheet" href="./assets/css/components.css">
+</head>
+<body>
+    <!-- 加载层 -->
+    <div class="loading-box" id="loadingBox">
+        <div class="loading-core">
+            <div class="loading-ring"></div>
+            <div class="loading-text">LengMeng</div>
+            <div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div>
+        </div>
+    </div>
+
+    <!-- 背景：极淡的时间色温 + 尘埃 -->
+    <div class="bg-layer" id="bgLayer">
+        <canvas id="particleCanvas"></canvas>
+    </div>
+
+    <!-- 移动端导航 -->
+    <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="打开导航" aria-expanded="false">☰</button>
+    <div class="sidebar-mask" id="sidebarMask"></div>
+
+    <!-- shell:sidebar:start 由 scripts/sync-shell.mjs 维护，勿手改 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">◆</span>
+            <span class="logo-text">LengMeng</span>
+            <button class="icon-btn dark-btn logo-dark-btn" id="darkBtn" type="button" title="切换纯黑模式" aria-label="切换纯黑模式">
+                <span class="icon-sun">☀</span>
+                <span class="icon-moon">☾</span>
+            </button>
+        </div>
+    
+        <div class="sidebar-tool">
+            <div class="weather-info" id="weatherInfo">
+                <div class="weather-line">
+                    <span class="weather-city">杭州</span>
+                    <span class="weather-temp">--°</span>
+                </div>
+                <div class="weather-line-2">
+                    <span class="weather-cond">加载中</span>
+                    <span class="weather-range">--/--</span>
+                </div>
+            </div>
+        </div>
+    
+        <nav class="sidebar-nav" aria-label="主导航">
+            <ul>
+                <li><a href="index.html"><span class="nav-icon">⌂</span><span class="nav-label">首页</span></a></li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle" role="button" aria-expanded="false">
+                        <span class="nav-icon">▤</span><span class="nav-label">工作</span><span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="blog.html">实用工具</a></li>
+                        <li><a href="finance-news.html">新闻大事</a></li>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle" role="button" aria-expanded="false">
+                        <span class="nav-icon">◈</span><span class="nav-label">生活</span><span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="cook.html">菜谱</a></li>
+                        <li><a href="stock.html">股票走势</a></li>
+                        <li><a href="stock-note.html">股票笔记</a></li>
+                        <li><a href="anime.html">动漫</a></li>
+                        <li><a href="music.html">在线音乐</a></li>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle" role="button" aria-expanded="false">
+                        <span class="nav-icon">⚡</span><span class="nav-label">AI 工具</span><span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="ecommerce-rpa.html">RPA 工具集</a></li>
+                        <li><a href="ai-comic.html">AI 漫剧工坊</a></li>
+                    </ul>
+                </li>
+                <li><a href="works.html"><span class="nav-icon">◆</span><span class="nav-label">项目作品</span></a></li>
+                <li><a href="album.html"><span class="nav-icon">▣</span><span class="nav-label">相册</span></a></li>
+                <li><a href="about.html"><span class="nav-icon">◉</span><span class="nav-label">关于我</span></a></li>
+            </ul>
+        </nav>
+    
+        <div class="sidebar-actions">
+            <button class="icon-btn music-btn" id="musicBtn" type="button" title="开启背景音" aria-label="背景音开关" aria-pressed="false">
+                <span class="music-icon">♪</span>
+                <span class="music-wave"><i></i><i></i><i></i></span>
+            </button>
+            <a class="icon-btn" href="./index.html#contact" title="联系我" aria-label="联系我">✉</a>
+        </div>
+    
+        <div class="sidebar-foot">
+            <span><span class="status-dot"></span>Online</span>
+            <span data-theme-label>—</span>
+        </div>
+    </aside>
+    <!-- shell:sidebar:end -->
+
+    <!-- 首页 -->
+    <main class="main-container index-main">
+        <section class="hero-section">
+            <div class="hero-grid">
+                <div class="hero-main">
+                    <p class="eyebrow hero-eyebrow animate-fade-up">Personal Site · <span data-year>2026</span></p>
+
+                    <h1 class="hero-name animate-fade-up" style="animation-delay:.08s">
+                        <span class="name-text">LengMeng</span><span class="name-cursor"></span>
+                    </h1>
+
+                    <div class="hero-role animate-fade-up" style="animation-delay:.14s">
+                        <span>跨境电商运营</span>
+                        <span>AI 工具实践</span>
+                        <span>数据与增长</span>
+                    </div>
+
+                    <p class="hero-desc animate-fade-up" style="animation-delay:.2s" id="sentenceText"></p>
+
+                    <div class="hero-meta animate-fade-up" style="animation-delay:.28s">
+                        <span class="meta-item"><span class="meta-icon">◷</span><span id="currentTime">--:--:--</span></span>
+                        <span class="meta-divider">·</span>
+                        <span class="meta-item"><span class="meta-icon">◉</span><span id="visitNum">访问 —</span></span>
+                        <span class="meta-divider">·</span>
+                        <span class="meta-item"><span class="meta-icon">◈</span><span id="themeLabel">—</span></span>
+                    </div>
+
+                    <div class="hero-btn-group animate-fade-up" style="animation-delay:.36s">
+                        <a href="works.html" class="tech-btn magnetic">
+                            <span>查看作品</span><span class="btn-arrow">→</span>
+                        </a>
+                        <a href="#contact" class="tech-btn outline">聊聊合作</a>
+                    </div>
+                </div>
+
+                <div class="hero-avatar-wrap animate-fade-up" style="animation-delay:.24s">
+                    <div class="hero-avatar">
+                        <div class="avatar-ring"></div>
+                        <div class="avatar-core">
+                            <img src="./assets/img/头像.jpg" alt="LengMeng 头像" width="208" height="208">
+                        </div>
+                    </div>
+                    <div class="avatar-status">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Open to work</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-foot animate-fade-up" style="animation-delay:.46s">
+                <div class="hero-facts">
+                    <div class="fact">
+                        <span class="fact-num" data-count="4" data-suffix="">4</span>
+                        <span class="fact-label">四时色温</span>
+                    </div>
+                    <div class="fact">
+                        <span class="fact-num" data-count="13">13</span>
+                        <span class="fact-label">站点页面</span>
+                    </div>
+                    <div class="fact">
+                        <span class="fact-num" data-count="6">6</span>
+                        <span class="fact-label">项目案例</span>
+                    </div>
+                </div>
+
+                <div class="hero-scroll-hint">
+                    <span>Scroll</span>
+                    <div class="scroll-arrow">↓</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 快速导航 -->
+        <section class="home-section" id="explore">
+            <div class="section-head animate-on-scroll">
+                <div class="section-head-main">
+                    <span class="section-kicker">Navigate</span>
+                    <h2 class="section-heading">从这里开始</h2>
+                </div>
+                <a class="section-more" href="about.html">
+                    了解更多
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </a>
+            </div>
+
+            <div class="quick-grid">
+                <a href="about.html" class="quick-card tilt spotlight animate-on-scroll" style="--i:0">
+                    <div class="quick-top">
+                        <span class="quick-index">01</span>
+                        <span class="quick-icon">◉</span>
+                    </div>
+                    <h3>关于我</h3>
+                    <p>跨境运营、竞赛经历与技能栈</p>
+                    <span class="quick-arrow">查看 →</span>
+                </a>
+                <a href="works.html" class="quick-card tilt spotlight animate-on-scroll" style="--i:1">
+                    <div class="quick-top">
+                        <span class="quick-index">02</span>
+                        <span class="quick-icon">◆</span>
+                    </div>
+                    <h3>项目作品</h3>
+                    <p>数据分析、店铺运营与 Web 应用</p>
+                    <span class="quick-arrow">查看 →</span>
+                </a>
+                <a href="blog.html" class="quick-card tilt spotlight animate-on-scroll" style="--i:2">
+                    <div class="quick-top">
+                        <span class="quick-index">03</span>
+                        <span class="quick-icon">▤</span>
+                    </div>
+                    <h3>实用工具</h3>
+                    <p>常用 AI 工具与效率入口</p>
+                    <span class="quick-arrow">查看 →</span>
+                </a>
+                <a href="stock.html" class="quick-card tilt spotlight animate-on-scroll" style="--i:3">
+                    <div class="quick-top">
+                        <span class="quick-index">04</span>
+                        <span class="quick-icon">◈</span>
+                    </div>
+                    <h3>股票行情</h3>
+                    <p>自选池、K 线与多指标选股</p>
+                    <span class="quick-arrow">查看 →</span>
+                </a>
+                <a href="ecommerce-rpa.html" class="quick-card tilt spotlight animate-on-scroll" style="--i:4">
+                    <div class="quick-top">
+                        <span class="quick-index">05</span>
+                        <span class="quick-icon">⚡</span>
+                    </div>
+                    <h3>电商 RPA</h3>
+                    <p>选品、监控与自动化工作流</p>
+                    <span class="quick-arrow">查看 →</span>
+                </a>
+                <a href="album.html" class="quick-card tilt spotlight animate-on-scroll" style="--i:5">
+                    <div class="quick-top">
+                        <span class="quick-index">06</span>
+                        <span class="quick-icon">▣</span>
+                    </div>
+                    <h3>光影相册</h3>
+                    <p>生活、旅行与创作记录</p>
+                    <span class="quick-arrow">查看 →</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- 热点话题 -->
+        <section class="hot-topics-section">
+            <div class="section-head animate-on-scroll">
+                <div class="section-head-main">
+                    <span class="section-kicker">Live</span>
+                    <h2 class="section-heading">热点话题</h2>
+                </div>
+                <a class="section-more" href="finance-news.html">
+                    全部资讯
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </a>
+            </div>
+
+            <div class="hot-topics-container animate-on-scroll">
+                <div class="hot-topics-header">
+                    <span class="hot-topics-badge">实时更新</span>
+                    <span class="hot-topics-more" id="hotSource"></span>
+                </div>
+                <div class="hot-topics-list" id="hotTopicsList">
+                    <div class="hot-topic-loading">Loading</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 联系 -->
+        <section class="contact-section" id="contact">
+            <div class="section-head animate-on-scroll">
+                <div class="section-head-main">
+                    <span class="section-kicker">Contact</span>
+                    <h2 class="section-heading">聊聊合作</h2>
+                </div>
+            </div>
+
+            <div class="contact-layout">
+                <div class="animate-on-scroll">
+                    <p class="contact-desc">
+                        如果你是品牌方、店铺主或团队负责人，想聊跨境运营、数据自动化或站点搭建，
+                        欢迎直接写信给我。通常我会在 24 小时内回复。
+                    </p>
+
+                    <div class="contact-list">
+                        <div class="contact-item">
+                            <span class="contact-label">Email</span>
+                            <span class="contact-value"><a href="mailto:q2685788319@qq.com">q2685788319@qq.com</a></span>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-label">Location</span>
+                            <span class="contact-value">浙江 · 杭州</span>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-label">Douyin</span>
+                            <span class="contact-value">88819671669</span>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-label">Response</span>
+                            <span class="contact-value">24 小时内</span>
+                        </div>
+                    </div>
+
+                    <div class="contact-qrcode">
+                        <div class="qrcode-box">
+                            <img class="qrcode-img" src="./assets/img/contact-qr.jpg" alt="微信联系二维码" width="84" height="84" loading="lazy">
+                            <span class="qrcode-label">扫码添加<br>备注来意更快通过</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-form-wrap animate-on-scroll">
+                    <h3 class="form-heading">写一封简短的邮件</h3>
+                    <form id="contactForm" novalidate>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cfName">称呼</label>
+                                <input id="cfName" name="name" type="text" autocomplete="name" placeholder="怎么称呼你" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cfEmail">邮箱</label>
+                                <input id="cfEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cfMessage">想聊什么</label>
+                            <textarea id="cfMessage" name="message" placeholder="简单说明需求或背景，越具体越好" required></textarea>
+                        </div>
+                        <input type="text" name="company" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0" aria-hidden="true">
+                        <button class="tech-btn form-submit" type="submit">
+                            <span>发送</span><span class="btn-arrow">→</span>
+                        </button>
+                        <p class="form-tip">表单会通过站点接口发送；若接口未配置，将自动改用你的邮件客户端。</p>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© <span data-year>2026</span> LengMeng · All Rights Reserved</p>
+            <p class="footer-link">
+                <a href="https://lengmeng.online" target="_blank" rel="noopener">lengmeng.online</a>
+                <span>·</span>
+                <a href="about.html">关于</a>
+                <span>·</span>
+                <span>Powered by Vercel</span>
+            </p>
+        </div>
+    </footer>
+
+    <!-- 脚本 -->
+
+    <script>
+    /* 热点话题 */
+    (function () {
+        var list = document.getElementById('hotTopicsList');
+        var srcEl = document.getElementById('hotSource');
+        if (!list) return;
+
+        var fallback = [
+            { title: 'A股三大指数集体收涨，创业板指涨超1%', hot: '财经' },
+            { title: '央行开展逆回购操作，利率维持不变', hot: '政策' },
+            { title: '新能源汽车板块持续走强', hot: '板块' },
+            { title: '人民币汇率小幅升值', hot: '外汇' },
+            { title: 'AI 算力概念股持续活跃', hot: '科技' },
+            { title: '房地产政策利好频出', hot: '地产' },
+            { title: '国际油价震荡整理', hot: '原油' },
+            { title: '黄金价格维持高位', hot: '黄金' }
+        ];
+
+        function esc(s) {
+            return String(s).replace(/[&<>"]/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+            });
+        }
+
+        function render(items) {
+            list.innerHTML = items.slice(0, 8).map(function (item, i) {
+                return '<div class="hot-topic-item">' +
+                    '<span class="hot-topic-rank">' + (i + 1 < 10 ? '0' : '') + (i + 1) + '</span>' +
+                    '<span class="hot-topic-title">' + esc(item.title) + '</span>' +
+                    (item.hot ? '<span class="hot-topic-hot">' + esc(item.hot) + '</span>' : '') +
+                '</div>';
+            }).join('');
+        }
+
+        render(fallback);
+        if (srcEl) srcEl.textContent = '离线快照';
+
+        fetch('/api/toutiao', { cache: 'no-store' })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (data) {
+                if (data && data.success && data.data && data.data.length) {
+                    render(data.data);
+                    if (srcEl) srcEl.textContent = data.source || '实时';
+                }
+            })
+            .catch(function () {});
+    })();
+
+    /* 联系表单 */
+    (function () {
+        var form = document.getElementById('contactForm');
+        if (!form) return;
+        var btn = form.querySelector('.form-submit span');
+        var tip = form.querySelector('.form-tip');
+
+        function mailtoFallback(data) {
+            var subject = encodeURIComponent('来自个人站点的留言 · ' + data.name);
+            var body = encodeURIComponent(data.message + '\n\n——\n' + data.name + ' / ' + data.email);
+            window.location.href = 'mailto:q2685788319@qq.com?subject=' + subject + '&body=' + body;
+            if (tip) tip.textContent = '已调起邮件客户端，确认发送即可。';
+        }
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var submitBtn = form.querySelector('.form-submit');
+            var data = {
+                name: form.name.value.trim(),
+                email: form.email.value.trim(),
+                message: form.message.value.trim(),
+                company: (form.company && form.company.value) || ''
+            };
+
+            if (!data.name || !data.email || !data.message) {
+                if (window.lmToast) window.lmToast('请把称呼、邮箱和内容填完整');
+                return;
+            }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+                if (window.lmToast) window.lmToast('邮箱格式好像不太对');
+                return;
+            }
+
+            var label = btn.textContent;
+            btn.textContent = '发送中';
+            submitBtn.disabled = true;
+
+            fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+                .then(function (r) { return r.json().catch(function () { return {}; }); })
+                .then(function (res) {
+                    if (res && res.ok) {
+                        btn.textContent = '已发送';
+                        if (window.lmToast) window.lmToast('收到了，我会尽快回复');
+                        form.reset();
+                        setTimeout(function () { btn.textContent = label; }, 2600);
+                    } else {
+                        throw new Error(res && res.error ? res.error : 'failed');
+                    }
+                })
+                .catch(function () {
+                    btn.textContent = label;
+                    mailtoFallback(data);
+                })
+                .then(function () {
+                    submitBtn.disabled = false;
+                });
+        });
+    })();
+    </script>
+    <!-- shell:scripts:start 由 scripts/sync-shell.mjs 维护 -->
+    <!-- 通用脚本：顺序敏感，theme → effects → app → 模块 → 页面脚本 -->
+    <script src="./assets/js/core/theme.js"></script>
+    <script src="./assets/js/core/effects.js"></script>
+    <script src="./assets/js/core/app.js"></script>
+    <script src="./assets/js/modules/weather.js"></script>
+    <script src="./assets/js/modules/music.js"></script>
+    <script src="./assets/js/core/darkmode.js"></script>
+    <!-- shell:scripts:end -->
+</body>
+</html>
