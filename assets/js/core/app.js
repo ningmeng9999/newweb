@@ -32,13 +32,15 @@
         }
         try { sessionStorage.setItem('lm_seen', '1'); } catch (e) {}
 
-        if (document.readyState === 'complete') {
-            hide(320);
+        // DOM 一就绪就撤，不等图片 / iframe（音乐页内嵌播放器、菜谱页 iframe 会把 load 拖到好几秒后）
+        function dismiss() { hide(120); }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', dismiss, { once: true });
         } else {
-            window.addEventListener('load', function () { hide(320); });
-            // 兜底：资源再慢也不让用户干等
-            setTimeout(function () { hide(0); }, 2200);
+            dismiss();
         }
+        // 兜底：无论如何不超过 900ms
+        setTimeout(function () { hide(0); }, 900);
     }
 
     /* ============================================================

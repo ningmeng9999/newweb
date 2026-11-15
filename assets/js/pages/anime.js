@@ -53,18 +53,18 @@
 
     // 国产动漫数据
     var GUOCHUANG = [
-        { title: { native: '仙逆' }, cover: './assets/img/anime-xianni.jpg', color: '#4169E1', score: 82, genres: ['修仙', '热血', '玄幻'], eps: '更新中', status: '连载中', url: 'https://v.qq.com/x/cover/mzc00200mp8v9a.html' },
-        { title: { native: '凡人修仙传' }, cover: './assets/img/anime-fanren.jpg', color: '#556B2F', score: 85, genres: ['修仙', '热血', '经典'], eps: '更新中', status: '连载中', url: 'https://www.bilibili.com/bangumi/media/md28229138' },
-        { title: { native: '灵笼' }, cover: './assets/img/anime-linglong.jpg', color: '#696969', score: 84, genres: ['科幻', '末日', '热血'], eps: 16, status: '已完结', url: 'https://www.bilibili.com/bangumi/media/md28223020' },
-        { title: { native: '牧神记' }, cover: './assets/img/anime-mushenji.jpg', color: '#2E8B57', score: 80, genres: ['修仙', '热血', '东方玄幻'], eps: '更新中', status: '连载中', url: 'https://www.bilibili.com/bangumi/media/md28235678' },
-        { title: { native: '吞噬星空' }, cover: './assets/img/anime-tunshi.jpg', color: '#4682B4', score: 78, genres: ['科幻', '热血', '进化'], eps: '更新中', status: '连载中', url: 'https://v.qq.com/x/cover/mzc00200mp8v9b.html' },
-        { title: { native: '一念永恒' }, cover: './assets/img/anime-yinian.jpg', color: '#6A5ACD', score: 79, genres: ['修仙', '搞笑', '热血'], eps: '更新中', status: '连载中', url: 'https://v.qq.com/x/cover/mzc00200mp8v9c.html' },
-        { title: { native: '斗罗大陆' }, cover: './assets/img/anime-douluo.jpg', color: '#B8860B', score: 75, genres: ['玄幻', '热血', '战斗'], eps: '更新中', status: '连载中', url: 'https://v.qq.com/x/cover/mzc00200mp8v9d.html' },
-        { title: { native: '斗破苍穹' }, cover: './assets/img/anime-doupo.jpg', color: '#CD853F', score: 77, genres: ['玄幻', '热血', '战斗'], eps: '更新中', status: '连载中', url: 'https://v.qq.com/x/cover/mzc00200mp8v9e.html' },
-        { title: { native: '完美世界' }, cover: './assets/img/anime-wanmei.jpg', color: '#DAA520', score: 76, genres: ['玄幻', '热血', '修仙'], eps: '更新中', status: '连载中', url: 'https://v.qq.com/x/cover/mzc00200mp8v9f.html' },
-        { title: { native: '遮天' }, cover: './assets/img/anime-zetian.jpg', color: '#2F4F4F', score: 80, genres: ['玄幻', '热血', '修仙'], eps: '更新中', status: '连载中', url: 'https://v.qq.com/x/cover/mzc00200mp8v9g.html' },
-        { title: { native: '剑来' }, cover: './assets/img/anime-jianlai.jpg', color: '#708090', score: 81, genres: ['武侠', '修仙', '文艺'], eps: '更新中', status: '连载中', url: 'https://www.bilibili.com/bangumi/media/md28237890' },
-        { title: { native: '沧元图' }, cover: './assets/img/anime-cangyuan.jpg', color: '#008B8B', score: 79, genres: ['玄幻', '热血', '战斗'], eps: '更新中', status: '连载中', url: 'https://v.qq.com/x/cover/mzc00200mp8v9h.html' }
+        { title: { native: '仙逆' }, cover: './assets/img/anime-xianni.webp', color: '#4169E1', score: 82, genres: ['修仙', '热血', '玄幻'], eps: '更新中', status: '连载中', url: 'https://v.qq.com/x/cover/mzc00200mp8v9a.html' },
+        { title: { native: '凡人修仙传' }, cover: './assets/img/anime-fanren.webp', color: '#556B2F', score: 85, genres: ['修仙', '热血', '经典'], eps: '更新中', status: '连载中', url: 'https://www.bilibili.com/bangumi/media/md28229138' },
+        { title: { native: '灵笼' }, cover: './assets/img/anime-linglong.webp', color: '#696969', score: 84, genres: ['科幻', '末日', '热血'], eps: 16, status: '已完结', url: 'https://www.bilibili.com/bangumi/media/md28223020' },
+        { title: { native: '牧神记' }, cover: './assets/img/anime-mushenji.webp', color: '#2E8B57', score: 80, genres: ['修仙', '热血', '东方玄幻'], eps: '更新中', status: '连载中', url: 'https://www.bilibili.com/bangumi/media/md28235678' },
+        { title: { native: '吞噬星空' }, cover: './assets/img/anime-tunshi.webp', color: '#4682B4', score: 78, genres: ['科幻', '热血', '进化'], eps: '更新中', status: '连载中', url: 'https://v.qq.com/x/cover/mzc00200mp8v9b.html' },
+        { title: { native: '一念永恒' }, cover: './assets/img/anime-yinian.webp', color: '#6A5ACD', score: 79, genres: ['修仙', '搞笑', '热血'], eps: '更新中', status: '连载中', url: 'https://v.qq.com/x/cover/mzc00200mp8v9c.html' },
+        { title: { native: '斗罗大陆' }, cover: './assets/img/anime-douluo.webp', color: '#B8860B', score: 75, genres: ['玄幻', '热血', '战斗'], eps: '更新中', status: '连载中', url: 'https://v.qq.com/x/cover/mzc00200mp8v9d.html' },
+        { title: { native: '斗破苍穹' }, cover: './assets/img/anime-doupo.webp', color: '#CD853F', score: 77, genres: ['玄幻', '热血', '战斗'], eps: '更新中', status: '连载中', url: 'https://v.qq.com/x/cover/mzc00200mp8v9e.html' },
+        { title: { native: '完美世界' }, cover: './assets/img/anime-wanmei.webp', color: '#DAA520', score: 76, genres: ['玄幻', '热血', '修仙'], eps: '更新中', status: '连载中', url: 'https://v.qq.com/x/cover/mzc00200mp8v9f.html' },
+        { title: { native: '遮天' }, cover: './assets/img/anime-zetian.webp', color: '#2F4F4F', score: 80, genres: ['玄幻', '热血', '修仙'], eps: '更新中', status: '连载中', url: 'https://v.qq.com/x/cover/mzc00200mp8v9g.html' },
+        { title: { native: '剑来' }, cover: './assets/img/anime-jianlai.webp', color: '#708090', score: 81, genres: ['武侠', '修仙', '文艺'], eps: '更新中', status: '连载中', url: 'https://www.bilibili.com/bangumi/media/md28237890' },
+        { title: { native: '沧元图' }, cover: './assets/img/anime-cangyuan.webp', color: '#008B8B', score: 79, genres: ['玄幻', '热血', '战斗'], eps: '更新中', status: '连载中', url: 'https://v.qq.com/x/cover/mzc00200mp8v9h.html' }
     ];
 
     function getTitle(t) {

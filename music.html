@@ -204,6 +204,9 @@
             animation-duration: 1.5s;
         }
     </style>
+    <!-- 预热外部资源，缩短首屏等待 -->
+    <link rel="preconnect" href="https://music.163.com" crossorigin>
+    <link rel="dns-prefetch" href="https://music.163.com">
 </head>
 <body>
     <div class="loading-box" id="loadingBox"><div class="loading-core"><div class="loading-ring"></div><div class="loading-ring ring2"></div><div class="loading-text">LOADING</div><div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div></div></div>
@@ -334,27 +337,27 @@
                 <!-- 推荐歌单方块 -->
                 <div class="playlist-blocks">
                     <div class="pl-block" onclick="loadPlaylist('3778678','云音乐热歌榜')">
-                        <div class="pl-block-cover" style="background-image:url('https://picsum.photos/seed/hot100/400/400');"></div>
+                        <div class="pl-block-cover" style="background-image:url('./assets/img/album/cover1.webp');"></div>
                         <div class="pl-block-info"><div class="pl-block-name">热歌榜</div><div class="pl-block-desc">网易云官方</div></div>
                         <div class="pl-block-play">▶</div>
                     </div>
                     <div class="pl-block" onclick="loadPlaylist('19723756','云音乐飙升榜')">
-                        <div class="pl-block-cover" style="background-image:url('https://picsum.photos/seed/rising2024/400/400');"></div>
+                        <div class="pl-block-cover" style="background-image:url('./assets/img/album/cover2.webp');"></div>
                         <div class="pl-block-info"><div class="pl-block-name">飙升榜</div><div class="pl-block-desc">网易云官方</div></div>
                         <div class="pl-block-play">▶</div>
                     </div>
                     <div class="pl-block" onclick="loadPlaylist('2884035','网易原创榜')">
-                        <div class="pl-block-cover" style="background-image:url('https://picsum.photos/seed/original3/400/400');"></div>
+                        <div class="pl-block-cover" style="background-image:url('./assets/img/album/cover3.webp');"></div>
                         <div class="pl-block-info"><div class="pl-block-name">原创榜</div><div class="pl-block-desc">网易云官方</div></div>
                         <div class="pl-block-play">▶</div>
                     </div>
                     <div class="pl-block" onclick="loadPlaylist('5059642708','华语流行')">
-                        <div class="pl-block-cover" style="background-image:url('https://picsum.photos/seed/popmusic4/400/400');"></div>
+                        <div class="pl-block-cover" style="background-image:url('./assets/img/album/cover4.webp');"></div>
                         <div class="pl-block-info"><div class="pl-block-name">华语流行</div><div class="pl-block-desc">华语经典</div></div>
                         <div class="pl-block-play">▶</div>
                     </div>
                     <div class="pl-block" onclick="window.open('https://music.163.com/#/playlist?id=3778678','_blank')">
-                        <div class="pl-block-cover" style="background-image:url('https://picsum.photos/seed/webplayer5/400/400');"></div>
+                        <div class="pl-block-cover" style="background-image:url('./assets/img/album/cover5.webp');"></div>
                         <div class="pl-block-info"><div class="pl-block-name">网页版</div><div class="pl-block-desc">新窗口打开</div></div>
                         <div class="pl-block-play">↗</div>
                     </div>

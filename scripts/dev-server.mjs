@@ -11,6 +11,7 @@
 import http from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { createReadStream, existsSync, readFileSync } from 'node:fs';
+import zlib from 'node:zlib';
 import { join, extname, normalize, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -154,6 +155,15 @@ const server = http.createServer(async (req, res) => {
     }
     res.setHeader('Content-Type', MIME[extname(file).toLowerCase()] || 'application/octet-stream');
     res.setHeader('Cache-Control', 'no-cache');
+
+    // 与 Vercel 对齐：文本资源走 gzip，本地预览速度才接近线上
+    const ext = extname(file).toLowerCase();
+    const compressible = ['.html', '.css', '.js', '.mjs', '.json', '.svg', '.txt', '.xml'].includes(ext);
+    if (compressible && /gzip/.test(req.headers['accept-encoding'] || '')) {
+        res.setHeader('Content-Encoding', 'gzip');
+        res.setHeader('Vary', 'Accept-Encoding');
+        return createReadStream(file).pipe(zlib.createGzip({ level: 9 })).pipe(res);
+    }
     createReadStream(file).pipe(res);
 });
 
