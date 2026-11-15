@@ -19,6 +19,7 @@ npm run dev          # http://localhost:4000
 | `npm run sync` | 把侧边栏 / 脚本模板同步进 13 个页面 |
 | `npm run new <名字> "<标题>" [--js]` | 新建页面骨架 |
 | `npm run check` | 自检：语法、资源引用、重复 id、外壳同步 |
+| `npm run push` | 提交并推送到 GitHub（Vercel 自动部署） |
 
 ## 目录
 

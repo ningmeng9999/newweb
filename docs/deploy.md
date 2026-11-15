@@ -9,7 +9,11 @@
 
 ## 一、推到 GitHub
 
-### 方式 A：网页建仓 + 本地推送（最稳）
+> **网页拖拽上传有 100 个文件上限**，本项目有 128 个文件，传不全；而且每次改动都要重传。用下面的命令行方式，登录一次之后变成一句 `npm run push`。
+>
+> 本项目当前已关联 `https://github.com/ningmeng9999/newweb.git`，日常更新直接跳到「方式 C」。
+
+### 方式 A：首次关联一个新建的空仓库
 
 1. GitHub 右上角 **New repository** → 仓库名 `lengmeng-site` → **Private 或 Public 都行** → 不要勾选 README/.gitignore（本地已有）→ Create。
 2. 本地执行（把 `<你的用户名>` 换成实际的）：
@@ -20,7 +24,7 @@ git branch -M main
 git push -u origin main
 ```
 
-第一次推送会弹出浏览器登录 GitHub，按提示授权即可。
+第一次推送会弹出浏览器登录 GitHub，按提示授权即可（凭据会被系统记住，之后不再询问）。
 如果提示 `remote origin already exists`，先 `git remote remove origin` 再执行上面的命令。
 
 ### 方式 B：装 GitHub CLI（以后提交更方便）
@@ -30,6 +34,15 @@ winget install --id GitHub.cli
 gh auth login          # 选 GitHub.com → HTTPS → 浏览器登录
 gh repo create lengmeng-site --private --source=. --remote=origin --push
 ```
+
+### 方式 C：日常更新（最常用）
+
+```bash
+npm run push                    # 自动生成提交信息
+npm run push -- "改了导航和配图"   # 自己写提交信息
+```
+
+它会依次做：暂存全部改动 → 有改动就提交 → 推送到 `origin/main`。Vercel 收到推送后自动重新部署。
 
 ---
 
