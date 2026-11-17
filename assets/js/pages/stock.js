@@ -12,6 +12,12 @@
 
     'use strict';
 
+    // 主题感知的画布墨色：跟随 --tint（暗色为浅字，亮色为深字）
+    function ink(alpha) {
+        var tint = (getComputedStyle(document.documentElement).getPropertyValue('--tint') || '255,255,255').trim();
+        return 'rgba(' + tint + ',' + alpha + ')';
+    }
+
 
 
     // ===== 配置 =====
@@ -1946,9 +1952,9 @@
 
 
             // 价格区网
-            ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+            ctx.strokeStyle = ink(0.08);
 
-            ctx.fillStyle = 'rgba(255,255,255,0.55)';
+            ctx.fillStyle = ink(0.55);
 
             ctx.font = '11px monospace';
 
@@ -1977,7 +1983,7 @@
 
 
             // 成交量区分隔
-            ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+            ctx.strokeStyle = ink(0.15);
 
             ctx.beginPath();
 
@@ -1987,7 +1993,7 @@
 
             ctx.stroke();
 
-            ctx.fillStyle = 'rgba(255,255,255,0.4)';
+            ctx.fillStyle = ink(0.4);
 
             ctx.textAlign = 'left';
 
@@ -2107,7 +2113,7 @@
 
 
             // X轴日
-            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.fillStyle = ink(0.5);
 
             ctx.textAlign = 'center';
 
@@ -2139,7 +2145,7 @@
 
                 const x = L.padL + gap * klineHoverIdx + gap / 2;
 
-                ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+                ctx.strokeStyle = ink(0.4);
 
                 ctx.setLineDash([4, 4]);
 
@@ -2682,7 +2688,7 @@
         if (!kline || kline.length < 2) {
 
             // 加载中提
-            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.fillStyle = ink(0.3);
 
             ctx.font = '10px sans-serif';
 
@@ -3483,7 +3489,7 @@
         }
         
         if (!cloudData.length) {
-            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.fillStyle = ink(0.3);
             ctx.font = '16px sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(cloudSourceType === 'history' ? '暂无历史交易数据' : '添加自选股后显示盈利云图', W / 2, H / 2);
@@ -3520,7 +3526,7 @@
 
         maxRate = rateRange; minRate = -rateRange;
 
-        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.strokeStyle = ink(0.15);
 
         ctx.lineWidth = 1;
 
@@ -3534,7 +3540,7 @@
 
         const zeroX = padL + plotW / 2;
 
-        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+        ctx.strokeStyle = ink(0.3);
 
         ctx.setLineDash([4, 4]);
 
@@ -3542,7 +3548,7 @@
 
         ctx.setLineDash([]);
 
-        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.fillStyle = ink(0.4);
 
         ctx.font = '11px sans-serif';
 
@@ -3749,7 +3755,7 @@
 
         if (!favorites.length) {
 
-            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.fillStyle = ink(0.3);
 
             ctx.font = '16px sans-serif';
 
@@ -3837,7 +3843,7 @@
 
             // 边框
 
-            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.strokeStyle = ink(0.1);
 
             ctx.lineWidth = 1;
 
@@ -3867,7 +3873,7 @@
 
                     ctx.font = '11px sans-serif';
 
-                    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                    ctx.fillStyle = ink(0.8);
 
                     ctx.fillText(`¥${item.price.toFixed(2)}`, cx, cy + 4);
 
@@ -4904,13 +4910,13 @@
 
             loadAllBtn.textContent = '已加载（' + allStocksCache.length + '只），点击刷新';
 
-            loadAllBtn.style.background = 'linear-gradient(135deg,#00cc88,#009966)';
+            loadAllBtn.style.background = 'linear-gradient(135deg,var(--signal),var(--signal))';
 
         } else {
 
             loadAllBtn.textContent = '加载全市场数据';
 
-            loadAllBtn.style.background = 'linear-gradient(135deg,#00d4ff,#0099cc)';
+            loadAllBtn.style.background = 'linear-gradient(135deg,var(--accent),var(--accent-secondary))';
 
         }
 
@@ -5043,5 +5049,16 @@
 
 
 
+
+    // 主题 / 模式切换时重绘所有画布，保证任何主题下都清晰
+    ['themechange', 'modechange'].forEach(function (evt) {
+        document.addEventListener(evt, function () {
+            try {
+                renderAll();
+                drawKlineChart();
+            } catch (e) { /* 数据未就绪时忽略 */ }
+        });
+    });
 })();
+
 

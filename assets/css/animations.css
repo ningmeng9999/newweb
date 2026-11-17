@@ -414,11 +414,15 @@ html.page-enter body {
     50% { height: 12px; }
 }
 
-/* ---------- 11. 暗色切换图标 ---------- */
-.dark-btn .icon-sun { display: none; }
-.dark-btn .icon-moon { display: inline; }
-html[data-dark="true"] .dark-btn .icon-sun { display: inline; }
-html[data-dark="true"] .dark-btn .icon-moon { display: none; }
+/* ---------- 11. 主题模式图标（跟随时间 ◐ / 纯黑 ☾ / 亮色 ☀） ---------- */
+.dark-btn .icon-dark,
+.dark-btn .icon-light { display: none; }
+.dark-btn .icon-auto { display: inline; }
+
+html[data-mode="dark"] .dark-btn .icon-auto,
+html[data-mode="light"] .dark-btn .icon-auto { display: none; }
+html[data-mode="dark"] .dark-btn .icon-dark { display: inline; }
+html[data-mode="light"] .dark-btn .icon-light { display: inline; }
 
 /* ---------- 12. 滚动提示 ---------- */
 .scroll-hint-line {

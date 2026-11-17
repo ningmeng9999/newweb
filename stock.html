@@ -1,16 +1,18 @@
 ﻿<!DOCTYPE html>
-<html lang="zh-CN" data-theme="night" data-dark="false">
+<html lang="zh-CN" data-theme="night" data-mode="auto" data-dark="false">
 <head>
     <meta charset="UTF-8">
     <!-- 主题预置：避免首帧闪白 / 闪错主题 -->
     <script>
     (function () {
         try {
-            var dark = localStorage.getItem('lengmeng_dark_mode') === 'true';
+            var mode = localStorage.getItem('lm_mode') || 'auto';
+            if (['auto', 'dark', 'light'].indexOf(mode) === -1) mode = 'auto';
             var h = new Date().getHours();
             var theme = h < 6 ? 'dawn' : h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'night';
             var root = document.documentElement;
-            root.setAttribute('data-dark', dark ? 'true' : 'false');
+            root.setAttribute('data-mode', mode);
+            root.setAttribute('data-dark', mode === 'dark' ? 'true' : 'false');
             root.setAttribute('data-theme', theme);
         } catch (e) {}
     })();
@@ -57,9 +59,10 @@
         <div class="sidebar-logo">
             <span class="logo-icon">◆</span>
             <span class="logo-text">LengMeng</span>
-            <button class="icon-btn dark-btn logo-dark-btn" id="darkBtn" type="button" title="切换纯黑模式" aria-label="切换纯黑模式">
-                <span class="icon-sun">☀</span>
-                <span class="icon-moon">☾</span>
+            <button class="icon-btn dark-btn logo-dark-btn" id="darkBtn" type="button" title="主题：跟随时间（点击切换）" aria-label="切换主题">
+                <span class="icon-auto">◐</span>
+                <span class="icon-dark">☾</span>
+                <span class="icon-light">☀</span>
             </button>
         </div>
     
@@ -99,7 +102,7 @@
                         <li><a href="music.html">在线音乐</a></li>
                     </ul>
                 </li>
-                <li><a href="ecommerce-rpa.html"><span class="nav-icon">⚡</span><span class="nav-label">RPA 工具集</span></a></li>
+                <li><a href="tools.html"><span class="nav-icon">⚡</span><span class="nav-label">工具</span></a></li>
                 <li><a href="works.html"><span class="nav-icon">◆</span><span class="nav-label">项目作品</span></a></li>
                 <li><a href="album.html"><span class="nav-icon">▣</span><span class="nav-label">相册</span></a></li>
                 <li><a href="about.html"><span class="nav-icon">◉</span><span class="nav-label">关于我</span></a></li>
@@ -398,7 +401,7 @@
     <script src="./assets/js/core/app.js"></script>
     <script src="./assets/js/modules/weather.js"></script>
     <script src="./assets/js/modules/music.js"></script>
-    <script src="./assets/js/core/darkmode.js"></script>
+    <script src="./assets/js/core/mode.js"></script>
     <script src="./assets/js/pages/stock.js"></script>
     <!-- shell:scripts:end -->
 </body>

@@ -28,12 +28,18 @@
     }
 
     function syncLabels(theme) {
+        // 手动模式优先：纯黑 / 亮色 时不再显示四时标签
+        var mode = document.documentElement.getAttribute('data-mode');
+        var text = mode === 'dark' ? '纯黑 · 固定'
+            : mode === 'light' ? '亮色 · 固定'
+                : (LABELS[theme] || theme);
+
         var full = document.querySelectorAll('[data-theme-label]');
         Array.prototype.forEach.call(full, function (el) {
-            el.textContent = LABELS[theme] || theme;
+            el.textContent = text;
         });
         var shortEl = document.getElementById('themeLabel');
-        if (shortEl) shortEl.textContent = SHORT[theme] || theme;
+        if (shortEl) shortEl.textContent = mode === 'dark' ? '纯黑' : mode === 'light' ? '亮色' : (SHORT[theme] || theme);
 
         var dot = document.querySelector('[data-theme-dot]');
         if (dot) dot.setAttribute('data-theme', theme);

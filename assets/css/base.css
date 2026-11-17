@@ -251,7 +251,7 @@ p {
     border-radius: 999px;
     border: 1px solid var(--text-primary);
     background: var(--text-primary);
-    color: #0a0b0d;
+    color: var(--bg-primary);
     font-size: 0.9rem;
     font-weight: 500;
     letter-spacing: 0.01em;

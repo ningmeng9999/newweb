@@ -23,7 +23,7 @@ lengmeng-site/
 │   │   │   ├── theme.js      四时主题切换 + 手动覆盖
 │   │   │   ├── effects.js    粒子、3D 倾斜、光斑、滚动进度、页面过渡
 │   │   │   ├── app.js        加载层、导航状态、回顶、Toast、通用交互
-│   │   │   └── darkmode.js   纯黑模式
+│   │   │   └── mode.js       主题模式（跟随时间/纯黑/亮色）
 │   │   ├── modules/          可选模块，按页面引入
 │   │   │   ├── weather.js    侧边栏天气
 │   │   │   ├── music.js      背景音开关
@@ -49,7 +49,6 @@ lengmeng-site/
 │   ├── toutiao.js            /api/toutiao
 │   ├── ocr-stock.js          /api/ocr-stock
 │   ├── stock-sync.js         /api/stock-sync
-│   ├── stock-note.js         /api/stock-note
 │   └── shop-monitor.js       /api/shop-monitor（cron 每天 16:00）
 │
 ├── templates/                源模板（不参与线上访问）

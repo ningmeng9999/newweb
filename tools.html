@@ -1,0 +1,583 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="night" data-mode="auto" data-dark="false">
+<head>
+    <meta charset="UTF-8">
+    <!-- 主题预置：避免首帧闪白 / 闪错主题 -->
+    <script>
+    (function () {
+        try {
+            var mode = localStorage.getItem('lm_mode') || 'auto';
+            if (['auto', 'dark', 'light'].indexOf(mode) === -1) mode = 'auto';
+            var h = new Date().getHours();
+            var theme = h < 6 ? 'dawn' : h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'night';
+            var root = document.documentElement;
+            root.setAttribute('data-mode', mode);
+            root.setAttribute('data-dark', mode === 'dark' ? 'true' : 'false');
+            root.setAttribute('data-theme', theme);
+        } catch (e) {}
+    })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工具 | LengMeng</title>
+    <link rel="stylesheet" href="./assets/css/base.css">
+    <link rel="stylesheet" href="./assets/css/animations.css">
+    <link rel="stylesheet" href="./assets/css/theme.css">
+    <link rel="stylesheet" href="./assets/css/components.css">
+    <style>
+        /* ---------- 工具页 ---------- */
+        .tools-layout {
+            display: grid;
+            grid-template-columns: 188px minmax(0, 1fr);
+            gap: 22px;
+            align-items: start;
+            margin-top: 26px;
+        }
+
+        .tool-nav {
+            position: sticky;
+            top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .tool-nav button {
+            text-align: left;
+            padding: 9px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text-secondary);
+            font: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background var(--dur) var(--ease), color var(--dur) var(--ease),
+                border-color var(--dur) var(--ease);
+        }
+
+        .tool-nav button:hover {
+            background: var(--card-bg-hover);
+            color: var(--text-primary);
+        }
+
+        .tool-nav button.active {
+            background: var(--card-bg);
+            border-color: var(--border);
+            color: var(--text-primary);
+        }
+
+        .panel {
+            display: none;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+        }
+
+        .panel.active {
+            display: block;
+            animation: panelIn 0.32s var(--ease-out);
+        }
+
+        @keyframes panelIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: none; }
+        }
+
+        .panel-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .panel-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+        }
+
+        .fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            letter-spacing: 0.02em;
+        }
+
+        .field input,
+        .field select,
+        .panel textarea {
+            width: 100%;
+            padding: 9px 11px;
+            font: inherit;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            outline: none;
+            transition: border-color var(--dur) var(--ease);
+        }
+
+        .field input:focus,
+        .field select:focus,
+        .panel textarea:focus {
+            border-color: var(--border-hover);
+        }
+
+        .panel textarea {
+            resize: vertical;
+            min-height: 132px;
+            line-height: 1.6;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+
+        .cols {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 14px 0;
+        }
+
+        .tbtn {
+            padding: 8px 16px;
+            font: inherit;
+            font-size: 0.82rem;
+            color: var(--text-primary);
+            background: var(--card-bg-hover);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            cursor: pointer;
+            transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+        }
+
+        .tbtn:hover {
+            border-color: var(--border-hover);
+        }
+
+        .tbtn.primary {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: transparent;
+            font-weight: 600;
+        }
+
+        .tbtn.primary:hover {
+            opacity: 0.88;
+        }
+
+        .out {
+            margin-top: 14px;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg-secondary);
+            font-size: 0.84rem;
+            color: var(--text-secondary);
+            line-height: 1.9;
+        }
+
+        .out.empty {
+            color: var(--text-muted);
+        }
+
+        .kv {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 5px 0;
+            border-bottom: 1px dashed var(--line-soft);
+        }
+
+        .kv:last-child { border-bottom: 0; }
+
+        .kv b {
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-weight: 600;
+        }
+
+        .kv .good { color: var(--signal); }
+
+        .err { color: #d9534f; }
+
+        .code-out {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            line-height: 1.75;
+            color: var(--text-secondary);
+            max-height: 320px;
+            overflow: auto;
+        }
+
+        .line-add { color: var(--signal); }
+        .line-del { color: #d9534f; }
+        .line-same { color: var(--text-muted); }
+        mark.hit {
+            background: var(--signal-glow);
+            color: var(--text-primary);
+            border-radius: 3px;
+            padding: 0 1px;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .link-card {
+            display: block;
+            padding: 11px 13px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--card-bg);
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+        }
+
+        .link-card:hover {
+            border-color: var(--border-hover);
+            color: var(--text-primary);
+        }
+
+        .link-card span {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            margin-top: 3px;
+        }
+
+        @media (max-width: 860px) {
+            .tools-layout { grid-template-columns: 1fr; }
+            .tool-nav {
+                position: static;
+                flex-direction: row;
+                overflow-x: auto;
+                gap: 6px;
+                padding-bottom: 4px;
+            }
+            .tool-nav button { white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-box" id="loadingBox">
+        <div class="loading-core">
+            <div class="loading-ring"></div>
+            <div class="loading-ring ring2"></div>
+            <div class="loading-text">LOADING</div>
+            <div class="loading-bar"><div class="loading-bar-inner" id="loadingBar"></div></div>
+        </div>
+    </div>
+
+    <div class="bg-layer" id="bgLayer">
+        <div class="bg-wallpaper"></div>
+        <canvas id="particleCanvas"></canvas>
+        <div class="grid-overlay" id="gridOverlay"></div>
+        <div class="glow-orb orb1"></div>
+        <div class="glow-orb orb2"></div>
+        <div class="glow-orb orb3"></div>
+    </div>
+
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="sidebar-mask" id="sidebarMask"></div>
+
+    <!-- shell:sidebar:start 由 scripts/sync-shell.mjs 维护，勿手改 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">◆</span>
+            <span class="logo-text">LengMeng</span>
+            <button class="icon-btn dark-btn logo-dark-btn" id="darkBtn" type="button" title="主题：跟随时间（点击切换）" aria-label="切换主题">
+                <span class="icon-auto">◐</span>
+                <span class="icon-dark">☾</span>
+                <span class="icon-light">☀</span>
+            </button>
+        </div>
+    
+        <div class="sidebar-tool">
+            <div class="weather-info" id="weatherInfo">
+                <div class="weather-line">
+                    <span class="weather-city">杭州</span>
+                    <span class="weather-temp">--°</span>
+                </div>
+                <div class="weather-line-2">
+                    <span class="weather-cond">加载中</span>
+                    <span class="weather-range">--/--</span>
+                </div>
+            </div>
+        </div>
+    
+        <nav class="sidebar-nav" aria-label="主导航">
+            <ul>
+                <li><a href="index.html"><span class="nav-icon">⌂</span><span class="nav-label">首页</span></a></li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle" role="button" aria-expanded="false">
+                        <span class="nav-icon">▤</span><span class="nav-label">工作</span><span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="blog.html">实用工具</a></li>
+                        <li><a href="finance-news.html">新闻大事</a></li>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <a href="javascript:void(0)" class="submenu-toggle" role="button" aria-expanded="false">
+                        <span class="nav-icon">◈</span><span class="nav-label">生活</span><span class="submenu-arrow">▶</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="cook.html">菜谱</a></li>
+                        <li><a href="stock.html">股票走势</a></li>
+                        <li><a href="anime.html">动漫</a></li>
+                        <li><a href="music.html">在线音乐</a></li>
+                    </ul>
+                </li>
+                <li><a href="tools.html"><span class="nav-icon">⚡</span><span class="nav-label">工具</span></a></li>
+                <li><a href="works.html"><span class="nav-icon">◆</span><span class="nav-label">项目作品</span></a></li>
+                <li><a href="album.html"><span class="nav-icon">▣</span><span class="nav-label">相册</span></a></li>
+                <li><a href="about.html"><span class="nav-icon">◉</span><span class="nav-label">关于我</span></a></li>
+            </ul>
+        </nav>
+    
+        <div class="sidebar-actions">
+            <button class="icon-btn music-btn" id="musicBtn" type="button" title="开启背景音" aria-label="背景音开关" aria-pressed="false">
+                <span class="music-icon">♪</span>
+                <span class="music-wave"><i></i><i></i><i></i></span>
+            </button>
+            <a class="icon-btn" href="./index.html#contact" title="联系我" aria-label="联系我">✉</a>
+        </div>
+    
+        <div class="sidebar-foot">
+            <span><span class="status-dot"></span>Online</span>
+            <span data-theme-label>—</span>
+        </div>
+    </aside>
+    <!-- shell:sidebar:end -->
+
+    <main class="main-container page-container">
+        <div class="page-header animate-fade-up">
+            <h1 class="page-title">实用工具</h1>
+            <p class="page-subtitle">Tools · 打开就能用，全部在浏览器本地计算，数据不上传</p>
+        </div>
+
+        <div class="tools-layout">
+            <nav class="tool-nav" id="toolNav" aria-label="工具列表">
+                <button type="button" class="active" data-tool="profit">利润测算</button>
+                <button type="button" data-tool="acos">广告 ACOS</button>
+                <button type="button" data-tool="json">JSON 格式化</button>
+                <button type="button" data-tool="csv">CSV ↔ JSON</button>
+                <button type="button" data-tool="diff">文本对比</button>
+                <button type="button" data-tool="codec">编码转换</button>
+                <button type="button" data-tool="time">时间戳</button>
+                <button type="button" data-tool="regex">正则测试</button>
+                <button type="button" data-tool="text">文本处理</button>
+                <button type="button" data-tool="hash">哈希计算</button>
+                <button type="button" data-tool="links">常用入口</button>
+            </nav>
+
+            <div class="tool-body" id="toolBody">
+                <!-- 利润测算 -->
+                <section class="panel active" data-panel="profit">
+                    <div class="panel-title">跨境电商利润测算</div>
+                    <p class="panel-desc">按售价拆解各项成本，算出毛利、毛利率与盈亏平衡 ACOS（即广告最多能烧到多少还能保本）。</p>
+                    <div class="fields">
+                        <div class="field"><label for="p_price">售价（元）</label><input type="number" id="p_price" value="199"></div>
+                        <div class="field"><label for="p_cost">采购成本（元）</label><input type="number" id="p_cost" value="60"></div>
+                        <div class="field"><label for="p_ship">头程物流（元/件）</label><input type="number" id="p_ship" value="12"></div>
+                        <div class="field"><label for="p_fee">平台配送费（元）</label><input type="number" id="p_fee" value="35"></div>
+                        <div class="field"><label for="p_comm">佣金率（%）</label><input type="number" id="p_comm" value="15"></div>
+                        <div class="field"><label for="p_ads">广告占比（%）</label><input type="number" id="p_ads" value="12"></div>
+                        <div class="field"><label for="p_target">目标净利率（%）</label><input type="number" id="p_target" value="15"></div>
+                    </div>
+                    <div class="actions"><button type="button" class="tbtn primary" id="profitCalc">计算</button></div>
+                    <div class="out empty" id="profitOut">填入参数后点击计算</div>
+                </section>
+
+                <!-- ACOS -->
+                <section class="panel" data-panel="acos">
+                    <div class="panel-title">广告效果 / ACOS 计算</div>
+                    <p class="panel-desc">用花费、销售额、点击、订单算出 ACOS、ROAS、CPC、转化率，判断广告是否在赚钱。</p>
+                    <div class="fields">
+                        <div class="field"><label for="a_spend">广告花费（元）</label><input type="number" id="a_spend" value="1200"></div>
+                        <div class="field"><label for="a_sales">广告销售额（元）</label><input type="number" id="a_sales" value="5400"></div>
+                        <div class="field"><label for="a_clicks">点击量</label><input type="number" id="a_clicks" value="800"></div>
+                        <div class="field"><label for="a_orders">广告订单</label><input type="number" id="a_orders" value="46"></div>
+                        <div class="field"><label for="a_margin">净利率（%，可选）</label><input type="number" id="a_margin" value="18"></div>
+                    </div>
+                    <div class="actions"><button type="button" class="tbtn primary" id="acosCalc">计算</button></div>
+                    <div class="out empty" id="acosOut">填入参数后点击计算</div>
+                </section>
+
+                <!-- JSON -->
+                <section class="panel" data-panel="json">
+                    <div class="panel-title">JSON 格式化 / 校验</div>
+                    <p class="panel-desc">粘贴 JSON，一键美化、压缩或校验；报错会给出具体行列位置。</p>
+                    <textarea id="jsonIn" placeholder='{"a":1,"b":[1,2,3]}' spellcheck="false"></textarea>
+                    <div class="actions">
+                        <button type="button" class="tbtn primary" id="jsonPretty">格式化</button>
+                        <button type="button" class="tbtn" id="jsonMin">压缩</button>
+                        <button type="button" class="tbtn" id="jsonValid">仅校验</button>
+                        <button type="button" class="tbtn" id="jsonCopy">复制结果</button>
+                    </div>
+                    <div class="out empty" id="jsonOut">结果会显示在这里</div>
+                </section>
+
+                <!-- CSV -->
+                <section class="panel" data-panel="csv">
+                    <div class="panel-title">CSV ↔ JSON 互转</div>
+                    <p class="panel-desc">支持逗号或制表符分隔（从 Excel 直接复制粘贴即可），自动处理引号包裹的字段。</p>
+                    <textarea id="csvIn" placeholder="标题,价格,销量&#10;无线耳机,199,120" spellcheck="false"></textarea>
+                    <div class="actions">
+                        <button type="button" class="tbtn primary" id="csv2json">CSV → JSON</button>
+                        <button type="button" class="tbtn" id="json2csv">JSON → CSV</button>
+                        <button type="button" class="tbtn" id="csvCopy">复制结果</button>
+                    </div>
+                    <div class="out empty" id="csvOut">结果会显示在这里</div>
+                </section>
+
+                <!-- diff -->
+                <section class="panel" data-panel="diff">
+                    <div class="panel-title">文本对比</div>
+                    <p class="panel-desc">逐行比对两段文本，标出新增与删除行。适合核对两份导出数据、配置或文案。</p>
+                    <div class="cols">
+                        <div class="field"><label for="d_left">原文本</label><textarea id="d_left" spellcheck="false" style="min-height:150px"></textarea></div>
+                        <div class="field"><label for="d_right">新文本</label><textarea id="d_right" spellcheck="false" style="min-height:150px"></textarea></div>
+                    </div>
+                    <div class="actions"><button type="button" class="tbtn primary" id="diffRun">开始对比</button></div>
+                    <div class="out empty" id="diffOut">结果会显示在这里</div>
+                </section>
+
+                <!-- codec -->
+                <section class="panel" data-panel="codec">
+                    <div class="panel-title">Base64 / URL 编解码</div>
+                    <p class="panel-desc">中文按 UTF-8 处理，Base64 不会乱码；URL 编解码用于处理带特殊字符的链接与参数。</p>
+                    <textarea id="c_in" placeholder="粘贴需要转换的内容" spellcheck="false"></textarea>
+                    <div class="actions">
+                        <button type="button" class="tbtn primary" data-codec="b64e">Base64 编码</button>
+                        <button type="button" class="tbtn primary" data-codec="b64d">Base64 解码</button>
+                        <button type="button" class="tbtn" data-codec="urle">URL 编码</button>
+                        <button type="button" class="tbtn" data-codec="urld">URL 解码</button>
+                        <button type="button" class="tbtn" id="c_copy">复制结果</button>
+                    </div>
+                    <div class="out empty" id="c_out">结果会显示在这里</div>
+                </section>
+
+                <!-- time -->
+                <section class="panel" data-panel="time">
+                    <div class="panel-title">时间戳转换</div>
+                    <p class="panel-desc">秒级 / 毫秒级时间戳与日期互转，同时给出本地时间、UTC 与相对时间。</p>
+                    <div class="fields">
+                        <div class="field"><label for="t_in">时间戳或日期</label><input type="text" id="t_in" placeholder="1730000000 或 2026-11-17 18:30"></div>
+                    </div>
+                    <div class="actions">
+                        <button type="button" class="tbtn primary" id="t_run">转换</button>
+                        <button type="button" class="tbtn" id="t_now">当前时间</button>
+                    </div>
+                    <div class="out empty" id="t_out">结果会显示在这里</div>
+                </section>
+
+                <!-- regex -->
+                <section class="panel" data-panel="regex">
+                    <div class="panel-title">正则表达式测试</div>
+                    <p class="panel-desc">实时匹配并高亮命中内容，列出每个匹配的位置与分组。</p>
+                    <div class="fields">
+                        <div class="field" style="grid-column:1/-1"><label for="r_pat">表达式</label><input type="text" id="r_pat" value="\d+" spellcheck="false"></div>
+                        <div class="field"><label for="r_flags">修饰符</label><input type="text" id="r_flags" value="g" spellcheck="false"></div>
+                    </div>
+                    <div class="field"><label for="r_text">待匹配文本</label><textarea id="r_text" spellcheck="false">订单 A1001 金额 258 元，订单 A1002 金额 99 元</textarea></div>
+                    <div class="out empty" id="r_out">结果会显示在这里</div>
+                </section>
+
+                <!-- text -->
+                <section class="panel" data-panel="text">
+                    <div class="panel-title">文本处理</div>
+                    <p class="panel-desc">去重、去空行、排序、裁剪空格，顺带统计字数。处理 Excel 复制出来的脏数据很快。</p>
+                    <textarea id="x_in" placeholder="一行一条，粘贴文本" spellcheck="false"></textarea>
+                    <div class="actions">
+                        <button type="button" class="tbtn primary" data-text="dedupe">去重行</button>
+                        <button type="button" class="tbtn" data-text="blank">去空行</button>
+                        <button type="button" class="tbtn" data-text="trim">去首尾空格</button>
+                        <button type="button" class="tbtn" data-text="sort">排序</button>
+                        <button type="button" class="tbtn" data-text="lower">转小写</button>
+                        <button type="button" class="tbtn" data-text="upper">转大写</button>
+                        <button type="button" class="tbtn" data-text="stats">仅统计</button>
+                        <button type="button" class="tbtn" id="x_copy">复制结果</button>
+                    </div>
+                    <div class="out empty" id="x_out">结果会显示在这里</div>
+                </section>
+
+                <!-- hash -->
+                <section class="panel" data-panel="hash">
+                    <div class="panel-title">哈希计算</div>
+                    <p class="panel-desc">用浏览器原生加密接口计算 SHA-1 / SHA-256 / SHA-512，可用于校验文件内容或生成指纹。</p>
+                    <textarea id="h_in" placeholder="粘贴需要计算的内容" spellcheck="false"></textarea>
+                    <div class="actions">
+                        <button type="button" class="tbtn primary" data-hash="SHA-1">SHA-1</button>
+                        <button type="button" class="tbtn primary" data-hash="SHA-256">SHA-256</button>
+                        <button type="button" class="tbtn" data-hash="SHA-512">SHA-512</button>
+                    </div>
+                    <div class="out empty" id="h_out">结果会显示在这里</div>
+                </section>
+
+                <!-- 常用入口 -->
+                <section class="panel" data-panel="links">
+                    <div class="panel-title">常用入口</div>
+                    <p class="panel-desc">平时用得最多的几个后台与工具，直接跳转。</p>
+                    <div class="links-grid">
+                        <a class="link-card" href="https://sellercentral.amazon.com" target="_blank" rel="noopener">亚马逊卖家后台<span>订单 / 库存 / 广告</span></a>
+                        <a class="link-card" href="https://www.lingxing.com" target="_blank" rel="noopener">领星 ERP<span>多店铺数据聚合</span></a>
+                        <a class="link-card" href="https://www.maijia.com" target="_blank" rel="noopener">卖家精灵<span>选品与关键词反查</span></a>
+                        <a class="link-card" href="https://www.winrobot360.com" target="_blank" rel="noopener">影刀 RPA<span>可视化流程搭建</span></a>
+                        <a class="link-card" href="https://developer-docs.amazon.com/sp-api/" target="_blank" rel="noopener">SP-API 文档<span>订单 / 库存 / 广告接口</span></a>
+                        <a class="link-card" href="https://www.ziniao.com" target="_blank" rel="noopener">紫鸟浏览器<span>多账号防关联</span></a>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2026 LengMeng · All Rights Reserved</p>
+            <p class="footer-link">
+                <a href="https://lengmeng.online" target="_blank">lengmeng.online</a>
+                <span>·</span>
+                <span>Powered by Vercel</span>
+            </p>
+        </div>
+    </footer>
+
+    <!-- 脚本 -->
+
+    <!-- shell:scripts:start 由 scripts/sync-shell.mjs 维护 -->
+    <!-- 通用脚本：顺序敏感，theme → effects → app → 模块 → 页面脚本 -->
+    <script src="./assets/js/core/theme.js"></script>
+    <script src="./assets/js/core/effects.js"></script>
+    <script src="./assets/js/core/app.js"></script>
+    <script src="./assets/js/modules/weather.js"></script>
+    <script src="./assets/js/modules/music.js"></script>
+    <script src="./assets/js/core/mode.js"></script>
+    <script src="./assets/js/pages/tools.js"></script>
+    <!-- shell:scripts:end -->
+</body>
+</html>
