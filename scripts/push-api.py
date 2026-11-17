@@ -172,7 +172,7 @@ def main():
             if posixpath.dirname(sub) == d:
                 items.append({'path': posixpath.basename(sub), 'mode': '040000',
                               'type': 'tree', 'sha': sub_sha})
-        base = remote_dirs.get(d)
+        base = remote_commit['tree']['sha'] if not d else remote_dirs.get(d)
         built[d] = call('POST', '/repos/%s/%s/git/trees' % (OWNER, REPO),
                         {'base_tree': base, 'tree': items} if base else {'tree': items})['sha']
 
