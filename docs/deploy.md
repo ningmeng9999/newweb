@@ -44,6 +44,18 @@ npm run push -- "改了导航和配图"   # 自己写提交信息
 
 它会依次做：暂存全部改动 → 有改动就提交 → 推送到 `origin/main`。Vercel 收到推送后自动重新部署。
 
+### 方式 D：github.com 连不上时的备用通道
+
+代理只挡 `github.com`、但 `api.github.com` 还通的时候，用 REST API 推送：
+
+```bash
+npm run push:api        # python scripts/push-api.py
+```
+
+它复用 git 已缓存的登录凭据，把差异逐文件上传、重建目录树、创建提交，
+并在推送前后校验目录树与提交 SHA 是否与本地完全一致（不一致会中止，不会破坏远端）。
+先照常用 `npm run push` 提交，失败了再补一条 `npm run push:api` 即可。
+
 ---
 
 ## 二、接到 Vercel
