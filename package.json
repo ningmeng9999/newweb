@@ -8,7 +8,8 @@
     "check": "node scripts/check.mjs",
     "sync": "node scripts/sync-shell.mjs",
     "new": "node scripts/new-page.mjs",
-    "push": "node scripts/push.mjs"
+    "push": "node scripts/push.mjs",
+    "push:api": "python scripts/push-api.py"
   },
   "engines": {
     "node": ">=18"
