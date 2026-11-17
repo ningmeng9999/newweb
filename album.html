@@ -22,6 +22,8 @@
     <link rel="stylesheet" href="./assets/css/theme.css">
     <link rel="stylesheet" href="./assets/css/components.css">
     <!-- 预热外部资源，缩短首屏等待 -->
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
 </head>
 <body>
     <div class="loading-box" id="loadingBox">
@@ -88,20 +90,11 @@
                     <ul class="submenu">
                         <li><a href="cook.html">菜谱</a></li>
                         <li><a href="stock.html">股票走势</a></li>
-                        <li><a href="stock-note.html">股票笔记</a></li>
                         <li><a href="anime.html">动漫</a></li>
                         <li><a href="music.html">在线音乐</a></li>
                     </ul>
                 </li>
-                <li class="has-submenu">
-                    <a href="javascript:void(0)" class="submenu-toggle" role="button" aria-expanded="false">
-                        <span class="nav-icon">⚡</span><span class="nav-label">AI 工具</span><span class="submenu-arrow">▶</span>
-                    </a>
-                    <ul class="submenu">
-                        <li><a href="ecommerce-rpa.html">RPA 工具集</a></li>
-                        <li><a href="ai-comic.html">AI 漫剧工坊</a></li>
-                    </ul>
-                </li>
+                <li><a href="ecommerce-rpa.html"><span class="nav-icon">⚡</span><span class="nav-label">RPA 工具集</span></a></li>
                 <li><a href="works.html"><span class="nav-icon">◆</span><span class="nav-label">项目作品</span></a></li>
                 <li><a href="album.html"><span class="nav-icon">▣</span><span class="nav-label">相册</span></a></li>
                 <li><a href="about.html"><span class="nav-icon">◉</span><span class="nav-label">关于我</span></a></li>
@@ -131,146 +124,124 @@
 
         <div class="album-filter animate-on-scroll">
             <button class="album-filter-btn active" data-filter="all">全部</button>
+            <button class="album-filter-btn" data-filter="scenery">风景</button>
+            <button class="album-filter-btn" data-filter="city">城市</button>
             <button class="album-filter-btn" data-filter="life">生活</button>
-            <button class="album-filter-btn" data-filter="travel">旅行</button>
-            <button class="album-filter-btn" data-filter="anime">动漫</button>
             <button class="album-filter-btn" data-filter="car">汽车</button>
             <button class="album-filter-btn" data-filter="beauty">人像</button>
         </div>
 
         <div class="album-grid">
+            <!-- 风景 -->
+            <div class="album-item animate-on-scroll" data-category="scenery" style="--i:0">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=700&q=70" alt="湖光山色 · 黄昏" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">湖光山色 · 黄昏</span><span class="album-date">2026.08</span></div>
+            </div>
+            <div class="album-item animate-on-scroll tall" data-category="scenery" style="--i:1">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=700&q=70" alt="远山 · 积雪初晴" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">远山 · 积雪初晴</span><span class="album-date">2026.07</span></div>
+            </div>
+            <div class="album-item animate-on-scroll" data-category="scenery" style="--i:2">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=700&q=70" alt="山谷 · 晨光斜照" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">山谷 · 晨光斜照</span><span class="album-date">2026.06</span></div>
+            </div>
+            <div class="album-item animate-on-scroll wide" data-category="scenery" style="--i:3">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=700&q=70" alt="林间 · 幽径" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">林间 · 幽径</span><span class="album-date">2026.05</span></div>
+            </div>
+            <div class="album-item animate-on-scroll" data-category="scenery" style="--i:4">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=700&q=70" alt="湖畔 · 泛舟" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">湖畔 · 泛舟</span><span class="album-date">2026.04</span></div>
+            </div>
+            <div class="album-item animate-on-scroll tall" data-category="scenery" style="--i:5">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?auto=format&fit=crop&w=700&q=70" alt="花田 · 春末" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">花田 · 春末</span><span class="album-date">2026.03</span></div>
+            </div>
+            <!-- 城市 -->
+            <div class="album-item animate-on-scroll" data-category="city" style="--i:6">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=700&q=70" alt="天际线 · 入夜前" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">天际线 · 入夜前</span><span class="album-date">2026.08</span></div>
+            </div>
+            <div class="album-item animate-on-scroll tall" data-category="city" style="--i:7">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=700&q=70" alt="街灯 · 深夜霓虹" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">街灯 · 深夜霓虹</span><span class="album-date">2026.07</span></div>
+            </div>
+            <div class="album-item animate-on-scroll" data-category="city" style="--i:8">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=700&q=70" alt="街景 · 午后" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">街景 · 午后</span><span class="album-date">2026.06</span></div>
+            </div>
+            <div class="album-item animate-on-scroll wide" data-category="city" style="--i:9">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=700&q=70" alt="建筑 · 几何与光" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">建筑 · 几何与光</span><span class="album-date">2026.05</span></div>
+            </div>
+            <div class="album-item animate-on-scroll" data-category="city" style="--i:10">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1444723121867-7a241cacace9?auto=format&fit=crop&w=700&q=70" alt="黄昏 · 城市轮廓" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">黄昏 · 城市轮廓</span><span class="album-date">2026.04</span></div>
+            </div>
             <!-- 生活 -->
-            <div class="album-item animate-on-scroll" data-category="life" style="--i:0">
-                <div class="album-thumb"><img src="./assets/img/album/life01.webp" alt="生活记录01" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">生活记录 01</span><span class="album-date">2026.08</span></div>
+            <div class="album-item animate-on-scroll tall" data-category="life" style="--i:11">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=700&q=70" alt="晚餐 · 慢下来" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">晚餐 · 慢下来</span><span class="album-date">2026.08</span></div>
             </div>
-            <div class="album-item animate-on-scroll tall" data-category="life" style="--i:1">
-                <div class="album-thumb"><img src="./assets/img/album/life02.webp" alt="生活记录02" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">生活记录 02</span><span class="album-date">2026.07</span></div>
+            <div class="album-item animate-on-scroll" data-category="life" style="--i:12">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=700&q=70" alt="咖啡 · 清晨第一杯" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">咖啡 · 清晨第一杯</span><span class="album-date">2026.07</span></div>
             </div>
-            <div class="album-item animate-on-scroll" data-category="life" style="--i:2">
-                <div class="album-thumb"><img src="./assets/img/album/life03.webp" alt="生活记录03" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">生活记录 03</span><span class="album-date">2026.06</span></div>
+            <div class="album-item animate-on-scroll tall" data-category="life" style="--i:13">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=700&q=70" alt="居家 · 安静角落" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">居家 · 安静角落</span><span class="album-date">2026.06</span></div>
             </div>
-            <div class="album-item animate-on-scroll wide" data-category="life" style="--i:3">
-                <div class="album-thumb"><img src="./assets/img/album/life04.webp" alt="生活记录04" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">生活记录 04</span><span class="album-date">2026.05</span></div>
+            <div class="album-item animate-on-scroll" data-category="life" style="--i:14">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=700&q=70" alt="小店 · 逛逛" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">小店 · 逛逛</span><span class="album-date">2026.05</span></div>
             </div>
-            <div class="album-item animate-on-scroll" data-category="life" style="--i:4">
-                <div class="album-thumb"><img src="./assets/img/album/life05.webp" alt="生活记录05" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">生活记录 05</span><span class="album-date">2026.04</span></div>
+            <div class="album-item animate-on-scroll wide" data-category="life" style="--i:15">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=700&q=70" alt="闲暇 · 发呆时刻" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">闲暇 · 发呆时刻</span><span class="album-date">2026.04</span></div>
             </div>
-            <div class="album-item animate-on-scroll tall" data-category="life" style="--i:5">
-                <div class="album-thumb"><img src="./assets/img/album/life06.webp" alt="生活记录06" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">生活记录 06</span><span class="album-date">2026.03</span></div>
-            </div>
-
-            <!-- 旅行 -->
-            <div class="album-item animate-on-scroll" data-category="travel" style="--i:6">
-                <div class="album-thumb"><img src="./assets/img/album/life07.webp" alt="旅行记录01" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">旅行记录 01</span><span class="album-date">2026.08</span></div>
-            </div>
-            <div class="album-item animate-on-scroll tall" data-category="travel" style="--i:7">
-                <div class="album-thumb"><img src="./assets/img/album/life08.webp" alt="旅行记录02" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">旅行记录 02</span><span class="album-date">2026.07</span></div>
-            </div>
-            <div class="album-item animate-on-scroll wide" data-category="travel" style="--i:8">
-                <div class="album-thumb"><img src="./assets/img/album/life09.webp" alt="旅行记录03" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">旅行记录 03</span><span class="album-date">2026.06</span></div>
-            </div>
-            <div class="album-item animate-on-scroll" data-category="travel" style="--i:9">
-                <div class="album-thumb"><img src="./assets/img/album/life10.webp" alt="旅行记录04" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">旅行记录 04</span><span class="album-date">2026.05</span></div>
-            </div>
-            <div class="album-item animate-on-scroll tall" data-category="travel" style="--i:10">
-                <div class="album-thumb"><img src="./assets/img/album/life11.webp" alt="旅行记录05" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">旅行记录 05</span><span class="album-date">2026.04</span></div>
-            </div>
-            <div class="album-item animate-on-scroll" data-category="travel" style="--i:11">
-                <div class="album-thumb"><img src="./assets/img/album/life12.webp" alt="旅行记录06" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">旅行记录 06</span><span class="album-date">2026.03</span></div>
-            </div>
-
-            <!-- 动漫 -->
-            <div class="album-item animate-on-scroll" data-category="anime" style="--i:12">
-                <div class="album-thumb"><img src="./assets/img/album/life13.webp" alt="动漫收藏01" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">动漫收藏 01</span><span class="album-date">2026.08</span></div>
-            </div>
-            <div class="album-item animate-on-scroll tall" data-category="anime" style="--i:13">
-                <div class="album-thumb"><img src="./assets/img/album/life14.webp" alt="动漫收藏02" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">动漫收藏 02</span><span class="album-date">2026.07</span></div>
-            </div>
-            <div class="album-item animate-on-scroll" data-category="anime" style="--i:14">
-                <div class="album-thumb"><img src="./assets/img/album/life15.webp" alt="动漫收藏03" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">动漫收藏 03</span><span class="album-date">2026.06</span></div>
-            </div>
-            <div class="album-item animate-on-scroll wide" data-category="anime" style="--i:15">
-                <div class="album-thumb"><img src="./assets/img/album/life16.webp" alt="动漫收藏04" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">动漫收藏 04</span><span class="album-date">2026.05</span></div>
-            </div>
-            <div class="album-item animate-on-scroll" data-category="anime" style="--i:16">
-                <div class="album-thumb"><img src="./assets/img/album/life17.webp" alt="动漫收藏05" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">动漫收藏 05</span><span class="album-date">2026.04</span></div>
-            </div>
-            <div class="album-item animate-on-scroll tall" data-category="anime" style="--i:17">
-                <div class="album-thumb"><img src="./assets/img/album/life18.webp" alt="动漫收藏06" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">动漫收藏 06</span><span class="album-date">2026.03</span></div>
-            </div>
-
             <!-- 汽车 -->
+            <div class="album-item animate-on-scroll" data-category="car" style="--i:16">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=700&q=70" alt="跑车 · 引擎线条" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">跑车 · 引擎线条</span><span class="album-date">2026.08</span></div>
+            </div>
+            <div class="album-item animate-on-scroll tall" data-category="car" style="--i:17">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=700&q=70" alt="轿跑 · 一抹红" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">轿跑 · 一抹红</span><span class="album-date">2026.07</span></div>
+            </div>
             <div class="album-item animate-on-scroll" data-category="car" style="--i:18">
-                <div class="album-thumb"><img src="./assets/img/album/life19.webp" alt="汽车摄影01" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">汽车摄影 01</span><span class="album-date">2026.08</span></div>
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1494905998402-395d579af36f?auto=format&fit=crop&w=700&q=70" alt="老爷车 · 旧时光" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">老爷车 · 旧时光</span><span class="album-date">2026.06</span></div>
             </div>
             <div class="album-item animate-on-scroll tall" data-category="car" style="--i:19">
-                <div class="album-thumb"><img src="./assets/img/album/life20.webp" alt="汽车摄影02" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">汽车摄影 02</span><span class="album-date">2026.07</span></div>
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=700&q=70" alt="改装 · 街头风" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">改装 · 街头风</span><span class="album-date">2026.05</span></div>
             </div>
             <div class="album-item animate-on-scroll" data-category="car" style="--i:20">
-                <div class="album-thumb"><img src="./assets/img/album/life21.webp" alt="汽车摄影03" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">汽车摄影 03</span><span class="album-date">2026.06</span></div>
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=700&q=70" alt="巡航 · 公路日" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">巡航 · 公路日</span><span class="album-date">2026.04</span></div>
             </div>
-            <div class="album-item animate-on-scroll wide" data-category="car" style="--i:21">
-                <div class="album-thumb"><img src="./assets/img/album/life22.webp" alt="汽车摄影04" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">汽车摄影 04</span><span class="album-date">2026.05</span></div>
-            </div>
-            <div class="album-item animate-on-scroll" data-category="car" style="--i:22">
-                <div class="album-thumb"><img src="./assets/img/album/life23.webp" alt="汽车摄影05" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">汽车摄影 05</span><span class="album-date">2026.04</span></div>
-            </div>
-            <div class="album-item animate-on-scroll tall" data-category="car" style="--i:23">
-                <div class="album-thumb"><img src="./assets/img/album/life24.webp" alt="汽车摄影06" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">汽车摄影 06</span><span class="album-date">2026.03</span></div>
-            </div>
-
             <!-- 人像 -->
+            <div class="album-item animate-on-scroll wide" data-category="beauty" style="--i:21">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=70" alt="笑容 · 自然光" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">笑容 · 自然光</span><span class="album-date">2026.08</span></div>
+            </div>
+            <div class="album-item animate-on-scroll" data-category="beauty" style="--i:22">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=700&q=70" alt="侧影 · 沉思" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">侧影 · 沉思</span><span class="album-date">2026.07</span></div>
+            </div>
+            <div class="album-item animate-on-scroll tall" data-category="beauty" style="--i:23">
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=700&q=70" alt="凝视 · 午后" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">凝视 · 午后</span><span class="album-date">2026.06</span></div>
+            </div>
             <div class="album-item animate-on-scroll" data-category="beauty" style="--i:24">
-                <div class="album-thumb"><img src="./assets/img/album/life25.webp" alt="人像摄影01" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">人像摄影 01</span><span class="album-date">2026.08</span></div>
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=700&q=70" alt="回眸 · 窗边" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">回眸 · 窗边</span><span class="album-date">2026.05</span></div>
             </div>
             <div class="album-item animate-on-scroll tall" data-category="beauty" style="--i:25">
-                <div class="album-thumb"><img src="./assets/img/album/life26.webp" alt="人像摄影02" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">人像摄影 02</span><span class="album-date">2026.07</span></div>
+                <div class="album-thumb"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=700&q=70" alt="光影 · 轮廓" loading="lazy"></div>
+                <div class="album-info"><span class="album-title">光影 · 轮廓</span><span class="album-date">2026.04</span></div>
             </div>
-            <div class="album-item animate-on-scroll" data-category="beauty" style="--i:26">
-                <div class="album-thumb"><img src="./assets/img/album/life27.webp" alt="人像摄影03" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">人像摄影 03</span><span class="album-date">2026.06</span></div>
-            </div>
-            <div class="album-item animate-on-scroll wide" data-category="beauty" style="--i:27">
-                <div class="album-thumb"><img src="./assets/img/album/life28.webp" alt="人像摄影04" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">人像摄影 04</span><span class="album-date">2026.05</span></div>
-            </div>
-            <div class="album-item animate-on-scroll" data-category="beauty" style="--i:28">
-                <div class="album-thumb"><img src="./assets/img/album/life29.webp" alt="人像摄影05" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">人像摄影 05</span><span class="album-date">2026.04</span></div>
-            </div>
-            <div class="album-item animate-on-scroll tall" data-category="beauty" style="--i:29">
-                <div class="album-thumb"><img src="./assets/img/album/life30.webp" alt="人像摄影06" loading="lazy"></div>
-                <div class="album-info"><span class="album-title">人像摄影 06</span><span class="album-date">2026.03</span></div>
-            </div>
-        </div>
-
-        <!-- 图片预览灯箱 -->
+                <!-- 图片预览灯箱 -->
         <div class="lightbox" id="lightbox">
             <div class="lightbox-mask" id="lightboxMask"></div>
             <div class="lightbox-content">
